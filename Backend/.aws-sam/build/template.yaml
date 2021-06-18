@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  myDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Users
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  SignUp:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: SignUp
+      Handler: users.signup
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /signup
+            Method: post
+      Policies:
+        DynamoDBWritePolicy:
+          TableName:
+            Ref: myDB
+  LoginEmail:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: LoginEmail
+      Handler: users.loginemail
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /loginemail
+            Method: post
+      Policies:
+        DynamoDBWritePolicy:
+          TableName:
+            Ref: myDB
+  LoginPass:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: LoginPass
+      Handler: users.loginpass
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /loginpass
+            Method: post
+      Policies:
+        DynamoDBWritePolicy:
+          TableName:
+            Ref: myDB
+  LoginPhone:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: LoginPhone
+      Handler: users.loginphone
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /loginphone
+            Method: post
+      Policies:
+        DynamoDBWritePolicy:
+          TableName:
+            Ref: myDB
