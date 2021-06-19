@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  myDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Users
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  SignUp:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/d8d69494b2b80fbdb0604bea26cf4bcc
+      Handler: users.signup
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /signup
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  LoginEmail:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/d8d69494b2b80fbdb0604bea26cf4bcc
+      Handler: users.loginemail
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /loginemail
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  LoginPass:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/d8d69494b2b80fbdb0604bea26cf4bcc
+      Handler: users.loginpass
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /loginpass
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  LoginPhone:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/d8d69494b2b80fbdb0604bea26cf4bcc
+      Handler: users.loginphone
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /loginphone
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  LoginOtp:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/d8d69494b2b80fbdb0604bea26cf4bcc
+      Handler: users.loginotp
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /loginotp
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser

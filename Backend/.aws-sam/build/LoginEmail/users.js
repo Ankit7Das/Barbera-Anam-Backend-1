@@ -4,12 +4,11 @@ var AWS = require('aws-sdk');
 var uuid = require('uuid');
 var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
-var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'us-east-2' });
+var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-southeast-1' });
 const jwt = require("jsonwebtoken");
 // const { tokenVerify } = require("./tokenVerify");
 const { hashPassword, matchPassword } = require("./password");
 const { JWT_SECRET } = process.env;
-var random = Math.floor(100000 + Math.random() * 900000);
 
 exports.signup = async (event) => {
     try {
@@ -84,7 +83,7 @@ exports.signup = async (event) => {
                 id: userID.id,
             }
 
-            var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+            token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
 
             var response = {
                 'statusCode': 200,
@@ -263,74 +262,29 @@ exports.loginphone = async(event) => {
         var obj = JSON.parse(event.body);
 
         var PHONE = obj.phone;
-        
-        var params = {
-            TableName: 'Users',
-            FilterExpression: '#phone = :this_phone',
-            ExpressionAttributeValues: {':this_phone': PHONE},
-            ExpressionAttributeNames: {'#phone': 'phone'}
-        };
-        
-        var data = await documentClient.scan(params).promise();
-        var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`
-        var user; 
-        var response;
 
-        if(!data.Items[0]) {
-            var ID = uuid.v1();
+        var random = Math.floor(100000 + Math.random() * 900000);
 
-            var params = {
-                TableName: 'Users',
-                Item: {
-                    id: ID,
-                    phone: PHONE,
-                }
-            }
-
-            data = await documentClient.put(params).promise();
-            console.log("User not found:", data);
-
-            user = {
-                id: ID,
-            }
-
-            response = {
-                code: 200,
-                success: false,
-                message: 'User Not Found',
-            };
-
-        } else {
-            console.log("Item read successfully:", data);
-
-            user = {
-                id: data.Items[0].id,
-            }
-
-            response = {
-                code: 200,
-                success: true,
-                message: "User found",
-            };
-            
+        var user = {
+            phone: PHONE,
+            otp: random
         }
 
         var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
 
-        params = {
+        var msg = `${user.otp} is your verification code for Barbera: Salon Service at your Home.`; 
+
+        var params = {
             Message: msg,
             PhoneNumber: '+91' + PHONE,
-            Subject: 'Barbera: Salon Service'
         };
     
         var sms = await sns.publish(params).promise();
     
         if(sms.MessageId) {
             return {
-                statusCode: response.code,
+                statusCode: 200,
                 body: JSON.stringify({
-                    loginSuccess: response.success,
-                    loginMessage: response.message,
                     messageId: sms.MessageId,
                     token: token,
                 })
@@ -339,17 +293,121 @@ exports.loginphone = async(event) => {
             return {
                 statusCode: 400,
                 body: JSON.stringify({
-                    loginSuccess: response.success,
-                    loginMessage: response.message,
                     messageSuccess: false,
                 })
             };
         }
-    
-
     } catch(err) {
         console.log(err);
         return err;
     }
 
+}
+
+exports.loginotp = async (event) => {
+    try {
+
+        var obj = JSON.parse(event.body);
+
+        var OTP = obj.otp;
+        var token = event.headers.token;
+
+        if(token == null) {
+            return {
+                statusCode: 401,
+                body: JSON.stringify({
+                    success: false,
+                    message: "No token passed"
+                })
+            };
+        }
+
+        var userID;
+
+        try {
+            userID = jwt.verify(token, JWT_SECRET);
+        } catch(err) {
+            return {
+                statusCode: 403,
+                body: JSON.stringify({
+                    success: false,
+                    message: "Invalid Token",
+                })
+            };
+        }
+
+        if(`${userID.otp}` == OTP){
+
+            var params = {
+                TableName: 'Users',
+                FilterExpression: '#phone = :this_phone',
+                ExpressionAttributeValues: {':this_phone': userID.phone},
+                ExpressionAttributeNames: {'#phone': 'phone'}
+            };
+            
+            var data = await documentClient.scan(params).promise();
+            var user; 
+    
+            if(!data.Items[0]) {
+                var ID = uuid.v1();
+    
+                var params = {
+                    TableName: 'Users',
+                    Item: {
+                        id: ID,
+                        phone: userID.phone,
+                    }
+                }
+    
+                data = await documentClient.put(params).promise();
+                console.log("User not found:", data);
+    
+                user = {
+                    id: ID,
+                }
+
+                token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+    
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        token: token,
+                        message: 'User not found',
+                        success: true, 
+                    })
+                };
+    
+            } else {
+                console.log("Item read successfully:", data);
+    
+                user = {
+                    id: data.Items[0].id,
+                }
+    
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        token: token,
+                        message: 'User found',
+                        success: true, 
+                    })
+                };
+                
+            }
+
+        } else {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    succes: false,
+                    message: 'Wrong OTP'
+                })
+            };
+        }
+
+    } catch(err) {
+        console.log(err);
+        return err;
+    }
+    
 }

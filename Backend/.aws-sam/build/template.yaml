@@ -26,10 +26,7 @@ Resources:
           Properties:
             Path: /signup
             Method: post
-      Policies:
-        DynamoDBWritePolicy:
-          TableName:
-            Ref: myDB
+      Role: arn:aws:iam::140544830924:role/BackendUser
   LoginEmail:
     Type: AWS::Serverless::Function
     Properties:
@@ -42,10 +39,7 @@ Resources:
           Properties:
             Path: /loginemail
             Method: post
-      Policies:
-        DynamoDBWritePolicy:
-          TableName:
-            Ref: myDB
+      Role: arn:aws:iam::140544830924:role/BackendUser
   LoginPass:
     Type: AWS::Serverless::Function
     Properties:
@@ -58,10 +52,7 @@ Resources:
           Properties:
             Path: /loginpass
             Method: post
-      Policies:
-        DynamoDBWritePolicy:
-          TableName:
-            Ref: myDB
+      Role: arn:aws:iam::140544830924:role/BackendUser
   LoginPhone:
     Type: AWS::Serverless::Function
     Properties:
@@ -74,7 +65,17 @@ Resources:
           Properties:
             Path: /loginphone
             Method: post
-      Policies:
-        DynamoDBWritePolicy:
-          TableName:
-            Ref: myDB
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  LoginOtp:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: LoginOtp
+      Handler: users.loginotp
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /loginotp
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
