@@ -15,6 +15,24 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+
+  myCart:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Carts
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: serviceId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: serviceId
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
         
   SignUp:
     Type: AWS::Serverless::Function
@@ -95,6 +113,62 @@ Resources:
           Type: Api 
           Properties:
             Path: /loginotp
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  AddtoCart:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Cart/
+      Handler: cart.addtocart
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /addtocart/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  GetCart:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Cart/
+      Handler: cart.getcart
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getcart
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  Quantity:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Cart/
+      Handler: cart.quantity
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /quantity/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  DeleteService:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Cart/
+      Handler: cart.deleteservice
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /deleteservice/{serviceid}
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
             

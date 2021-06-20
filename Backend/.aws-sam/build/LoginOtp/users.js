@@ -59,14 +59,14 @@ exports.signup = async (event) => {
                 '#email': 'email',
                 '#address': 'address',
                 '#password': 'password',
-                '#role': 'role'
+                '#role': 'role',
             },
             ExpressionAttributeValues:{
                 ":n": NAME,
                 ":e": EMAIL,
                 ":a": ADD,
                 ":p": HASH,
-                ":r": ROLE
+                ":r": ROLE,
             },
             ReturnValues:"UPDATED_NEW"
         };

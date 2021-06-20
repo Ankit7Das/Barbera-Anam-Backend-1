@@ -8,4 +8,11 @@ source_md5 = ""
 packagetype = "Zip"
 functions = ["SignUp", "LoginEmail", "LoginPass", "LoginPhone", "LoginOtp"]
 
+[function_build_definitions.2ebc5ab0-53d2-4489-839a-00e017cb966e]
+codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Cart"
+runtime = "nodejs12.x"
+source_md5 = ""
+packagetype = "Zip"
+functions = ["AddtoCart", "GetCart", "Quantity", "DeleteService"]
+
 [layer_build_definitions]
