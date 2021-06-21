@@ -13,6 +13,13 @@ codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Cart"
 runtime = "nodejs12.x"
 source_md5 = ""
 packagetype = "Zip"
-functions = ["AddtoCart", "GetCart", "Quantity", "DeleteService"]
+functions = ["AddtoCart", "GetCart", "Quantity", "DeleteFromCart"]
+
+[function_build_definitions.d4751972-4e45-499b-adf2-e19b9a4829b0]
+codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Services"
+runtime = "nodejs12.x"
+source_md5 = ""
+packagetype = "Zip"
+functions = ["AddService", "DelService"]
 
 [layer_build_definitions]

@@ -144,7 +144,7 @@ exports.loginemail = async (event) => {
             console.log("Item read successfully:", data);
 
             var user = {
-                id: data.Items[0].id,
+                email: EMAIL,
             }
 
             var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
@@ -202,53 +202,43 @@ exports.loginpass = async (event) => {
 
         var params = {
             TableName: 'Users',
-            Key: {
-                id: userID.id,
-            }
+            FilterExpression: '#email = :this_email',
+            ExpressionAttributeValues: {':this_email': userID.email},
+            ExpressionAttributeNames: {'#email': 'email'}
         };
 
         var data;
 
-        try {
-            data = await documentClient.get(params).promise();
-            
-            const hashedPassword = data.Item.password;
-            const matchedPassword = await matchPassword(PASS, hashedPassword);
+        data = await documentClient.scan(params).promise();
+        
+        const hashedPassword = data.Items[0].password;
+        const matchedPassword = await matchPassword(PASS, hashedPassword);
 
-            var user = {
-                id: data.Item.id,
-            }
+        var user = {
+            id: data.Items[0].id,
+        }
 
-            var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+        var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
 
-            if(matchedPassword) {
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify({
-                        success: true,
-                        token: token,
-                        message: "Login Success",
-                    })
-                };
-            } else {
-                return {
-                    statusCode: 401,
-                    body: JSON.stringify({
-                        success: false,
-                        err: "Incorrect password",
-                    })
-                };
-            }
-
-        } catch(err) {
+        if(matchedPassword) {
             return {
-                statusCode: 400,
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: true,
+                    token: token,
+                    message: "Login Success",
+                })
+            };
+        } else {
+            return {
+                statusCode: 401,
                 body: JSON.stringify({
                     success: false,
-                    err: "Wrong token entered"
+                    err: "Incorrect password",
                 })
             };
         }
+
     } catch(err) {
         console.log(err);
         return err;
@@ -366,28 +356,47 @@ exports.loginotp = async (event) => {
                     id: ID,
                 }
 
-                token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+                var token1 = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
     
                 return {
                     statusCode: 200,
                     body: JSON.stringify({
-                        token: token,
+                        token: token1,
                         message: 'User not found',
                         success: true, 
                     })
                 };
     
             } else {
+                if(!data.Items[0].name){
+                    user = {
+                        id: data.Items[0].id,
+                    }
+    
+                    var token1 = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+        
+                    return {
+                        statusCode: 200,
+                        body: JSON.stringify({
+                            token: token1,
+                            message: 'User not found',
+                            success: true, 
+                        })
+                    };
+                }
+
                 console.log("Item read successfully:", data);
     
                 user = {
                     id: data.Items[0].id,
                 }
+
+                var token1 = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
     
                 return {
                     statusCode: 200,
                     body: JSON.stringify({
-                        token: token,
+                        token: token1,
                         message: 'User found',
                         success: true, 
                     })

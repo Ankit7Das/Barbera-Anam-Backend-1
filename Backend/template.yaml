@@ -33,6 +33,20 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+
+  myServices:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Services
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
         
   SignUp:
     Type: AWS::Serverless::Function
@@ -158,17 +172,45 @@ Resources:
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
 
-  DeleteService:
+  DeleteFromCart:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: Cart/
-      Handler: cart.deleteservice
+      Handler: cart.deletefromcart
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api 
           Properties:
-            Path: /deleteservice/{serviceid}
+            Path: /deletefromcart/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  AddService:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Services/
+      Handler: service.addservice
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /addservice
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  DelService:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Services/
+      Handler: service.delservice
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /delservice/{serviceid}
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
             

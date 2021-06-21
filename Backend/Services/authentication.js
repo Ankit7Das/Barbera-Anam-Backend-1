@@ -15,7 +15,7 @@ module.exports.userVerifier = async (id) => {
 
     if(!data.Item) {
         return false;
-    } else if(data.Item.role == 'user') {
+    } else if(data.Item.role == 'admin') {
         return true;
     } else {
         return false;
@@ -35,31 +35,25 @@ module.exports.serviceVerifier = async (id) => {
     var data = await documentClient.get(params).promise();
 
     if(!data.Item) {
-        return{ 
-            success: false
-        };
+        return false;
     } else {
-        return {
-            success: true,
-            data: data.Item
-        };
+        return true;
     }
 
 }
 
-module.exports.addedBefore = async (userId, serviceId) => {
+module.exports.addedBefore = async (serviceName) => {
 
     var params = {
-        TableName: 'Carts',
-        Key: {
-            userId: userId,
-            serviceId: serviceId
-        }
+        TableName: 'Services',
+        FilterExpression: '#name = :this_name',
+        ExpressionAttributeValues: {':this_name': serviceName},
+        ExpressionAttributeNames: {'#name': 'name'}
     }
 
-    var data = await documentClient.get(params).promise();
+    var data = await documentClient.scan(params).promise();
 
-    if(!data.Item) {
+    if(!data.Items) {
         return true;
     } else {
         return false;

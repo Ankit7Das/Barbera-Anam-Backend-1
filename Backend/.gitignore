@@ -1,3 +1,4 @@
 .aws-sam
 Users/.env
 Cart/.env
+Services/.env

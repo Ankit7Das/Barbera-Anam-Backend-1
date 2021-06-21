@@ -6,16 +6,13 @@ var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-southeast-1' });
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
-const { userVerifier, addedBefore } = require("./authentication");
+const { userVerifier, addedBefore, serviceVerifier } = require("./authentication");
 
 
 exports.addtocart = async (event) => {
     try {
 
         var serviceId = event.pathParameters.serviceid;
-
-        var NAME = 'Haircut'    //not ready yet, need to connect to Services db in the future for service name
-        var PRICE = 200;        //not ready yet, need to connect to Services db in the future for price
         var token = event.headers.token;
 
         if(token == null) {
@@ -49,23 +46,38 @@ exports.addtocart = async (event) => {
                 statusCode: 404,
                 body: JSON.stringify({
                     message: 'User not found',
-                    succes: false,
+                    success: false,
+                })
+            }
+        }
+
+        var exist2 = await serviceVerifier(serviceId);
+
+        if(exist2.success == false) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    message: 'Service Unavailable',
+                    success: false,
                 })
             }
         }
         
-        var exist2 = await addedBefore(userID.id, serviceId);
+        var exist3 = await addedBefore(userID.id, serviceId);
 
-        if(exist2 == false) {
+        if(exist3 == false) {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
                     message: 'Already added to cart',
-                    succes: false,
+                    success: false,
                 })
             }
         }
 
+        var NAME = exist2.data.name;
+        var PRICE = exist2.data.price;
+        
         var params = {
             TableName: 'Carts',
             Item: {
@@ -148,7 +160,7 @@ exports.getcart = async (event) => {
                 statusCode: 404,
                 body: JSON.stringify({
                     message: 'User not found',
-                    succes: false,
+                    success: false,
                 })
             }
         }
@@ -214,7 +226,31 @@ exports.quantity = async (event) => {
                 statusCode: 404,
                 body: JSON.stringify({
                     message: 'User not found',
-                    succes: false,
+                    success: false,
+                })
+            }
+        }
+
+        var exist2 = await serviceVerifier(serviceId);
+
+        if(exist2.success == false) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    message: 'Service Unavailable',
+                    success: false,
+                })
+            }
+        }
+        
+        var exist3 = await addedBefore(userID.id, serviceId);
+
+        if(exist3 == true) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    message: 'Service has not been added to the cart',
+                    success: false,
                 })
             }
         }
@@ -289,7 +325,7 @@ exports.quantity = async (event) => {
     }
 }
 
-exports.deleteservice = async (event) => {
+exports.deletefromcart = async (event) => {
     try {
 
         var serviceId = event.pathParameters.serviceid;
@@ -326,7 +362,31 @@ exports.deleteservice = async (event) => {
                 statusCode: 404,
                 body: JSON.stringify({
                     message: 'User not found',
-                    succes: false,
+                    success: false,
+                })
+            }
+        }
+
+        var exist2 = await serviceVerifier(serviceId);
+
+        if(exist2.success == false) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    message: 'Service Unavailable',
+                    success: false,
+                })
+            }
+        }
+        
+        var exist3 = await addedBefore(userID.id, serviceId);
+
+        if(exist3 == true) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    message: 'Service not avalable in cart',
+                    success: false,
                 })
             }
         }

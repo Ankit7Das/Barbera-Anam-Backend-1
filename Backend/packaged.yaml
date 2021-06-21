@@ -31,10 +31,23 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+  myServices:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Services
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
   SignUp:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/96f3f0ef993a1f29e178a84dc53d2513
+      CodeUri: s3://barbera-bucket/1fdb462a11e630bed3a3ddb1019492b5
       Handler: users.signup
       Runtime: nodejs12.x
       Events:
@@ -47,7 +60,7 @@ Resources:
   LoginEmail:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/96f3f0ef993a1f29e178a84dc53d2513
+      CodeUri: s3://barbera-bucket/1fdb462a11e630bed3a3ddb1019492b5
       Handler: users.loginemail
       Runtime: nodejs12.x
       Events:
@@ -60,7 +73,7 @@ Resources:
   LoginPass:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/96f3f0ef993a1f29e178a84dc53d2513
+      CodeUri: s3://barbera-bucket/1fdb462a11e630bed3a3ddb1019492b5
       Handler: users.loginpass
       Runtime: nodejs12.x
       Events:
@@ -73,7 +86,7 @@ Resources:
   LoginPhone:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/96f3f0ef993a1f29e178a84dc53d2513
+      CodeUri: s3://barbera-bucket/1fdb462a11e630bed3a3ddb1019492b5
       Handler: users.loginphone
       Runtime: nodejs12.x
       Events:
@@ -86,7 +99,7 @@ Resources:
   LoginOtp:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/96f3f0ef993a1f29e178a84dc53d2513
+      CodeUri: s3://barbera-bucket/1fdb462a11e630bed3a3ddb1019492b5
       Handler: users.loginotp
       Runtime: nodejs12.x
       Events:
@@ -99,7 +112,7 @@ Resources:
   AddtoCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/71e0f517837e8f0e31123ef2abfc689d
+      CodeUri: s3://barbera-bucket/c70ea8bd9192a161d0c75ce61e1e6f6e
       Handler: cart.addtocart
       Runtime: nodejs12.x
       Events:
@@ -112,7 +125,7 @@ Resources:
   GetCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/71e0f517837e8f0e31123ef2abfc689d
+      CodeUri: s3://barbera-bucket/c70ea8bd9192a161d0c75ce61e1e6f6e
       Handler: cart.getcart
       Runtime: nodejs12.x
       Events:
@@ -125,7 +138,7 @@ Resources:
   Quantity:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/71e0f517837e8f0e31123ef2abfc689d
+      CodeUri: s3://barbera-bucket/c70ea8bd9192a161d0c75ce61e1e6f6e
       Handler: cart.quantity
       Runtime: nodejs12.x
       Events:
@@ -135,16 +148,42 @@ Resources:
             Path: /quantity/{serviceid}
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
-  DeleteService:
+  DeleteFromCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/71e0f517837e8f0e31123ef2abfc689d
-      Handler: cart.deleteservice
+      CodeUri: s3://barbera-bucket/c70ea8bd9192a161d0c75ce61e1e6f6e
+      Handler: cart.deletefromcart
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api
           Properties:
-            Path: /deleteservice/{serviceid}
+            Path: /deletefromcart/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  AddService:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/fe1822c2674d39512e65038140634f0b
+      Handler: service.addservice
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /addservice
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  DelService:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/fe1822c2674d39512e65038140634f0b
+      Handler: service.delservice
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /delservice/{serviceid}
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
