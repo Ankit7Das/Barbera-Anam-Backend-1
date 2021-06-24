@@ -47,57 +47,85 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+
+  BarberLocation:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Barbers
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
         
-  SignUp:
+  Register:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: Users/
-      Handler: users.signup
+      Handler: users.register
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api 
           Properties:
-            Path: /signup
-            Method: post
-      Role: arn:aws:iam::140544830924:role/BackendUser
-      # Policies:
-      #   DynamoDBWritePolicy:
-      #     TableName: !Ref myDB
-        
-  LoginEmail:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: Users/
-      Handler: users.loginemail
-      Runtime: nodejs12.x
-      Events:
-        apiForLambda:
-          Type: Api 
-          Properties:
-            Path: /loginemail
+            Path: /register
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
       # Policies:
       #   DynamoDBWritePolicy:
       #     TableName: !Ref myDB
 
-  LoginPass:
+  AddUpdate:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: Users/
-      Handler: users.loginpass
+      Handler: users.addupdate
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api 
           Properties:
-            Path: /loginpass
+            Path: /address
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
-      # Policies:
-      #   DynamoDBWritePolicy:
-      #     TableName: !Ref myDB
+        
+  # LoginEmail:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: Users/
+  #     Handler: users.loginemail
+  #     Runtime: nodejs12.x
+  #     Events:
+  #       apiForLambda:
+  #         Type: Api 
+  #         Properties:
+  #           Path: /loginemail
+  #           Method: post
+  #     Role: arn:aws:iam::140544830924:role/BackendUser
+  #     # Policies:
+  #     #   DynamoDBWritePolicy:
+  #     #     TableName: !Ref myDB
+
+  # LoginPass:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: Users/
+  #     Handler: users.loginpass
+  #     Runtime: nodejs12.x
+  #     Events:
+  #       apiForLambda:
+  #         Type: Api 
+  #         Properties:
+  #           Path: /loginpass
+  #           Method: post
+  #     Role: arn:aws:iam::140544830924:role/BackendUser
+  #     # Policies:
+  #     #   DynamoDBWritePolicy:
+  #     #     TableName: !Ref myDB
 
   LoginPhone:
     Type: AWS::Serverless::Function
@@ -211,6 +239,20 @@ Resources:
           Type: Api 
           Properties:
             Path: /delservice/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  LocationUpdate:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Barber/
+      Handler: barber.locationupdate
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /locupd
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
             

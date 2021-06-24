@@ -44,43 +44,43 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-  SignUp:
+  BarberLocation:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Barbers
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  Register:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: SignUp
-      Handler: users.signup
+      CodeUri: Register
+      Handler: users.register
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api
           Properties:
-            Path: /signup
+            Path: /register
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
-  LoginEmail:
+  AddUpdate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: LoginEmail
-      Handler: users.loginemail
+      CodeUri: AddUpdate
+      Handler: users.addupdate
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api
           Properties:
-            Path: /loginemail
-            Method: post
-      Role: arn:aws:iam::140544830924:role/BackendUser
-  LoginPass:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: LoginPass
-      Handler: users.loginpass
-      Runtime: nodejs12.x
-      Events:
-        apiForLambda:
-          Type: Api
-          Properties:
-            Path: /loginpass
+            Path: /address
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   LoginPhone:
@@ -185,5 +185,18 @@ Resources:
           Type: Api
           Properties:
             Path: /delservice/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  LocationUpdate:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: LocationUpdate
+      Handler: barber.locationupdate
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /locupd
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser

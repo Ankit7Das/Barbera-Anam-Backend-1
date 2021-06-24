@@ -2,3 +2,5 @@
 Users/.env
 Cart/.env
 Services/.env
+Barber/.env
+Coupons/.env
