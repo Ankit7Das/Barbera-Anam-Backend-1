@@ -16,6 +16,13 @@ exports.addservice = async (event) => {
         var obj = JSON.parse(event.body);
         var NAME = obj.name;
         var PRICE = obj.price;
+        var TIME = obj.time;
+        var DET = obj.details;
+        var DISC = obj.discount;
+        var DOD = obj.dealsofday;
+        var ICON = obj.icon;
+        var GENDER = obj.gender;
+        var TYPE = obj.type;
         var token = event.headers.token;
 
         if(token == null) {
@@ -71,7 +78,14 @@ exports.addservice = async (event) => {
             Item: {
                 id: uuid.v1(),
                 name: NAME,
-                price: PRICE 
+                price: PRICE,
+                time: TIME,
+                details: DET ? DET : null,
+                discount: DISC ? DISC : null,
+                icon: ICON ? ICON : null,
+                dealOfDay: DOD ? DOD : false,
+                type: TYPE,
+                gender: GENDER, 
             }
         }
 

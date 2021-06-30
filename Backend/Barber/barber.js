@@ -7,15 +7,15 @@ var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-southeast-1' });
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
-const { userVerifier, addedBefore, serviceVerifier } = require("./authentication");
+const { userVerifier } = require("./authentication");
 
 
 exports.locationupdate = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
-        var LONG = obj.long;
-        var LAT = obj.lat;
+        var LONG = obj.longitude;
+        var LAT = obj.latitude;
         var token = event.headers.token;
 
         if(token == null) {
@@ -48,7 +48,7 @@ exports.locationupdate = async (event) => {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'User not found or user not an admin',
+                    message: 'User not found or user not a barber',
                     succes: false,
                 })
             }
@@ -69,8 +69,43 @@ exports.locationupdate = async (event) => {
                 TableName: 'Barbers',
                 Item: {
                     id: userID.id,
-                    long: LONG,
-                    lat: LAT,
+                    longitude: LONG,
+                    latitude: LAT,
+                    day1: {
+                        '10':false,
+                        '11':false,
+                        '12':false,
+                    },
+                    day2: {
+                        '10':false,
+                        '11':false,
+                        '12':false,
+                    },
+                    day3: {
+                        '10':false,
+                        '11':false,
+                        '12':false,
+                    },
+                    day4: {
+                        '10':false,
+                        '11':false,
+                        '12':false,
+                    },
+                    day5: {
+                        '10':false,
+                        '11':false,
+                        '12':false,
+                    },
+                    day6: {
+                        '10':false,
+                        '11':false,
+                        '12':false,
+                    },
+                    day7: {
+                        '10':false,
+                        '11':false,
+                        '12':false,
+                    },
                 }
             }
 
@@ -102,8 +137,8 @@ exports.locationupdate = async (event) => {
                 },
                 UpdateExpression: "set #long=:lo, #lang=:la",
                 ExpressionAttributeNames: {
-                    '#long': 'long',
-                    '#lat': 'lat',
+                    '#long': 'longitude',
+                    '#lat': 'latitude',
                 },
                 ExpressionAttributeValues:{
                     ":lo": LONG,
@@ -134,6 +169,35 @@ exports.locationupdate = async (event) => {
             }
 
         }
+
+    } catch(err) {
+        console.log(err);
+        return err;
+    }
+}
+
+exports.getbarbers = async (event) => {
+    try {
+
+        var obj = JSON.parse(event.body);
+        var day = obj.day;  
+        var slot = obj.slot;
+
+        var params = {
+            TableName: 'Barbers',
+            FilterExpression: 'day1.10 = :this_day',
+            ExpressionAttributeValues: {':this_day': { "BOOL" : false }},
+            //ExpressionAttributeNames: {'#day': 'day1.10'}
+        }
+
+        var data = await documentClient.scan(params).promise();
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                data: data
+            })
+        };
 
     } catch(err) {
         console.log(err);

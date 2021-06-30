@@ -23,40 +23,40 @@ module.exports.userVerifier = async (id) => {
 
 }
 
-module.exports.serviceVerifier = async (id) => {
+// module.exports.serviceVerifier = async (id) => {
 
-    var params = {
-        TableName: 'Services',
-        Key: {
-            id: id,
-        }
-    }
+//     var params = {
+//         TableName: 'Services',
+//         Key: {
+//             id: id,
+//         }
+//     }
 
-    var data = await documentClient.get(params).promise();
+//     var data = await documentClient.get(params).promise();
 
-    if(!data.Item) {
-        return false;
-    } else {
-        return true;
-    }
+//     if(!data.Item) {
+//         return false;
+//     } else {
+//         return true;
+//     }
 
-}
+// }
 
-module.exports.addedBefore = async (serviceName) => {
+// module.exports.addedBefore = async (serviceName) => {
 
-    var params = {
-        TableName: 'Services',
-        FilterExpression: '#name = :this_name',
-        ExpressionAttributeValues: {':this_name': serviceName},
-        ExpressionAttributeNames: {'#name': 'name'}
-    }
+//     var params = {
+//         TableName: 'Services',
+//         FilterExpression: '#name = :this_name',
+//         ExpressionAttributeValues: {':this_name': serviceName},
+//         ExpressionAttributeNames: {'#name': 'name'}
+//     }
 
-    var data = await documentClient.scan(params).promise();
+//     var data = await documentClient.scan(params).promise();
 
-    if(!data.Items) {
-        return true;
-    } else {
-        return false;
-    }
+//     if(!data.Items) {
+//         return true;
+//     } else {
+//         return false;
+//     }
 
-}
+// }

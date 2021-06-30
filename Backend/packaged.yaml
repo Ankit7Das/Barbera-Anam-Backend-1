@@ -44,23 +44,44 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-  BarberLocation:
+  BarberLog:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: Barbers
       AttributeDefinitions:
-      - AttributeName: id
+      - AttributeName: date
+        AttributeType: S
+      - AttributeName: barberId
         AttributeType: S
       KeySchema:
-      - AttributeName: id
+      - AttributeName: date
         KeyType: HASH
+      - AttributeName: barberId
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  myBookings:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Bookings
+      AttributeDefinitions:
+      - AttributeName: userId
+        AttributeType: S
+      - AttributeName: barberId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: userId
+        KeyType: HASH
+      - AttributeName: barberId
+        KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
   Register:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/82a62cae94bf86dd945bfa521ce7817d
+      CodeUri: s3://barbera-bucket/e956bf14622aeafcbd22a75a1cda4c36
       Handler: users.register
       Runtime: nodejs12.x
       Events:
@@ -73,7 +94,7 @@ Resources:
   AddUpdate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/82a62cae94bf86dd945bfa521ce7817d
+      CodeUri: s3://barbera-bucket/e956bf14622aeafcbd22a75a1cda4c36
       Handler: users.addupdate
       Runtime: nodejs12.x
       Events:
@@ -83,10 +104,23 @@ Resources:
             Path: /address
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
+  GetUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/e956bf14622aeafcbd22a75a1cda4c36
+      Handler: users.getuser
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getuser
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
   LoginPhone:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/82a62cae94bf86dd945bfa521ce7817d
+      CodeUri: s3://barbera-bucket/e956bf14622aeafcbd22a75a1cda4c36
       Handler: users.loginphone
       Runtime: nodejs12.x
       Events:
@@ -99,7 +133,7 @@ Resources:
   LoginOtp:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/82a62cae94bf86dd945bfa521ce7817d
+      CodeUri: s3://barbera-bucket/e956bf14622aeafcbd22a75a1cda4c36
       Handler: users.loginotp
       Runtime: nodejs12.x
       Events:
@@ -112,7 +146,7 @@ Resources:
   AddtoCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/505b88507659e5cac3fa86abde7fb1da
+      CodeUri: s3://barbera-bucket/11f7fc8cb23abab5defbbcf759b66d4f
       Handler: cart.addtocart
       Runtime: nodejs12.x
       Events:
@@ -125,7 +159,7 @@ Resources:
   GetCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/505b88507659e5cac3fa86abde7fb1da
+      CodeUri: s3://barbera-bucket/11f7fc8cb23abab5defbbcf759b66d4f
       Handler: cart.getcart
       Runtime: nodejs12.x
       Events:
@@ -138,7 +172,7 @@ Resources:
   Quantity:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/505b88507659e5cac3fa86abde7fb1da
+      CodeUri: s3://barbera-bucket/11f7fc8cb23abab5defbbcf759b66d4f
       Handler: cart.quantity
       Runtime: nodejs12.x
       Events:
@@ -151,7 +185,7 @@ Resources:
   DeleteFromCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/505b88507659e5cac3fa86abde7fb1da
+      CodeUri: s3://barbera-bucket/11f7fc8cb23abab5defbbcf759b66d4f
       Handler: cart.deletefromcart
       Runtime: nodejs12.x
       Events:
@@ -164,7 +198,7 @@ Resources:
   AddService:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/62a35a79ec423ce5d11e5d2888c914fa
+      CodeUri: s3://barbera-bucket/087a74f4d724e9cb8875f312f9d1f147
       Handler: service.addservice
       Runtime: nodejs12.x
       Events:
@@ -177,7 +211,7 @@ Resources:
   DelService:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/62a35a79ec423ce5d11e5d2888c914fa
+      CodeUri: s3://barbera-bucket/087a74f4d724e9cb8875f312f9d1f147
       Handler: service.delservice
       Runtime: nodejs12.x
       Events:
@@ -190,7 +224,7 @@ Resources:
   LocationUpdate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/980cf89201fb6ef00e347c24811eb5dd
+      CodeUri: s3://barbera-bucket/0a27ceed845d82670a438de013133d32
       Handler: barber.locationupdate
       Runtime: nodejs12.x
       Events:
@@ -198,5 +232,44 @@ Resources:
           Type: Api
           Properties:
             Path: /locupd
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetBarbersByDate:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/f9c68721f27bd194d515eb23164294c8
+      Handler: booking.barberbyslot
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getbarb/{date}/{slot}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  BarberSelect:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/f9c68721f27bd194d515eb23164294c8
+      Handler: booking.selectbarber
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /book/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetBookings:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/f9c68721f27bd194d515eb23164294c8
+      Handler: booking.getbookings
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getbookings
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser

@@ -15,8 +15,22 @@ module.exports.userVerifier = async (id) => {
 
     if(!data.Item) {
         return false;
-    } else {
+    } else if(data.Item.role=='user') {
         return true;
+    } else {
+        return false;
     }
+
+}
+
+module.exports.dateSyn = async (date) => {
+
+    var dd = String(date.getDate()).padStart(2, '0');
+    var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = date.getFullYear();
+
+    var res = dd + '-' + mm + '-' + yyyy;
+
+    return res;
 
 }

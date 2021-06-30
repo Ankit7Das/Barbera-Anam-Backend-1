@@ -6,7 +6,7 @@ var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-southeast-1' });
 const jwt = require("jsonwebtoken");
-const { userVerifier } = require("./authentication");
+const { userVerifier, dateSyn } = require("./authentication");
 const { hashPassword, matchPassword } = require("./password");
 const { JWT_SECRET } = process.env;
 
@@ -16,6 +16,7 @@ exports.register = async (event) => {
 
         var EMAIL = obj.email;
         var NAME = obj.name;
+        var ADD = obj.address;
         var token = event.headers.token;
 
         if(token == null) {
@@ -59,14 +60,16 @@ exports.register = async (event) => {
             Key: {
                 id: userID.id,
             },
-            UpdateExpression: "set #name=:n, #email=:e",
+            UpdateExpression: "set #address=:a, #name=:n, #email=:e",
             ExpressionAttributeNames: {
                 '#name': 'name',
                 '#email': 'email',
+                '#address': 'address'
             },
             ExpressionAttributeValues:{
                 ":n": NAME,
                 ":e": EMAIL,
+                ":a": ADD,
             },
             ReturnValues:"UPDATED_NEW"
         };
@@ -103,6 +106,72 @@ exports.register = async (event) => {
 
     return response;
 
+}
+
+exports.getuser = async (event) => {
+    try {
+
+        var token = event.headers.token;
+
+        if(token == null) {
+            return {
+                statusCode: 401,
+                body: JSON.stringify({
+                    success: false,
+                    message: "No token passed"
+                })
+            };
+        }
+
+        var userID;
+
+        try {
+            userID = jwt.verify(token, JWT_SECRET);
+        } catch(err) {
+            return {
+                statusCode: 403,
+                body: JSON.stringify({
+                    success: false,
+                    message: "Invalid Token",
+                })
+            };
+        }
+
+        var params = {
+            TableName: 'Users',
+            Key: {
+                id: userID.id,
+            }
+        }
+
+        var data = await documentClient.get(params).promise();
+
+        if (!data.Item) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'User does not exist'
+                })
+            };
+        } else {
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: true,
+                    message: 'User found',
+                    name: data.Item.name,
+                    email: data.Item.email,
+                    phone: data.Item.phone,
+                    address: data.Item.address,
+                })
+            }
+        }
+
+    } catch(err) {
+        console.log(err);
+        return err;
+    }
 }
 
 exports.addupdate = async (event) => {
@@ -456,7 +525,6 @@ exports.loginotp = async (event) => {
         var LONG = obj.longitude;
         var LAT = obj.latitude;
         var token = event.headers.token;
-        // var REF = obj.refer; 
         
 
         if(token == null) {
@@ -501,75 +569,217 @@ exports.loginotp = async (event) => {
                 })
             };
         } else {
-
             var otp = data.Items[0].otp;
             var id = data.Items[0].id;
 
-            params = {
-                TableName: 'Users',
-                Key: {
-                    id: id,
-                },
-                UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la",
-                ExpressionAttributeNames: {
-                    '#otp': 'otp',
-                    '#role': 'role',
-                    '#address': 'address',
-                    '#long': 'longitude',
-                    '#lat': 'latitude'
-                },
-                ExpressionAttributeValues:{
-                    ":o": null,
-                    ":r": ROLE,
-                    ":a": ADD,
-                    ":lo": LONG,
-                    ":la": LAT
-                },
-                ReturnValues:"UPDATED_NEW"
-            };
-    
-            try {
-                data = await documentClient.update(params).promise();
-            } catch(err) {
-                return {
-                    statusCode: 500,
-                    body: JSON.stringify({
-                        success: false,
-                        message: err,
-                    })
-                };
-            }
-
             if(`${otp}` == OTP){
 
-                // params = {
-                //     TableName: 'Users',
-                //     FilterExpression: '#refer = :this_refer',
-                //     ExpressionAttributeValues: {':this_refer': REF},
-                //     ExpressionAttributeNames: {'#refer': 'refer'}
-                // };
-                
-                // data = await documentClient.scan(params).promise();
+                if(ROLE == 'barber') {
 
-                // if(!data.Items[0]) {
-                //     return {
-                //         statusCode: 400,
-                //         body: JSON.stringify({
-                //             succes: false,
-                //             message: 'Wrong referral code entered'
-                //         })
-                //     };
-                // } else{
+                    var today = new Date();
+                    var dd = String(today.getDate()).padStart(2, '0');
+                    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    var yyyy = today.getFullYear();
+                    var day1 = dd + '-' + mm + '-' + yyyy;
 
-                //     params = {
-                //         TableName: 'Coupons',
-                //         Item: {
-                //             userId: id,
-                //             couponId: uuid.v1(),
-                //         }
-                //     }
+                    today.setDate(today.getDate() + 1);
+                    dd = String(today.getDate()).padStart(2, '0');
+                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    yyyy = today.getFullYear();
+                    var day2 = dd + '-' + mm + '-' + yyyy;
 
-                // }
+                    today.setDate(today.getDate() + 1);
+                    dd = String(today.getDate()).padStart(2, '0');
+                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    yyyy = today.getFullYear();
+                    var day3 = dd + '-' + mm + '-' + yyyy;
+
+                    today.setDate(today.getDate() + 1);
+                    dd = String(today.getDate()).padStart(2, '0');
+                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    yyyy = today.getFullYear();
+                    var day4 = dd + '-' + mm + '-' + yyyy;
+
+                    today.setDate(today.getDate() + 1);
+                    dd = String(today.getDate()).padStart(2, '0');
+                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    yyyy = today.getFullYear();
+                    var day5 = dd + '-' + mm + '-' + yyyy;
+
+                    today.setDate(today.getDate() + 1);
+                    dd = String(today.getDate()).padStart(2, '0');
+                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    yyyy = today.getFullYear();
+                    var day6 = dd + '-' + mm + '-' + yyyy;
+
+                    today.setDate(today.getDate() + 1);
+                    dd = String(today.getDate()).padStart(2, '0');
+                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    yyyy = today.getFullYear();
+                    var day7 = dd + '-' + mm + '-' + yyyy;
+
+                    params = {
+                        RequestItems: {
+                            'Barbers': [
+                                {
+                                    PutRequest: {
+                                        Item: {
+                                            date: day1,
+                                            barberId: id,
+                                            '10': false,
+                                            '11': false,
+                                            '12': false,
+                                        }
+                                    }
+                                },
+                                {
+                                    PutRequest: {
+                                        Item: {
+                                            date: day2,
+                                            barberId: id,
+                                            '10': false,
+                                            '11': false,
+                                            '12': false,
+                                        }
+                                    }
+                                },
+                                {
+                                    PutRequest: {
+                                        Item: {
+                                            date: day3,
+                                            barberId: id,
+                                            '10': false,
+                                            '11': false,
+                                            '12': false,
+                                        }
+                                    }
+                                },
+                                {
+                                    PutRequest: {
+                                        Item: {
+                                            date: day4,
+                                            barberId: id,
+                                            '10': true,
+                                            '11': false,
+                                            '12': false,
+                                        }
+                                    }
+                                },
+                                {
+                                    PutRequest: {
+                                        Item: {
+                                            date: day5,
+                                            barberId: id,
+                                            '10': false,
+                                            '11': false,
+                                            '12': false,
+                                        }
+                                    }
+                                },
+                                {
+                                    PutRequest: {
+                                        Item: {
+                                            date: day6,
+                                            barberId: id,
+                                            '10': false,
+                                            '11': false,
+                                            '12': false,
+                                        }
+                                    }
+                                },
+                                {
+                                    PutRequest: {
+                                        Item: {
+                                            date: day7,
+                                            barberId: id,
+                                            '10': false,
+                                            '11': false,
+                                            '12': false,
+                                        }
+                                    }
+                                },
+                            ]
+                        }
+                    };
+
+                    try {
+                        data = await documentClient.batchWrite(params).promise();
+                    } catch(err) {
+                        return {
+                            statusCode: 500,
+                            body: JSON.stringify({
+                                success: false,
+                                message: err,
+                            })
+                        };
+                    }
+                }
+
+                if(!data.Items[0].role) {
+
+                    params = {
+                        TableName: 'Users',
+                        Key: {
+                            id: id,
+                        },
+                        UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la",
+                        ExpressionAttributeNames: {
+                            '#otp': 'otp',
+                            '#role': 'role',
+                            '#address': 'address',
+                            '#long': 'longitude',
+                            '#lat': 'latitude'
+                        },
+                        ExpressionAttributeValues:{
+                            ":o": null,
+                            ":r": ROLE,
+                            ":a": ADD,
+                            ":lo": LONG,
+                            ":la": LAT
+                        },
+                        ReturnValues:"UPDATED_NEW"
+                    };
+            
+                    try {
+                        data = await documentClient.update(params).promise();
+                    } catch(err) {
+                        return {
+                            statusCode: 500,
+                            body: JSON.stringify({
+                                success: false,
+                                message: err,
+                            })
+                        };
+                    }
+                } else {
+    
+                    params = {
+                        TableName: 'Users',
+                        Key: {
+                            id: id,
+                        },
+                        UpdateExpression: "set #otp=:o",
+                        ExpressionAttributeNames: {
+                            '#otp': 'otp',
+                        },
+                        ExpressionAttributeValues:{
+                            ":o": null,
+                        },
+                        ReturnValues:"UPDATED_NEW"
+                    };
+            
+                    try {
+                        data = await documentClient.update(params).promise();
+                    } catch(err) {
+                        return {
+                            statusCode: 500,
+                            body: JSON.stringify({
+                                success: false,
+                                message: err,
+                            })
+                        };
+                    }
+                }
 
                 var user = {
                     id: id,
