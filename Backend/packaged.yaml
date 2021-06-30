@@ -81,7 +81,7 @@ Resources:
   Register:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/e956bf14622aeafcbd22a75a1cda4c36
+      CodeUri: s3://barbera-bucket/f5ff81a10234f889233277ea2e025f98
       Handler: users.register
       Runtime: nodejs12.x
       Events:
@@ -94,7 +94,7 @@ Resources:
   AddUpdate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/e956bf14622aeafcbd22a75a1cda4c36
+      CodeUri: s3://barbera-bucket/f5ff81a10234f889233277ea2e025f98
       Handler: users.addupdate
       Runtime: nodejs12.x
       Events:
@@ -107,7 +107,7 @@ Resources:
   GetUser:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/e956bf14622aeafcbd22a75a1cda4c36
+      CodeUri: s3://barbera-bucket/f5ff81a10234f889233277ea2e025f98
       Handler: users.getuser
       Runtime: nodejs12.x
       Events:
@@ -120,7 +120,7 @@ Resources:
   LoginPhone:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/e956bf14622aeafcbd22a75a1cda4c36
+      CodeUri: s3://barbera-bucket/f5ff81a10234f889233277ea2e025f98
       Handler: users.loginphone
       Runtime: nodejs12.x
       Events:
@@ -133,7 +133,7 @@ Resources:
   LoginOtp:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/e956bf14622aeafcbd22a75a1cda4c36
+      CodeUri: s3://barbera-bucket/f5ff81a10234f889233277ea2e025f98
       Handler: users.loginotp
       Runtime: nodejs12.x
       Events:
@@ -146,7 +146,7 @@ Resources:
   AddtoCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/11f7fc8cb23abab5defbbcf759b66d4f
+      CodeUri: s3://barbera-bucket/d9f57e7b3f76a3e60e8ef7767dafde0c
       Handler: cart.addtocart
       Runtime: nodejs12.x
       Events:
@@ -159,7 +159,7 @@ Resources:
   GetCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/11f7fc8cb23abab5defbbcf759b66d4f
+      CodeUri: s3://barbera-bucket/d9f57e7b3f76a3e60e8ef7767dafde0c
       Handler: cart.getcart
       Runtime: nodejs12.x
       Events:
@@ -172,7 +172,7 @@ Resources:
   Quantity:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/11f7fc8cb23abab5defbbcf759b66d4f
+      CodeUri: s3://barbera-bucket/d9f57e7b3f76a3e60e8ef7767dafde0c
       Handler: cart.quantity
       Runtime: nodejs12.x
       Events:
@@ -185,7 +185,7 @@ Resources:
   DeleteFromCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/11f7fc8cb23abab5defbbcf759b66d4f
+      CodeUri: s3://barbera-bucket/d9f57e7b3f76a3e60e8ef7767dafde0c
       Handler: cart.deletefromcart
       Runtime: nodejs12.x
       Events:
@@ -198,7 +198,7 @@ Resources:
   AddService:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/c53782069ea0fe3418d4a080df897efa
+      CodeUri: s3://barbera-bucket/a3f8380f3e18cfa0154fec3d16c6161b
       Handler: service.addservice
       Runtime: nodejs12.x
       Events:
@@ -211,7 +211,7 @@ Resources:
   DelService:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/c53782069ea0fe3418d4a080df897efa
+      CodeUri: s3://barbera-bucket/a3f8380f3e18cfa0154fec3d16c6161b
       Handler: service.delservice
       Runtime: nodejs12.x
       Events:
@@ -224,7 +224,7 @@ Resources:
   GetServiceByID:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/c53782069ea0fe3418d4a080df897efa
+      CodeUri: s3://barbera-bucket/a3f8380f3e18cfa0154fec3d16c6161b
       Handler: service.getservicebyid
       Runtime: nodejs12.x
       Events:
@@ -237,7 +237,7 @@ Resources:
   GetAllServiceName:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/c53782069ea0fe3418d4a080df897efa
+      CodeUri: s3://barbera-bucket/a3f8380f3e18cfa0154fec3d16c6161b
       Handler: service.getallservicenames
       Runtime: nodejs12.x
       Events:
@@ -250,7 +250,7 @@ Resources:
   UpdateService:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/c53782069ea0fe3418d4a080df897efa
+      CodeUri: s3://barbera-bucket/a3f8380f3e18cfa0154fec3d16c6161b
       Handler: service.updateservice
       Runtime: nodejs12.x
       Events:
@@ -260,10 +260,36 @@ Resources:
             Path: /updateservice
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
+  GetTrending:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/a3f8380f3e18cfa0154fec3d16c6161b
+      Handler: service.gettrending
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /gettrend
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetServiceByType:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-bucket/a3f8380f3e18cfa0154fec3d16c6161b
+      Handler: service.getservicebytype
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getserv/{gender}/{type}
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
   LocationUpdate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/6b3086a2b3262176659fe1b5400d4521
+      CodeUri: s3://barbera-bucket/2e699b2089d0418f09e77105304209cf
       Handler: barber.locationupdate
       Runtime: nodejs12.x
       Events:
@@ -276,7 +302,7 @@ Resources:
   GetBarbersByDate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/8d8651783edc82e251d249a5167bba2a
+      CodeUri: s3://barbera-bucket/443b0b95e4f47a9f8364b9f59e600d91
       Handler: booking.barberbyslot
       Runtime: nodejs12.x
       Events:
@@ -289,7 +315,7 @@ Resources:
   BarberSelect:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/8d8651783edc82e251d249a5167bba2a
+      CodeUri: s3://barbera-bucket/443b0b95e4f47a9f8364b9f59e600d91
       Handler: booking.selectbarber
       Runtime: nodejs12.x
       Events:
@@ -302,7 +328,7 @@ Resources:
   GetBookings:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-bucket/8d8651783edc82e251d249a5167bba2a
+      CodeUri: s3://barbera-bucket/443b0b95e4f47a9f8364b9f59e600d91
       Handler: booking.getbookings
       Runtime: nodejs12.x
       Events:

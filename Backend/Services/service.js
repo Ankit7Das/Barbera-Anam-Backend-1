@@ -19,7 +19,7 @@ exports.addservice = async (event) => {
         var TIME = obj.time;
         var DET = obj.details;
         var DISC = obj.discount;
-        var DOD = obj.dealsofday;
+        var DOD = obj.dod;
         var ICON = obj.icon;
         var GENDER = obj.gender;
         var TYPE = obj.type;
@@ -53,7 +53,7 @@ exports.addservice = async (event) => {
 
         // if(exist1.success == false) {
         //     return {
-        //         statusCode: 404,
+        //         statusCode: 400,
         //         body: JSON.stringify({
         //             success: false,
         //             message: 'User not found',
@@ -63,7 +63,7 @@ exports.addservice = async (event) => {
 
         // if(exist1.user.role != 'admin') {
         //     return {
-        //         statusCode: 404,
+        //         statusCode: 400,
         //         body: JSON.stringify({
         //             success: false,
         //             message: 'User not an admin',
@@ -95,7 +95,8 @@ exports.addservice = async (event) => {
                 icon: ICON ? ICON : null,
                 dealOfDay: DOD ? DOD : false,
                 type: TYPE,
-                gender: GENDER, 
+                gender: GENDER,
+                trending: false
             }
         }
 
@@ -166,7 +167,7 @@ exports.delservice = async (event) => {
 
         // if(exist1.success == false) {
         //     return {
-        //         statusCode: 404,
+        //         statusCode: 400,
         //         body: JSON.stringify({
         //             success: false,
         //             message: 'User not found',
@@ -176,7 +177,7 @@ exports.delservice = async (event) => {
 
         // if(exist1.user.role != 'admin') {
         //     return {
-        //         statusCode: 404,
+        //         statusCode: 400,
         //         body: JSON.stringify({
         //             success: false,
         //             message: 'User not an admin',
@@ -270,7 +271,7 @@ exports.getservicebyid = async (event) => {
 
         // if(exist1.success == false) {
         //     return {
-        //         statusCode: 404,
+        //         statusCode: 400,
         //         body: JSON.stringify({
         //             success: false,
         //             message: 'User not found',
@@ -303,7 +304,9 @@ exports.getservicebyid = async (event) => {
         return {
             statusCode: 200,
             body: JSON.stringify({
-                service: exist2.service
+                success: true,
+                message: 'Service found',
+                data: exist2.service
             })
         }
         
@@ -323,7 +326,7 @@ exports.updateservice = async (event) => {
         var TIME = obj.time;
         var DET = obj.details;
         var DISC = obj.discount;
-        var DOD = obj.dealsofday;
+        var DOD = obj.dod;
         var ICON = obj.icon;
         var GENDER = obj.gender;
         var TYPE = obj.type;
@@ -357,7 +360,7 @@ exports.updateservice = async (event) => {
 
         // if(exist1.success == false) {
         //     return {
-        //         statusCode: 404,
+        //         statusCode: 400,
         //         body: JSON.stringify({
         //             success: false,
         //             message: 'User not found',
@@ -367,7 +370,7 @@ exports.updateservice = async (event) => {
 
         // if(exist1.user.role != 'admin') {
         //     return {
-        //         statusCode: 404,
+        //         statusCode: 400,
         //         body: JSON.stringify({
         //             success: false,
         //             message: 'User not an admin',
@@ -484,7 +487,7 @@ exports.getallservicenames = async (event) => {
 
         // if(exist1.success == false) {
         //     return {
-        //         statusCode: 404,
+        //         statusCode: 400,
         //         body: JSON.stringify({
         //             success: false,
         //             message: 'User not found',
@@ -494,7 +497,7 @@ exports.getallservicenames = async (event) => {
 
         // if(exist1.user.role != 'admin') {
         //     return {
-        //         statusCode: 404,
+        //         statusCode: 400,
         //         body: JSON.stringify({
         //             success: false,
         //             message: 'User not an admin',
@@ -519,7 +522,7 @@ exports.getallservicenames = async (event) => {
                 body: JSON.stringify({
                     success: true,
                     message: 'Service list',
-                    service: data.Items
+                    data: data.Items
                 })
             }
         } else {
@@ -532,6 +535,178 @@ exports.getallservicenames = async (event) => {
             }
         }
         
+    } catch(err) {
+        console.log(err);
+        return err;
+    }
+}
+
+exports.gettrending = async (event) => {
+    try {
+
+        // var token = event.headers.token;
+
+        // if(token == null) {
+        //     return {
+        //         statusCode: 401,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "No token passed"
+        //         })
+        //     };
+        // }
+
+        // var userID;
+
+        // try {
+        //     userID = jwt.verify(token, JWT_SECRET);
+        // } catch(err) {
+        //     return {
+        //         statusCode: 403,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "Invalid Token",
+        //         })
+        //     };
+        // }
+
+        // var exist1 = await userVerifier(userID.id);
+
+        // if(exist1.success == false) {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not found',
+        //         })
+        //     }
+        // }
+
+        // if(exist1.user.role != 'user') {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not an admin',
+        //         })
+        //     }
+        // }
+
+        var params = {
+            TableName: 'Services',
+            FilterExpression: '#trend = :this_trend',
+            ExpressionAttributeValues: {':this_trend': true},
+            ExpressionAttributeNames: {'#trend': 'trending'}
+        }
+
+        var data = await documentClient.scan(params).promise();
+
+        if(data.Items.length == 0) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'No trending services'
+                })
+            }
+        } else {
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: true,
+                    message: 'Trending services',
+                    data: data.Items
+                })
+            }
+        }
+
+    } catch(err) {
+        console.log(err);
+        return err;
+    }
+}
+
+exports.getservicebytype = async (event) => {
+    try {
+
+        var GENDER = event.pathParameters.gender;
+        var TYPE = event.pathParameters.type;
+        // var token = event.headers.token;
+
+        // if(token == null) {
+        //     return {
+        //         statusCode: 401,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "No token passed"
+        //         })
+        //     };
+        // }
+
+        // var userID;
+
+        // try {
+        //     userID = jwt.verify(token, JWT_SECRET);
+        // } catch(err) {
+        //     return {
+        //         statusCode: 403,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "Invalid Token",
+        //         })
+        //     };
+        // }
+
+        // var exist1 = await userVerifier(userID.id);
+
+        // if(exist1.success == false) {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not found',
+        //         })
+        //     }
+        // }
+
+        // if(exist1.user.role != 'user') {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not an admin',
+        //         })
+        //     }
+        // }
+
+        var params = {
+            TableName: 'Services',
+            FilterExpression: '#gender = :this_gender AND #type = :this_type',
+            ExpressionAttributeValues: {':this_gender': GENDER, ':this_type': TYPE},
+            ExpressionAttributeNames: {'#gender': 'gender', '#type': 'type'}
+        }
+
+        var data = await documentClient.scan(params).promise();
+
+        if(data.Items.length == 0) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'No Services found'
+                })
+            }
+        } else {
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: true,
+                    message: 'Services found',
+                    data: data.Items
+                })
+            }
+        }
+
     } catch(err) {
         console.log(err);
         return err;

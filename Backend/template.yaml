@@ -329,6 +329,34 @@ Resources:
             Path: /updateservice
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
+
+  GetTrending:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Services/
+      Handler: service.gettrending
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /gettrend
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  GetServiceByType:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Services/
+      Handler: service.getservicebytype
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getserv/{gender}/{type}
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
   #---------------------------------------------------------------
