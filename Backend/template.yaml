@@ -2,6 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Resources:
+
+  #---------------------------------------------------------------
+  # DynamoDB tables
+  #---------------------------------------------------------------
   myDB:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -83,7 +87,11 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-        
+  #---------------------------------------------------------------
+
+  #---------------------------------------------------------------
+  # Login Functions
+  #---------------------------------------------------------------    
   Register:
     Type: AWS::Serverless::Function
     Properties:
@@ -97,9 +105,6 @@ Resources:
             Path: /register
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
-      # Policies:
-      #   DynamoDBWritePolicy:
-      #     TableName: !Ref myDB
 
   AddUpdate:
     Type: AWS::Serverless::Function
@@ -176,9 +181,6 @@ Resources:
             Path: /loginphone
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
-      # Policies:
-      #   DynamoDBWritePolicy:
-      #     TableName: !Ref myDB
 
   LoginOtp:
     Type: AWS::Serverless::Function
@@ -193,7 +195,11 @@ Resources:
             Path: /loginotp
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
 
+  #---------------------------------------------------------------
+  # Cart Functions
+  #---------------------------------------------------------------
   AddtoCart:
     Type: AWS::Serverless::Function
     Properties:
@@ -249,7 +255,11 @@ Resources:
             Path: /deletefromcart/{serviceid}
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
 
+  #---------------------------------------------------------------
+  # Service Functions
+  #---------------------------------------------------------------
   AddService:
     Type: AWS::Serverless::Function
     Properties:
@@ -278,6 +288,52 @@ Resources:
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
 
+  GetServiceByID:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Services/
+      Handler: service.getservicebyid
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getservbyid/{serviceid}
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  GetAllServiceName:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Services/
+      Handler: service.getallservicenames
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getallservname
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  UpdateService:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Services/
+      Handler: service.updateservice
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /updateservice
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  #---------------------------------------------------------------
+  # Barber Functions
+  #---------------------------------------------------------------
   LocationUpdate:
     Type: AWS::Serverless::Function
     Properties:
@@ -291,7 +347,11 @@ Resources:
             Path: /locupd
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
 
+  #---------------------------------------------------------------
+  # Booking Functions
+  #---------------------------------------------------------------
   GetBarbersByDate:
     Type: AWS::Serverless::Function
     Properties:
@@ -303,7 +363,7 @@ Resources:
           Type: Api 
           Properties:
             Path: /getbarb/{date}/{slot}
-            Method: post
+            Method: get
       Role: arn:aws:iam::140544830924:role/BackendUser
 
   BarberSelect:

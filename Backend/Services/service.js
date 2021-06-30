@@ -23,52 +23,62 @@ exports.addservice = async (event) => {
         var ICON = obj.icon;
         var GENDER = obj.gender;
         var TYPE = obj.type;
-        var token = event.headers.token;
+        // var token = event.headers.token;
 
-        if(token == null) {
-            return {
-                statusCode: 401,
-                body: JSON.stringify({
-                    success: false,
-                    message: "No token passed"
-                })
-            };
-        }
+        // if(token == null) {
+        //     return {
+        //         statusCode: 401,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "No token passed"
+        //         })
+        //     };
+        // }
 
-        var userID;
+        // var userID;
 
-        try {
-            userID = jwt.verify(token, JWT_SECRET);
-        } catch(err) {
-            return {
-                statusCode: 403,
-                body: JSON.stringify({
-                    success: false,
-                    message: "Invalid Token",
-                })
-            };
-        }
+        // try {
+        //     userID = jwt.verify(token, JWT_SECRET);
+        // } catch(err) {
+        //     return {
+        //         statusCode: 403,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "Invalid Token",
+        //         })
+        //     };
+        // }
 
-        var exist1 = await userVerifier(userID.id);
+        // var exist1 = await userVerifier(userID.id);
 
-        if(exist1 == false) {
-            return {
-                statusCode: 404,
-                body: JSON.stringify({
-                    message: 'User not found or user not an admin',
-                    succes: false,
-                })
-            }
-        }
+        // if(exist1.success == false) {
+        //     return {
+        //         statusCode: 404,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not found',
+        //         })
+        //     }
+        // }
+
+        // if(exist1.user.role != 'admin') {
+        //     return {
+        //         statusCode: 404,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not an admin',
+        //         })
+        //     }
+        // }
         
         var exist2 = await addedBefore(NAME);
 
         if(exist2 == true) {
             return {
-                statusCode: 200,
+                statusCode: 400,
                 body: JSON.stringify({
-                    message: 'Already added',
-                    succes: false,
+                    success: false,
+                    message: 'Service already added',
                 })
             }
         }
@@ -94,7 +104,6 @@ exports.addservice = async (event) => {
 
         try {
             data = await documentClient.put(params).promise();
-            console.log("Item entered successfully:", data);
             msg = 'Service added to database';
 
             return {
@@ -127,52 +136,62 @@ exports.delservice = async (event) => {
     try {
 
         var serviceId = event.pathParameters.serviceid;
-        var token = event.headers.token;
+        // var token = event.headers.token;
 
-        if(token == null) {
-            return {
-                statusCode: 401,
-                body: JSON.stringify({
-                    success: false,
-                    message: "No token passed"
-                })
-            };
-        }
+        // if(token == null) {
+        //     return {
+        //         statusCode: 401,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "No token passed"
+        //         })
+        //     };
+        // }
 
-        var userID;
+        // var userID;
 
-        try {
-            userID = jwt.verify(token, JWT_SECRET);
-        } catch(err) {
-            return {
-                statusCode: 403,
-                body: JSON.stringify({
-                    success: false,
-                    message: "Invalid Token",
-                })
-            };
-        }
+        // try {
+        //     userID = jwt.verify(token, JWT_SECRET);
+        // } catch(err) {
+        //     return {
+        //         statusCode: 403,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "Invalid Token",
+        //         })
+        //     };
+        // }
 
-        var exist1 = await userVerifier(userID.id);
+        // var exist1 = await userVerifier(userID.id);
 
-        if(exist1 == false) {
-            return {
-                statusCode: 404,
-                body: JSON.stringify({
-                    message: 'User not found or user not an admin',
-                    succes: false,
-                })
-            }
-        }
+        // if(exist1.success == false) {
+        //     return {
+        //         statusCode: 404,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not found',
+        //         })
+        //     }
+        // }
+
+        // if(exist1.user.role != 'admin') {
+        //     return {
+        //         statusCode: 404,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not an admin',
+        //         })
+        //     }
+        // }
         
         var exist2 = await serviceVerifier(serviceId);
 
-        if(exist2 == false) {
+        if(exist2.success == false) {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
                     message: 'Service doesn\'t exist',
-                    succes: false,
+                    success: false,
                 })
             }
         }
@@ -189,7 +208,6 @@ exports.delservice = async (event) => {
 
         try {
             data = await documentClient.delete(params).promise();
-            console.log("Item entered successfully:", data);
             msg = 'Service deleted from database';
 
             return {
@@ -217,3 +235,307 @@ exports.delservice = async (event) => {
         return err;
     }
 }
+
+exports.getservicebyid = async (event) => {
+    try {
+
+        var serviceId = event.pathParameters.serviceid;
+        // var token = event.headers.token;
+        
+        // if(token == null) {
+        //     return {
+        //         statusCode: 401,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "No token passed"
+        //         })
+        //     };
+        // }
+
+        // var userID;
+
+        // try {
+        //     userID = jwt.verify(token, JWT_SECRET);
+        // } catch(err) {
+        //     return {
+        //         statusCode: 403,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "Invalid Token",
+        //         })
+        //     };
+        // }
+
+        // var exist1 = await userVerifier(userID.id);
+
+        // if(exist1.success == false) {
+        //     return {
+        //         statusCode: 404,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not found',
+        //         })
+        //     }
+        // }
+
+        // if(exist1.user.role != 'admin') {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not an admin',
+        //         })
+        //     }
+        // }
+        
+        var exist2 = await serviceVerifier(serviceId);
+
+        if(exist2.success == false) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Service not found',
+                })
+            }
+        }
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                service: exist2.service
+            })
+        }
+        
+    } catch(err) {
+        console.log(err);
+        return err;
+    }
+}
+
+exports.updateservice = async (event) => {
+    try {
+
+        var obj = JSON.parse(event.body);
+        var ID = obj.id;
+        var NAME = obj.name;
+        var PRICE = obj.price;
+        var TIME = obj.time;
+        var DET = obj.details;
+        var DISC = obj.discount;
+        var DOD = obj.dealsofday;
+        var ICON = obj.icon;
+        var GENDER = obj.gender;
+        var TYPE = obj.type;
+        // var token = event.headers.token;
+
+        // if(token == null) {
+        //     return {
+        //         statusCode: 401,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "No token passed"
+        //         })
+        //     };
+        // }
+
+        // var userID;
+
+        // try {
+        //     userID = jwt.verify(token, JWT_SECRET);
+        // } catch(err) {
+        //     return {
+        //         statusCode: 403,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "Invalid Token",
+        //         })
+        //     };
+        // }
+
+        // var exist1 = await userVerifier(userID.id);
+
+        // if(exist1.success == false) {
+        //     return {
+        //         statusCode: 404,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not found',
+        //         })
+        //     }
+        // }
+
+        // if(exist1.user.role != 'admin') {
+        //     return {
+        //         statusCode: 404,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not an admin',
+        //         })
+        //     }
+        // }
+        
+        var exist2 = await serviceVerifier(ID);
+
+        if(exist2.success == false) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'No such service exists for updating',
+                })
+            }
+        }
+
+        var params = {
+            TableName: 'Services',
+            Key: {
+                id: ID,
+            },
+            UpdateExpression: "set #name=:n, #price=:p, #time=:ti, #details=:det, #discount=:dis, #icon=:i, #deal=:dod, #type=:t, #gender=:g",
+            ExpressionAttributeNames: {
+                '#name': 'name',
+                '#price': 'price',
+                '#time': 'time',
+                '#details': 'details',
+                '#discount': 'discount',
+                '#icon': 'icon',
+                '#deal': 'dealOfDay',
+                '#type': 'type',
+                '#gender': 'gender', 
+            },
+            ExpressionAttributeValues:{
+                ":n": NAME,
+                ":p": PRICE,
+                ":ti": TIME,
+                ":det": DET ? DET : null,
+                ":dis": DISC ? DISC : null,
+                ":i": ICON ? ICON : null,
+                ":dod": DOD ? DOD : false,
+                ":t": TYPE,
+                ":g": GENDER,
+            },
+            ReturnValues:"UPDATED_NEW"
+        }
+
+        var data;
+        var msg;
+
+        try {
+            data = await documentClient.update(params).promise();
+            msg = 'Service info updated';
+
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: true,
+                    message: msg,
+                })
+            };
+        } catch(err) {
+            console.log("Error: ", err);
+            msg = err;
+
+            return {
+                statusCode: 500,
+                body: JSON.stringify({
+                    success: false,
+                    message: msg,
+                })
+            };
+        }
+
+    } catch(err) {
+        console.log(err);
+        return err;
+    }
+}
+
+exports.getallservicenames = async (event) => {
+    try {
+
+        // var token = event.headers.token;
+
+        // if(token == null) {
+        //     return {
+        //         statusCode: 401,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "No token passed"
+        //         })
+        //     };
+        // }
+
+        // var userID;
+
+        // try {
+        //     userID = jwt.verify(token, JWT_SECRET);
+        // } catch(err) {
+        //     return {
+        //         statusCode: 403,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "Invalid Token",
+        //         })
+        //     };
+        // }
+
+        // var exist1 = await userVerifier(userID.id);
+
+        // if(exist1.success == false) {
+        //     return {
+        //         statusCode: 404,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not found',
+        //         })
+        //     }
+        // }
+
+        // if(exist1.user.role != 'admin') {
+        //     return {
+        //         statusCode: 404,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not an admin',
+        //         })
+        //     }
+        // }
+
+        var params = {
+            TableName: 'Services',
+            ProjectionExpression: "#id, #name",
+            ExpressionAttributeNames: {
+                "#name": "name",
+                "#id": 'id'
+            },
+        }
+
+        var data = await documentClient.scan(params).promise();
+
+        if(data.Items.length != 0) {
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: true,
+                    message: 'Service list',
+                    service: data.Items
+                })
+            }
+        } else {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'No service entered'
+                })
+            }
+        }
+        
+    } catch(err) {
+        console.log(err);
+        return err;
+    }
+}
+
+

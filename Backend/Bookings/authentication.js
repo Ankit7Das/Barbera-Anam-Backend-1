@@ -32,8 +32,7 @@ module.exports.serviceVerifier = async (id) => {
         TableName: 'Services',
         Key: {
             id: id,
-        },
-        ProjectionExpression: 'role',
+        }
     }
 
     var data = await documentClient.get(params).promise();

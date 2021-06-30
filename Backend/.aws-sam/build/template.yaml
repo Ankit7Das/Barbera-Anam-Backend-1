@@ -221,6 +221,45 @@ Resources:
             Path: /delservice/{serviceid}
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
+  GetServiceByID:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetServiceByID
+      Handler: service.getservicebyid
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getservbyid/{serviceid}
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetAllServiceName:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetAllServiceName
+      Handler: service.getallservicenames
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getallservname
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  UpdateService:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: UpdateService
+      Handler: service.updateservice
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /updateservice
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
   LocationUpdate:
     Type: AWS::Serverless::Function
     Properties:
@@ -245,7 +284,7 @@ Resources:
           Type: Api
           Properties:
             Path: /getbarb/{date}/{slot}
-            Method: post
+            Method: get
       Role: arn:aws:iam::140544830924:role/BackendUser
   BarberSelect:
     Type: AWS::Serverless::Function
@@ -271,5 +310,5 @@ Resources:
           Type: Api
           Properties:
             Path: /getbookings
-            Method: post
+            Method: get
       Role: arn:aws:iam::140544830924:role/BackendUser

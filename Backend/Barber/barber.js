@@ -71,41 +71,6 @@ exports.locationupdate = async (event) => {
                     id: userID.id,
                     longitude: LONG,
                     latitude: LAT,
-                    day1: {
-                        '10':false,
-                        '11':false,
-                        '12':false,
-                    },
-                    day2: {
-                        '10':false,
-                        '11':false,
-                        '12':false,
-                    },
-                    day3: {
-                        '10':false,
-                        '11':false,
-                        '12':false,
-                    },
-                    day4: {
-                        '10':false,
-                        '11':false,
-                        '12':false,
-                    },
-                    day5: {
-                        '10':false,
-                        '11':false,
-                        '12':false,
-                    },
-                    day6: {
-                        '10':false,
-                        '11':false,
-                        '12':false,
-                    },
-                    day7: {
-                        '10':false,
-                        '11':false,
-                        '12':false,
-                    },
                 }
             }
 
@@ -169,35 +134,6 @@ exports.locationupdate = async (event) => {
             }
 
         }
-
-    } catch(err) {
-        console.log(err);
-        return err;
-    }
-}
-
-exports.getbarbers = async (event) => {
-    try {
-
-        var obj = JSON.parse(event.body);
-        var day = obj.day;  
-        var slot = obj.slot;
-
-        var params = {
-            TableName: 'Barbers',
-            FilterExpression: 'day1.10 = :this_day',
-            ExpressionAttributeValues: {':this_day': { "BOOL" : false }},
-            //ExpressionAttributeNames: {'#day': 'day1.10'}
-        }
-
-        var data = await documentClient.scan(params).promise();
-
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                data: data
-            })
-        };
 
     } catch(err) {
         console.log(err);

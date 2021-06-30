@@ -8,18 +8,25 @@ module.exports.userVerifier = async (id) => {
         TableName: 'Users',
         Key: {
             id: id,
-        }
+        },
+        ProjectionExpression: "#role",
+        ExpressionAttributeNames: {
+            "#role": "role"
+        },
     }
 
     var data = await documentClient.get(params).promise();
 
     if(!data.Item) {
-        return false;
-    } else if(data.Item.role == 'admin') {
-        return true;
+        return {
+            success: false
+        };
     } else {
-        return false;
-    }
+        return {
+            success: true,
+            user: data.Item
+        };
+    } 
 
 }
 
@@ -35,10 +42,15 @@ module.exports.serviceVerifier = async (id) => {
     var data = await documentClient.get(params).promise();
 
     if(!data.Item) {
-        return false;
+        return {
+            success: false
+        };
     } else {
-        return true;
-    }
+        return {
+            success: true,
+            service: data.Item
+        };
+    } 
 
 }
 
@@ -53,10 +65,10 @@ module.exports.addedBefore = async (serviceName) => {
 
     var data = await documentClient.scan(params).promise();
 
-    if(!data.Items) {
-        return true;
-    } else {
+    if(data.Items.length == 0 ) {
         return false;
+    } else {
+        return true;
     }
 
 }

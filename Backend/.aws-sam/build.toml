@@ -20,7 +20,7 @@ codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Services"
 runtime = "nodejs12.x"
 source_md5 = ""
 packagetype = "Zip"
-functions = ["AddService", "DelService"]
+functions = ["AddService", "DelService", "GetServiceByID", "GetAllServiceName", "UpdateService"]
 
 [function_build_definitions.0191654c-7ced-46ab-8ba7-2704781c3b76]
 codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Barber"

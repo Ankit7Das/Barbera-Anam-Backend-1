@@ -190,7 +190,7 @@ exports.selectbarber = async (event) => {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'User not found or user does not have role as user',
+                    message: 'User does not have role as user',
                     success: false,
                 })
             }
