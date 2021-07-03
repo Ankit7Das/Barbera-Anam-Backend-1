@@ -41,12 +41,22 @@ exports.addtocart = async (event) => {
 
         var exist1 = await userVerifier(userID.id);
 
-        if(exist1 == false) {
+        if(exist1.success == false) {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'User not found',
                     success: false,
+                    message: 'User not found',
+                })
+            }
+        }
+
+        if(exist1.user.role != 'user') {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'User does not have role as user',
                 })
             }
         }
@@ -57,20 +67,20 @@ exports.addtocart = async (event) => {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'Service Unavailable',
                     success: false,
+                    message: 'Service Unavailable',
                 })
             }
         }
         
         var exist3 = await addedBefore(userID.id, serviceId);
 
-        if(exist3 == false) {
+        if(exist3 == true) {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    message: 'Already added to cart',
                     success: false,
+                    message: 'Already added to cart',
                 })
             }
         }
@@ -155,31 +165,81 @@ exports.getcart = async (event) => {
 
         var exist1 = await userVerifier(userID.id);
 
-        if(exist1 == false) {
+        if(exist1.success == false) {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'User not found',
                     success: false,
+                    message: 'User not found',
+                })
+            }
+        }
+
+        if(exist1.user.role != 'user') {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'User does not have role as user',
                 })
             }
         }
 
         var params = {
             TableName: 'Carts',
-            FilterExpression: '#userId = :this_userId',
-            ExpressionAttributeValues: {':this_userId': userID.id},
-            ExpressionAttributeNames: {'#userId': 'userId'}
+            KeyConditionExpression: '#user = :u',
+            ExpressionAttributeValues: {
+                ':u': userID.id,
+            },
+            ExpressionAttributeNames: {
+                '#user': 'userId'
+            }
         };
 
-        var data = await documentClient.scan(params).promise();
+        try {
+            var data = await documentClient.query(params).promise();
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                data: data.Items,
-            })
-        };
+            // var cart = [];
+            // for(var i=0;i<data.Items.length;i++) {
+            //     params = {
+            //         TableName: 'Services',
+            //         Key: {
+            //             id: id,
+            //         }
+            //     }
+            
+            //     data = await documentClient.get(params).promise();
+            
+            //     if(!data.Item) {
+            //         cart.push(data.Item);
+            //     } else {
+            //         return {
+            //             statusCode: 400,
+            //             body: JSON.stringify({
+            //                 success: false,
+            //                 message: 'Service Ids provided are wrong',
+            //             })
+            //         };
+            //     }
+            // }
+
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: true,
+                    message: 'Cart Items found',
+                    data: data.Items,
+                })
+            };
+        } catch(err) {
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'No items in cart'
+                })
+            };
+        }
 
     } catch(err) {
         console.log(err);
@@ -221,12 +281,22 @@ exports.quantity = async (event) => {
 
         var exist1 = await userVerifier(userID.id);
 
-        if(exist1 == false) {
+        if(exist1.success == false) {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'User not found',
                     success: false,
+                    message: 'User not found',
+                })
+            }
+        }
+
+        if(exist1.user.role != 'user') {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'User does not have role as user',
                 })
             }
         }
@@ -237,20 +307,20 @@ exports.quantity = async (event) => {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'Service Unavailable',
                     success: false,
+                    message: 'Service Unavailable',
                 })
             }
         }
         
         var exist3 = await addedBefore(userID.id, serviceId);
 
-        if(exist3 == true) {
+        if(exist3 == false) {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'Service has not been added to the cart',
                     success: false,
+                    message: 'Service not in cart',
                 })
             }
         }
@@ -357,12 +427,22 @@ exports.deletefromcart = async (event) => {
 
         var exist1 = await userVerifier(userID.id);
 
-        if(exist1 == false) {
+        if(exist1.success == false) {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'User not found',
                     success: false,
+                    message: 'User not found',
+                })
+            }
+        }
+
+        if(exist1.user.role != 'user') {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'User does not have role as user',
                 })
             }
         }
@@ -373,20 +453,20 @@ exports.deletefromcart = async (event) => {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'Service Unavailable',
                     success: false,
+                    message: 'Service Unavailable',
                 })
             }
         }
         
         var exist3 = await addedBefore(userID.id, serviceId);
 
-        if(exist3 == true) {
+        if(exist3 == false) {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'Service not avalable in cart',
                     success: false,
+                    message: 'Service not in cart',
                 })
             }
         }

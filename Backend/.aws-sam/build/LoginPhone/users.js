@@ -318,7 +318,7 @@ exports.addupdate = async (event) => {
                 statusCode: 404,
                 body: JSON.stringify({
                     message: 'User not found',
-                    succes: false,
+                    success: false,
                 })
             }
         }
@@ -372,138 +372,6 @@ exports.addupdate = async (event) => {
         return err;
     }
 }
-
-// exports.loginemail = async (event) => {
-//     try {
-//         var obj = JSON.parse(event.body);
-
-//         var EMAIL = obj.email;
-        
-//         var params = {
-//             TableName: 'Users',
-//             FilterExpression: '#email = :this_email',
-//             ExpressionAttributeValues: {':this_email': EMAIL},
-//             ExpressionAttributeNames: {'#email': 'email'}
-//         };
-
-//         var data;
-
-        
-//         data = await documentClient.scan(params).promise();
-        
-//         if(!data.Items[0]) {
-//             var response = {
-//                 'statusCode': 404,
-//                 'body': JSON.stringify({
-//                     success: false,
-//                     message: "User not found",
-//                 })
-//             };
-//         } else {
-//             console.log("Item read successfully:", data);
-
-//             var user = {
-//                 email: EMAIL,
-//             }
-
-//             var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
-
-//             var response = {
-//                 'statusCode': 200,
-//                 'body': JSON.stringify({
-//                     success: true,
-//                     token: token,
-//                     message: "User found",
-//                 })
-//             };
-            
-//         }
-//     } catch(err) {
-//         console.log(err);
-//         return err;
-//     }
-
-//     return response;
-
-// }
-
-
-// exports.loginpass = async (event) => {
-//     try {
-//         var obj = JSON.parse(event.body);
-//         var head = event.headers;
-//         var PASS = obj.password;
-//         var token = head.token;
-
-//         if(token == null) {
-//             return {
-//                 statusCode: 401,
-//                 body: JSON.stringify({
-//                     success: false,
-//                     message: "No token passed"
-//                 })
-//             };
-//         }
-
-//         var userID;
-
-//         try {
-//             userID = jwt.verify(token, JWT_SECRET);
-//         } catch(err) {
-//             return {
-//                 statusCode: 403,
-//                 body: JSON.stringify({
-//                     success: false,
-//                     message: "Invalid Token",
-//                 })
-//             };
-//         }
-
-//         var params = {
-//             TableName: 'Users',
-//             FilterExpression: '#email = :this_email',
-//             ExpressionAttributeValues: {':this_email': userID.email},
-//             ExpressionAttributeNames: {'#email': 'email'}
-//         };
-
-//         var data;
-
-//         data = await documentClient.scan(params).promise();
-        
-//         const hashedPassword = data.Items[0].password;
-//         const matchedPassword = await matchPassword(PASS, hashedPassword);
-
-//         var user = {
-//             id: data.Items[0].id,
-//         }
-
-//         var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
-
-//         if(matchedPassword) {
-//             return {
-//                 statusCode: 200,
-//                 body: JSON.stringify({
-//                     success: true,
-//                     token: token,
-//                     message: "Login Success",
-//                 })
-//             };
-//         } else {
-//             return {
-//                 statusCode: 401,
-//                 body: JSON.stringify({
-//                     success: false,
-//                     err: "Incorrect password",
-//                 })
-//             };
-//         }
-
-//     } catch(err) {
-//         console.log(err);
-//         return err;
-//     }
-
-// }
 
 
 exports.loginphone = async(event) => {
@@ -668,7 +536,7 @@ exports.loginotp = async (event) => {
             return {
                 statusCode: 500,
                 body: JSON.stringify({
-                    succes: false,
+                    success: false,
                     message: 'Invalid token entered'
                 })
             };
@@ -904,7 +772,7 @@ exports.loginotp = async (event) => {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
-                        succes: false,
+                        success: false,
                         message: 'Wrong OTP'
                     })
                 };
