@@ -20,7 +20,7 @@ codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Services"
 runtime = "nodejs12.x"
 source_md5 = ""
 packagetype = "Zip"
-functions = ["AddService", "DelService", "GetServiceByID", "GetAllServiceName", "UpdateService", "GetTrending", "GetServiceByType"]
+functions = ["AddService", "DelService", "GetServiceByID", "GetAllServiceName", "UpdateService", "GetTrending", "GetServiceByType", "GetServiceByGender", "GetServiceBySubType"]
 
 [function_build_definitions.0191654c-7ced-46ab-8ba7-2704781c3b76]
 codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Barber"
@@ -29,7 +29,7 @@ source_md5 = ""
 packagetype = "Zip"
 functions = ["LocationUpdate"]
 
-[function_build_definitions.eddef47b-d7da-4c75-a520-439b6ec14101]
+[function_build_definitions.50f40b2e-ee70-4b32-9db7-48a559675187]
 codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Bookings"
 runtime = "nodejs12.x"
 source_md5 = ""

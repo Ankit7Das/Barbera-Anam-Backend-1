@@ -14,11 +14,14 @@ module.exports.userVerifier = async (id) => {
     var data = await documentClient.get(params).promise();
 
     if(!data.Item) {
-        return false;
-    } else if(data.Item.role=='user') {
-        return true;
+        return {
+            success: false,
+        };
     } else {
-        return false;
+        return {
+            success: true,
+            user: data.Item
+        };
     }
 
 }

@@ -8,7 +8,15 @@ var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-southeast-1' 
 const jwt = require("jsonwebtoken");
 const { userVerifier, dateSyn } = require("./authentication");
 const { hashPassword, matchPassword } = require("./password");
+var { Buffer } = require('buffer');
 const { JWT_SECRET } = process.env;
+const s3 = new AWS.S3({
+    accessKeyId: process.env.ACCESS_KEY,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY
+});
+var fileType = require('file-type');
+
+const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 
 exports.register = async (event) => {
     try {
@@ -45,14 +53,108 @@ exports.register = async (event) => {
 
         var exist1 = await userVerifier(userID.id);
 
-        if(exist1 == false) {
+        if(exist1.success == false) {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
+                    success: false,
                     message: 'User not found',
-                    succes: false,
                 })
             }
+        }
+        if(!exist1.user.name){
+            exist1.user.name = null;
+        }
+
+        if(!exist1.user.email){
+            exist1.user.email = null;
+        }
+
+        if(!exist1.user.pic){
+            exist1.user.pic = null;
+        }
+
+        if(!exist1.user.address){
+            exist1.user.address = null;
+        }
+
+        var url;
+        if(obj.mime && obj.image) {
+            if(exist1.user.pic) {
+                url = new URL(exist1.user.pic);
+                var key = url.pathname.substring(1);
+
+                try {
+                    await s3
+                        .deleteObject({
+                            Key: key,
+                            Bucket: 'barbera-images'
+                        })
+                        .promise();
+                } catch(err){
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            success: false,
+                        })
+                    };
+                }
+            }
+
+            if (!obj.image || !obj.mime) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        message: 'incorrect body on request'
+                    })
+                };
+            }
+    
+            if (!allowedMimes.includes(obj.mime)) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        message: 'mime is not allowed '
+                    })
+                };
+            }
+    
+            let imageData = obj.image;
+            if (obj.image.substr(0, 7) === 'base64,') {
+                imageData = obj.image.substr(7, obj.image.length);
+            }
+    
+            const buffer = Buffer.from(imageData, 'base64');
+            const fileInfo = await fileType.fromBuffer(buffer);
+            const detectedExt = fileInfo.ext;
+            const detectedMime = fileInfo.mime;
+    
+            if (detectedMime !== obj.mime) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        message: 'mime types dont match'
+                    })
+                };
+            }
+    
+            var name = userID.id;
+            var key = `${name}.${detectedExt}`;
+    
+            console.log(`writing image to bucket called ${key}`);
+    
+            await s3
+                .upload({
+                    Body: buffer,
+                    Key: `profiles/${key}`,
+                    ContentType: obj.mime,
+                    Bucket: 'barbera-images',
+                    ACL: 'public-read',
+                })
+                .promise();
+
+            url = `https://barbera-images.s3-ap-southeast-1.amazonaws.com/profiles/${key}`;
+    
         }
         
         var params = {
@@ -60,16 +162,18 @@ exports.register = async (event) => {
             Key: {
                 id: userID.id,
             },
-            UpdateExpression: "set #address=:a, #name=:n, #email=:e",
+            UpdateExpression: "set #address=:a, #name=:n, #email=:e, #pic=:p",
             ExpressionAttributeNames: {
                 '#name': 'name',
                 '#email': 'email',
-                '#address': 'address'
+                '#address': 'address',
+                '#pic': 'pic'
             },
             ExpressionAttributeValues:{
-                ":n": NAME,
-                ":e": EMAIL,
-                ":a": ADD,
+                ":n": NAME ? NAME : exist1.user.name,
+                ":e": EMAIL ? EMAIL : exist1.user.email,
+                ":a": ADD ? ADD : exist1.user.address,
+                ":p": url ? url : exist1.user.pic
             },
             ReturnValues:"UPDATED_NEW"
         };
@@ -269,138 +373,6 @@ exports.addupdate = async (event) => {
     }
 }
 
-// exports.loginemail = async (event) => {
-//     try {
-//         var obj = JSON.parse(event.body);
-
-//         var EMAIL = obj.email;
-        
-//         var params = {
-//             TableName: 'Users',
-//             FilterExpression: '#email = :this_email',
-//             ExpressionAttributeValues: {':this_email': EMAIL},
-//             ExpressionAttributeNames: {'#email': 'email'}
-//         };
-
-//         var data;
-
-        
-//         data = await documentClient.scan(params).promise();
-        
-//         if(!data.Items[0]) {
-//             var response = {
-//                 'statusCode': 404,
-//                 'body': JSON.stringify({
-//                     success: false,
-//                     message: "User not found",
-//                 })
-//             };
-//         } else {
-//             console.log("Item read successfully:", data);
-
-//             var user = {
-//                 email: EMAIL,
-//             }
-
-//             var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
-
-//             var response = {
-//                 'statusCode': 200,
-//                 'body': JSON.stringify({
-//                     success: true,
-//                     token: token,
-//                     message: "User found",
-//                 })
-//             };
-            
-//         }
-//     } catch(err) {
-//         console.log(err);
-//         return err;
-//     }
-
-//     return response;
-
-// }
-
-
-// exports.loginpass = async (event) => {
-//     try {
-//         var obj = JSON.parse(event.body);
-//         var head = event.headers;
-//         var PASS = obj.password;
-//         var token = head.token;
-
-//         if(token == null) {
-//             return {
-//                 statusCode: 401,
-//                 body: JSON.stringify({
-//                     success: false,
-//                     message: "No token passed"
-//                 })
-//             };
-//         }
-
-//         var userID;
-
-//         try {
-//             userID = jwt.verify(token, JWT_SECRET);
-//         } catch(err) {
-//             return {
-//                 statusCode: 403,
-//                 body: JSON.stringify({
-//                     success: false,
-//                     message: "Invalid Token",
-//                 })
-//             };
-//         }
-
-//         var params = {
-//             TableName: 'Users',
-//             FilterExpression: '#email = :this_email',
-//             ExpressionAttributeValues: {':this_email': userID.email},
-//             ExpressionAttributeNames: {'#email': 'email'}
-//         };
-
-//         var data;
-
-//         data = await documentClient.scan(params).promise();
-        
-//         const hashedPassword = data.Items[0].password;
-//         const matchedPassword = await matchPassword(PASS, hashedPassword);
-
-//         var user = {
-//             id: data.Items[0].id,
-//         }
-
-//         var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
-
-//         if(matchedPassword) {
-//             return {
-//                 statusCode: 200,
-//                 body: JSON.stringify({
-//                     success: true,
-//                     token: token,
-//                     message: "Login Success",
-//                 })
-//             };
-//         } else {
-//             return {
-//                 statusCode: 401,
-//                 body: JSON.stringify({
-//                     success: false,
-//                     err: "Incorrect password",
-//                 })
-//             };
-//         }
-
-//     } catch(err) {
-//         console.log(err);
-//         return err;
-//     }
-
-// }
-
 
 exports.loginphone = async(event) => {
     try {
@@ -574,7 +546,7 @@ exports.loginotp = async (event) => {
 
             if(`${otp}` == OTP){
 
-                if(ROLE == 'barber') {
+                if(ROLE == 'barber' && !data.Items[0].role) {
 
                     var today = new Date();
                     var dd = String(today.getDate()).padStart(2, '0');
@@ -620,7 +592,7 @@ exports.loginotp = async (event) => {
 
                     params = {
                         RequestItems: {
-                            'Barbers': [
+                            'BarbersLog': [
                                 {
                                     PutRequest: {
                                         Item: {

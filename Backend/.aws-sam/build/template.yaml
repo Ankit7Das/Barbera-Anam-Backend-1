@@ -47,7 +47,7 @@ Resources:
   BarberLog:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: Barbers
+      TableName: BarbersLog
       AttributeDefinitions:
       - AttributeName: date
         AttributeType: S
@@ -68,12 +68,12 @@ Resources:
       AttributeDefinitions:
       - AttributeName: userId
         AttributeType: S
-      - AttributeName: barberId
+      - AttributeName: serviceId
         AttributeType: S
       KeySchema:
       - AttributeName: userId
         KeyType: HASH
-      - AttributeName: barberId
+      - AttributeName: serviceId
         KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
@@ -283,8 +283,34 @@ Resources:
         apiForLambda:
           Type: Api
           Properties:
-            Path: /getserv/{gender}/{type}
+            Path: /getsubtypes/{gender}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetServiceByGender:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetServiceByGender
+      Handler: service.getservicebygender
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /gettypes/{gender}
             Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetServiceBySubType:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetServiceBySubType
+      Handler: service.getservicebysubtype
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getallserv/{gender}
+            Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   LocationUpdate:
     Type: AWS::Serverless::Function
@@ -322,7 +348,7 @@ Resources:
         apiForLambda:
           Type: Api
           Properties:
-            Path: /book/{serviceid}
+            Path: /book/{date}/{slot}
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   GetBookings:

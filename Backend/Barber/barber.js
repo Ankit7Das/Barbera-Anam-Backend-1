@@ -55,7 +55,7 @@ exports.locationupdate = async (event) => {
         }
 
         var params = {
-            TableName: 'Barbers',
+            TableName: 'BarbersLog',
             Key: {
                 id: userID.id,
             }
@@ -66,7 +66,7 @@ exports.locationupdate = async (event) => {
         if(!data.Item) {
 
             params = {
-                TableName: 'Barbers',
+                TableName: 'BarbersLog',
                 Item: {
                     id: userID.id,
                     longitude: LONG,
@@ -96,7 +96,7 @@ exports.locationupdate = async (event) => {
         } else {
 
             params = {
-                TableName: 'Barbers',
+                TableName: 'BarbersLog',
                 Key: {
                     id: userID.id,
                 },

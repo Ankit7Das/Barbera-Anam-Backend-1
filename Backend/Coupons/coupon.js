@@ -53,7 +53,7 @@
 //         }
 
 //         var params = {
-//             TableName: 'Barbers',
+//             TableName: 'BarbersLog',
 //             Key: {
 //                 id: userID.id,
 //             }
@@ -64,7 +64,7 @@
 //         if(!data.Item) {
 
 //             params = {
-//                 TableName: 'Barbers',
+//                 TableName: 'BarbersLog',
 //                 Item: {
 //                     id: userID.id,
 //                     long: LONG,
@@ -94,7 +94,7 @@
 //         } else {
 
 //             params = {
-//                 TableName: 'Barbers',
+//                 TableName: 'BarbersLog',
 //                 Key: {
 //                     id: userID.id,
 //                 },
