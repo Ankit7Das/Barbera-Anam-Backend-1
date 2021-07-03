@@ -49,7 +49,7 @@ exports.locationupdate = async (event) => {
                 statusCode: 404,
                 body: JSON.stringify({
                     message: 'User not found or user not a barber',
-                    succes: false,
+                    success: false,
                 })
             }
         }

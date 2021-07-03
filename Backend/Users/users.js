@@ -318,7 +318,7 @@ exports.addupdate = async (event) => {
                 statusCode: 404,
                 body: JSON.stringify({
                     message: 'User not found',
-                    succes: false,
+                    success: false,
                 })
             }
         }
@@ -536,7 +536,7 @@ exports.loginotp = async (event) => {
             return {
                 statusCode: 500,
                 body: JSON.stringify({
-                    succes: false,
+                    success: false,
                     message: 'Invalid token entered'
                 })
             };
@@ -772,7 +772,7 @@ exports.loginotp = async (event) => {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
-                        succes: false,
+                        success: false,
                         message: 'Wrong OTP'
                     })
                 };
