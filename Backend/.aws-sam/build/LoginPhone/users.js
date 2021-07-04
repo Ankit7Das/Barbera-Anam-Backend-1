@@ -4,10 +4,9 @@ var AWS = require('aws-sdk');
 var uuid = require('uuid');
 var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
-var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-southeast-1' });
+var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
-const { userVerifier, dateSyn } = require("./authentication");
-const { hashPassword, matchPassword } = require("./password");
+const { userVerifier } = require("./authentication");
 var { Buffer } = require('buffer');
 const { JWT_SECRET } = process.env;
 const s3 = new AWS.S3({
@@ -18,7 +17,7 @@ var fileType = require('file-type');
 
 const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 
-exports.register = async (event) => {
+exports.profileupdate = async (event) => {
     try {
         var obj = JSON.parse(event.body);
 
@@ -88,7 +87,7 @@ exports.register = async (event) => {
                     await s3
                         .deleteObject({
                             Key: key,
-                            Bucket: 'barbera-images'
+                            Bucket: 'barbera-image'
                         })
                         .promise();
                 } catch(err){
@@ -148,12 +147,12 @@ exports.register = async (event) => {
                     Body: buffer,
                     Key: `profiles/${key}`,
                     ContentType: obj.mime,
-                    Bucket: 'barbera-images',
+                    Bucket: 'barbera-image',
                     ACL: 'public-read',
                 })
                 .promise();
 
-            url = `https://barbera-images.s3-ap-southeast-1.amazonaws.com/profiles/${key}`;
+            url = `https://barbera-image.s3-ap-south-1.amazonaws.com/profiles/${key}`;
     
         }
         
@@ -313,12 +312,22 @@ exports.addupdate = async (event) => {
 
         var exist1 = await userVerifier(userID.id);
 
-        if(exist1 == false) {
+        if(exist1.success == false) {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'User not found',
                     success: false,
+                    message: 'User not found',
+                })
+            }
+        }
+
+        if(exist1.user.role == 'admin') {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'User not user or barber',
                 })
             }
         }
@@ -549,6 +558,8 @@ exports.loginotp = async (event) => {
                 if(ROLE == 'barber' && !data.Items[0].role) {
 
                     var today = new Date();
+                    today.setHours(today.getHours() + 5);
+                    today.setMinutes(today.getMinutes() + 30);
                     var dd = String(today.getDate()).padStart(2, '0');
                     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
                     var yyyy = today.getFullYear();
@@ -631,7 +642,7 @@ exports.loginotp = async (event) => {
                                         Item: {
                                             date: day4,
                                             barberId: id,
-                                            '10': true,
+                                            '10': false,
                                             '11': false,
                                             '12': false,
                                         }
@@ -676,6 +687,31 @@ exports.loginotp = async (event) => {
 
                     try {
                         data = await documentClient.batchWrite(params).promise();
+
+                        params = {
+                            TableName: 'Users',
+                            Key: {
+                                id: id,
+                            },
+                            UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #status=:s",
+                            ExpressionAttributeNames: {
+                                '#otp': 'otp',
+                                '#role': 'role',
+                                '#address': 'address',
+                                '#long': 'longitude',
+                                '#lat': 'latitude',
+                                '#status': 'status'
+                            },
+                            ExpressionAttributeValues:{
+                                ":o": null,
+                                ":r": ROLE,
+                                ":a": ADD,
+                                ":lo": LONG,
+                                ":la": LAT,
+                                ":s": 'free'
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        };
                     } catch(err) {
                         return {
                             statusCode: 500,
@@ -685,9 +721,7 @@ exports.loginotp = async (event) => {
                             })
                         };
                     }
-                }
-
-                if(!data.Items[0].role) {
+                } else if(!data.Items[0].role) {
 
                     params = {
                         TableName: 'Users',
@@ -712,17 +746,7 @@ exports.loginotp = async (event) => {
                         ReturnValues:"UPDATED_NEW"
                     };
             
-                    try {
-                        data = await documentClient.update(params).promise();
-                    } catch(err) {
-                        return {
-                            statusCode: 500,
-                            body: JSON.stringify({
-                                success: false,
-                                message: err,
-                            })
-                        };
-                    }
+                    
                 } else {
     
                     params = {
@@ -739,34 +763,34 @@ exports.loginotp = async (event) => {
                         },
                         ReturnValues:"UPDATED_NEW"
                     };
-            
-                    try {
-                        data = await documentClient.update(params).promise();
-                    } catch(err) {
-                        return {
-                            statusCode: 500,
-                            body: JSON.stringify({
-                                success: false,
-                                message: err,
-                            })
-                        };
-                    }
                 }
 
-                var user = {
-                    id: id,
+                try {
+                    data = await documentClient.update(params).promise();
+
+                    var user = {
+                        id: id,
+                    }
+        
+                    token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+        
+                    return {
+                        statusCode: 200,
+                        body: JSON.stringify({
+                            success: true,
+                            message: 'Login/Signup Success',
+                            token: token,
+                        })
+                    };
+                } catch(err) {
+                    return {
+                        statusCode: 500,
+                        body: JSON.stringify({
+                            success: false,
+                            message: err,
+                        })
+                    };
                 }
-    
-                token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
-    
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify({
-                        success: true,
-                        message: 'Login/Signup Success',
-                        token: token,
-                    })
-                };
 
             } else {
                 return {

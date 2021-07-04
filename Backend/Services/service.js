@@ -4,7 +4,7 @@ var AWS = require('aws-sdk');
 var uuid = require('uuid');
 var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
-var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-southeast-1' });
+var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 var { Buffer } = require('buffer');
 const { JWT_SECRET } = process.env;
@@ -140,12 +140,12 @@ exports.addservice = async (event) => {
                 Body: buffer,
                 Key: `services/${key}`,
                 ContentType: obj.mime,
-                Bucket: 'barbera-images',
+                Bucket: 'barbera-image',
                 ACL: 'public-read',
             })
             .promise();
 
-        const url = `https://barbera-images.s3-ap-southeast-1.amazonaws.com/services/${key}`;
+        const url = `https://barbera-image.s3-ap-south-1.amazonaws.com/services/${key}`;
 
         var params = {
             TableName: 'Services',
@@ -465,7 +465,7 @@ exports.updateservice = async (event) => {
                     await s3
                         .deleteObject({
                             Key: key,
-                            Bucket: 'barbera-images'
+                            Bucket: 'barbera-image'
                         })
                         .promise();
                 } catch(err){

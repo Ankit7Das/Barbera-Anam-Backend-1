@@ -1,6 +1,6 @@
 var AWS = require('aws-sdk');
 var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
-var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-southeast-1' });
+var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 
 module.exports.userVerifier = async (id) => {
 

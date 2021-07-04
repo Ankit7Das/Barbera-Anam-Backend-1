@@ -6,7 +6,7 @@ codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Users"
 runtime = "nodejs12.x"
 source_md5 = ""
 packagetype = "Zip"
-functions = ["Register", "AddUpdate", "GetUser", "LoginPhone", "LoginOtp"]
+functions = ["ProfileUpdate", "AddUpdate", "GetUser", "LoginPhone", "LoginOtp"]
 
 [function_build_definitions.2ebc5ab0-53d2-4489-839a-00e017cb966e]
 codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Cart"
@@ -27,7 +27,7 @@ codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Barber"
 runtime = "nodejs12.x"
 source_md5 = ""
 packagetype = "Zip"
-functions = ["LocationUpdate"]
+functions = ["LocationUpdate", "CreateNewLog"]
 
 [function_build_definitions.50f40b2e-ee70-4b32-9db7-48a559675187]
 codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Bookings"

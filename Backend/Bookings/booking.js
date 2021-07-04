@@ -4,7 +4,7 @@ var AWS = require('aws-sdk');
 var uuid = require('uuid');
 var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
-var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-southeast-1' });
+var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
 const { userVerifier, serviceVerifier } = require("./authentication");
@@ -328,7 +328,10 @@ exports.selectbarber = async (event) => {
 
         var params;
         var data;
-        var timest = new Date();
+        var now = new Date();
+        now.setHours(now.getHours() + 5);
+        now.setMinutes(now.getMinutes() + 30);
+        var timest = now.toLocaleString(); 
 
         for(var i=0;i<serviceId.length;i++){
 

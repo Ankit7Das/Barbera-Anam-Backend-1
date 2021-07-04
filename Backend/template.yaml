@@ -92,17 +92,17 @@ Resources:
   #---------------------------------------------------------------
   # Login Functions
   #---------------------------------------------------------------    
-  Register:
+  ProfileUpdate:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: Users/
-      Handler: users.register
+      Handler: users.profileupdate
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api 
           Properties:
-            Path: /register
+            Path: /profileupd
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
 
@@ -367,6 +367,20 @@ Resources:
           Type: Api 
           Properties:
             Path: /locupd
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  CreateNewLog:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: Barber/
+      Handler: barber.createnewlog
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /newlog
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------

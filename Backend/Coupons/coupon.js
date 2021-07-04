@@ -4,7 +4,7 @@
 // var uuid = require('uuid');
 // var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 // var sns = new AWS.SNS({apiVersion: '2010-03-31'});
-// var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-southeast-1' });
+// var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 // const jwt = require("jsonwebtoken");
 // const { JWT_SECRET } = process.env;
 // const { userVerifier, addedBefore, serviceVerifier } = require("./authentication");

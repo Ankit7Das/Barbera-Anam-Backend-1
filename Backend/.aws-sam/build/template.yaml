@@ -78,17 +78,17 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-  Register:
+  ProfileUpdate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: Register
-      Handler: users.register
+      CodeUri: ProfileUpdate
+      Handler: users.profileupdate
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api
           Properties:
-            Path: /register
+            Path: /profileupd
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   AddUpdate:
@@ -323,6 +323,19 @@ Resources:
           Type: Api
           Properties:
             Path: /locupd
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  CreateNewLog:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: CreateNewLog
+      Handler: barber.createnewlog
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /newlog
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   GetBarbersByDate:
