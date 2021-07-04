@@ -8,12 +8,14 @@ var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 const { userVerifier } = require("./authentication");
 var { Buffer } = require('buffer');
+var referralCodeGenerator = require('referral-code-generator')
 const { JWT_SECRET } = process.env;
 const s3 = new AWS.S3({
     accessKeyId: process.env.ACCESS_KEY,
     secretAccessKey: process.env.SECRET_ACCESS_KEY
 });
 var fileType = require('file-type');
+const { hashPassword } = require('./password');
 
 const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 
@@ -24,7 +26,8 @@ exports.profileupdate = async (event) => {
         var EMAIL = obj.email;
         var NAME = obj.name;
         var ADD = obj.address;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -214,7 +217,8 @@ exports.profileupdate = async (event) => {
 exports.getuser = async (event) => {
     try {
 
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -284,7 +288,8 @@ exports.addupdate = async (event) => {
         var ADD = obj.address;
         var LONG = obj.longitude;
         var LAT = obj.latitude;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -398,9 +403,25 @@ exports.loginphone = async(event) => {
         
         var data = await documentClient.scan(params).promise();
         var random = Math.floor(100000 + Math.random() * 900000);
-        // var random1 = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1);
 
-        if(!data.Items[0]) {
+        if(data.Items.length == 0) {
+            var code;
+            var data1;
+
+            do {
+                code = await referralCodeGenerator.alphaNumeric('lowercase',3,1);
+
+                params = {
+                    TableName: 'Users',
+                    FilterExpression: '#referral = :this_referral',
+                    ExpressionAttributeValues: {':this_referral': code},
+                    ExpressionAttributeNames: {'#referral': 'referral'}
+                };
+
+                data1 = await documentClient.scan(params).promise();
+            }
+            while(data1.Count != 0);
+
             var ID = uuid.v1();
 
             params = {
@@ -409,6 +430,7 @@ exports.loginphone = async(event) => {
                     id: ID,
                     phone: PHONE,
                     otp: random,
+                    referral: code
                 }
             }
 
@@ -505,7 +527,8 @@ exports.loginotp = async (event) => {
         var ADD = obj.address;
         var LONG = obj.longitude;
         var LAT = obj.latitude;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
         
 
         if(token == null) {
@@ -693,14 +716,15 @@ exports.loginotp = async (event) => {
                             Key: {
                                 id: id,
                             },
-                            UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #status=:s",
+                            UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #status=:s, #referral=:ref",
                             ExpressionAttributeNames: {
                                 '#otp': 'otp',
                                 '#role': 'role',
                                 '#address': 'address',
                                 '#long': 'longitude',
                                 '#lat': 'latitude',
-                                '#status': 'status'
+                                '#status': 'status',
+                                '#referral': 'referral'
                             },
                             ExpressionAttributeValues:{
                                 ":o": null,
@@ -708,7 +732,8 @@ exports.loginotp = async (event) => {
                                 ":a": ADD,
                                 ":lo": LONG,
                                 ":la": LAT,
-                                ":s": 'free'
+                                ":s": 'free',
+                                ":ref": null
                             },
                             ReturnValues:"UPDATED_NEW"
                         };

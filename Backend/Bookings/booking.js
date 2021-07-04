@@ -16,7 +16,8 @@ exports.barberbyslot = async (event) => {
 
         var DATE = event.pathParameters.date;
         var SLOT = event.pathParameters.slot;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -145,7 +146,8 @@ exports.barberbyslot = async (event) => {
 exports.getbookings = async (event) => {
     try {
 
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
         
         if(token == null) {
             return {
@@ -240,7 +242,8 @@ exports.selectbarber = async (event) => {
         var serviceId = obj.serviceid;
         var DATE = event.pathParameters.date;
         var SLOT = event.pathParameters.slot;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {

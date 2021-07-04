@@ -16,7 +16,8 @@ exports.locationupdate = async (event) => {
         var obj = JSON.parse(event.body);
         var LONG = obj.longitude;
         var LAT = obj.latitude;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -144,7 +145,8 @@ exports.locationupdate = async (event) => {
 exports.createnewlog = async (event) => {
     try {
 
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {

@@ -13,7 +13,8 @@ exports.addtocart = async (event) => {
     try {
 
         var serviceId = event.pathParameters.serviceid;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -137,7 +138,8 @@ exports.addtocart = async (event) => {
 exports.getcart = async (event) => {
     try {
 
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -251,7 +253,8 @@ exports.quantity = async (event) => {
     try {
 
         var serviceId = event.pathParameters.serviceid;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
         var obj = JSON.parse(event.body);
         var FLOW = obj.flow;
 
@@ -399,7 +402,8 @@ exports.deletefromcart = async (event) => {
     try {
 
         var serviceId = event.pathParameters.serviceid;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {

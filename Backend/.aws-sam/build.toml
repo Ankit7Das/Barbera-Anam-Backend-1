@@ -36,4 +36,11 @@ source_md5 = ""
 packagetype = "Zip"
 functions = ["GetBarbersByDate", "BarberSelect", "GetBookings"]
 
+[function_build_definitions.11c6efef-7872-40bf-8e46-59f0b0ad6da3]
+codeuri = "/home/ankit/Documents/Barbera-Anam-Backend/Backend/Coupons"
+runtime = "nodejs12.x"
+source_md5 = ""
+packagetype = "Zip"
+functions = ["GetReferralCode"]
+
 [layer_build_definitions]

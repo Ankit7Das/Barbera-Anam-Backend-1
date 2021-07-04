@@ -377,3 +377,16 @@ Resources:
             Path: /getbookings
             Method: get
       Role: arn:aws:iam::140544830924:role/BackendUser
+  GetReferralCode:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetReferralCode
+      Handler: coupon.getreferral
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getref
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser

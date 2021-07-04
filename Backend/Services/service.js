@@ -33,7 +33,8 @@ exports.addservice = async (event) => {
         var TYPE = obj.type;
         var SUBTYPE = obj.subtype;
         var TREND = obj.trending;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -202,7 +203,8 @@ exports.delservice = async (event) => {
     try {
 
         var serviceId = event.pathParameters.serviceid;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -306,7 +308,8 @@ exports.getservicebyid = async (event) => {
     try {
 
         var serviceId = event.pathParameters.serviceid;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
         
         if(token == null) {
             return {
@@ -396,7 +399,8 @@ exports.updateservice = async (event) => {
         var TYPE = obj.type;
         var SUBTYPE = obj.subtype;
         var TREND = obj.trending;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -601,7 +605,8 @@ exports.updateservice = async (event) => {
 exports.getallservicenames = async (event) => {
     try {
 
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -688,7 +693,8 @@ exports.getallservicenames = async (event) => {
 exports.gettrending = async (event) => {
     try {
 
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -777,7 +783,8 @@ exports.getservicebysubtype = async (event) => {
         var SUBTYPE = obj.subtype; 
         var GENDER = event.pathParameters.gender;
         var TYPE = obj.type;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -865,7 +872,8 @@ exports.getservicebytype = async (event) => {
         var obj = JSON.parse(event.body);
         var GENDER = event.pathParameters.gender;
         var TYPE = obj.type;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -960,7 +968,8 @@ exports.getservicebygender = async (event) => {
     try {
 
         var GENDER = event.pathParameters.gender;
-        var token = event.headers.token;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
