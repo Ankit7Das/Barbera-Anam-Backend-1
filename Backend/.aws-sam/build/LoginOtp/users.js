@@ -8,7 +8,7 @@ var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 const { userVerifier } = require("./authentication");
 var { Buffer } = require('buffer');
-var referralCodeGenerator = require('referral-code-generator')
+const multipart = require('aws-lambda-multipart-parser');
 const { JWT_SECRET } = process.env;
 const s3 = new AWS.S3({
     accessKeyId: process.env.ACCESS_KEY,
@@ -21,11 +21,15 @@ const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 
 exports.profileupdate = async (event) => {
     try {
-        var obj = JSON.parse(event.body);
+        var buff = Buffer.from(event.body, 'base64');
+        var decodedEventBody = buff.toString('latin1'); 
+        var decodedEvent = { ...event, body: decodedEventBody };
+        var jsonEvent = multipart.parse(decodedEvent, false);
+        var asset;
 
-        var EMAIL = obj.email;
-        var NAME = obj.name;
-        var ADD = obj.address;
+        var EMAIL = jsonEvent.email;
+        var NAME = jsonEvent.name;
+        var ADD = jsonEvent.address;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -81,8 +85,8 @@ exports.profileupdate = async (event) => {
         }
 
         var url;
-        if(obj.mime && obj.image) {
-            if(exist1.user.pic) {
+        if(jsonEvent.image) {
+            if(exist1.user.pic !== null) {
                 url = new URL(exist1.user.pic);
                 var key = url.pathname.substring(1);
 
@@ -103,16 +107,13 @@ exports.profileupdate = async (event) => {
                 }
             }
 
-            if (!obj.image || !obj.mime) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({
-                        message: 'incorrect body on request'
-                    })
-                };
-            }
+            asset = Buffer.from(jsonEvent.image.content, 'latin1');
+            var mime = jsonEvent.image.contentType;
+            var fileInfo = await fileType.fromBuffer(asset);
+            var detectedExt = fileInfo.ext;
+            var detectedMime = fileInfo.mime;
     
-            if (!allowedMimes.includes(obj.mime)) {
+            if (!allowedMimes.includes(mime)) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
@@ -120,18 +121,8 @@ exports.profileupdate = async (event) => {
                     })
                 };
             }
-    
-            let imageData = obj.image;
-            if (obj.image.substr(0, 7) === 'base64,') {
-                imageData = obj.image.substr(7, obj.image.length);
-            }
-    
-            const buffer = Buffer.from(imageData, 'base64');
-            const fileInfo = await fileType.fromBuffer(buffer);
-            const detectedExt = fileInfo.ext;
-            const detectedMime = fileInfo.mime;
-    
-            if (detectedMime !== obj.mime) {
+
+            if (detectedMime !== mime) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
@@ -143,18 +134,16 @@ exports.profileupdate = async (event) => {
             var name = userID.id;
             var key = `${name}.${detectedExt}`;
     
-            console.log(`writing image to bucket called ${key}`);
-    
             await s3
                 .upload({
-                    Body: buffer,
+                    Body: asset,
                     Key: `profiles/${key}`,
-                    ContentType: obj.mime,
+                    ContentType: mime,
                     Bucket: 'barbera-image',
                     ACL: 'public-read',
                 })
                 .promise();
-
+    
             url = `https://barbera-image.s3-ap-south-1.amazonaws.com/profiles/${key}`;
     
         }
@@ -409,7 +398,7 @@ exports.loginphone = async(event) => {
             var data1;
 
             do {
-                code = await referralCodeGenerator.alphaNumeric('lowercase',3,1);
+                code = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1);
 
                 params = {
                     TableName: 'Users',

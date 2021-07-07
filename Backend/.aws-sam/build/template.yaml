@@ -153,7 +153,7 @@ Resources:
         apiForLambda:
           Type: Api
           Properties:
-            Path: /addtocart/{serviceid}
+            Path: /addtocart
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   GetCart:

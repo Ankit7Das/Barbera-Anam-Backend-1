@@ -12,7 +12,8 @@
       "aws-sdk": "^2.783.0",
       "jsonwebtoken": "^8.5.1",
       "dotenv": "^8.2.0",
-      "file-type": "^14.6.2"
+      "file-type": "^14.6.2",
+      "aws-lambda-multipart-parser": "^0.1.3"
     }
   }
   

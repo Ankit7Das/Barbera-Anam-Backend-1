@@ -12,7 +12,8 @@ const { userVerifier, addedBefore, serviceVerifier } = require("./authentication
 exports.addtocart = async (event) => {
     try {
 
-        var serviceId = event.pathParameters.serviceid;
+        var obj = JSON.parse(event.body);
+        var serviceId = obj.serviceid;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -62,68 +63,86 @@ exports.addtocart = async (event) => {
             }
         }
 
-        var exist2 = await serviceVerifier(serviceId);
-
-        if(exist2.success == false) {
-            return {
-                statusCode: 404,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Service Unavailable',
-                })
-            }
-        }
-        
-        var exist3 = await addedBefore(userID.id, serviceId);
-
-        if(exist3 == true) {
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Already added to cart',
-                })
-            }
-        }
-
-        var NAME = exist2.data.name;
-        var PRICE = exist2.data.price;
-        
-        var params = {
-            TableName: 'Carts',
-            Item: {
-                userId: userID.id,
-                serviceId: serviceId,
-                name: NAME,
-                price: PRICE,
-                quantity: 1
-            }
-        };
-
+        var exist2;
+        var exist3;
+        var NAME;
+        var PRICE;
+        var TIME;
+        var params;
         var data;
-        var msg;
+        var cnt = 0;
+        var cnt1 = 0;
 
-        try {
+        for(var i=0;i<serviceId.length;i++) {
+            exist2 = await serviceVerifier(serviceId[i]);
+
+            if(exist2.success == false) {
+                cnt1++;
+                continue;
+            }
+            
+            exist3 = await addedBefore(userID.id, serviceId[i]);
+
+            if(exist3 == true) {
+                cnt++;
+                continue;
+            }
+
+            NAME = exist2.data.name;
+            PRICE = exist2.data.price;
+            TIME = exist2.data.time;
+            
+            params = {
+                TableName: 'Carts',
+                Item: {
+                    userId: userID.id,
+                    serviceId: serviceId[i],
+                    name: NAME,
+                    price: PRICE,
+                    quantity: 1,
+                    time: TIME
+                }
+            };
+
             data = await documentClient.put(params).promise();
-            console.log("Item entered successfully:", data);
-            msg = 'Added to Cart';
+        }
+ 
+        if(cnt + cnt1 < serviceId.length) {
+            params = {
+                TableName: 'Carts',
+                KeyConditionExpression: '#user = :u',
+                ExpressionAttributeValues: {
+                    ':u': userID.id,
+                },
+                ExpressionAttributeNames: {
+                    '#user': 'userId'
+                }
+            };
+    
+            data = await documentClient.query(params).promise();
 
             return {
                 statusCode: 200,
                 body: JSON.stringify({
                     success: true,
-                    message: msg,
+                    message: 'Added to Cart',
+                    count: data.Count
                 })
             };
-        } catch(err) {
-            console.log("Error: ", err);
-            msg = err;
-
+        } else if(cnt == serviceId.length) {
+            return {
+                statusCode: 500,
+                body:JSON.stringify({
+                    success: false,
+                    message: 'Already added in cart'
+                })
+            };
+        }else {
             return {
                 statusCode: 500,
                 body: JSON.stringify({
                     success: false,
-                    message: msg,
+                    message: 'Service IDs are invalid',
                 })
             };
         }
@@ -231,6 +250,7 @@ exports.getcart = async (event) => {
                     success: true,
                     message: 'Cart Items found',
                     data: data.Items,
+                    count: data.Count
                 })
             };
         } catch(err) {
@@ -249,14 +269,13 @@ exports.getcart = async (event) => {
     }
 }
 
-exports.quantity = async (event) => {
+exports.quantityupdate = async (event) => {
     try {
 
-        var serviceId = event.pathParameters.serviceid;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
         var obj = JSON.parse(event.body);
-        var FLOW = obj.flow;
+        var service = obj.service;
 
         if(token == null) {
             return {
@@ -304,71 +323,51 @@ exports.quantity = async (event) => {
             }
         }
 
-        var exist2 = await serviceVerifier(serviceId);
-
-        if(exist2.success == false) {
-            return {
-                statusCode: 404,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Service Unavailable',
-                })
-            }
-        }
-        
-        var exist3 = await addedBefore(userID.id, serviceId);
-
-        if(exist3 == false) {
-            return {
-                statusCode: 404,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Service not in cart',
-                })
-            }
-        }
-
+        var exist2;
+        var exist3;
         var params;
-
-        if(FLOW == true) {
-            params = {
-                TableName: 'Carts',
-                Key: {
-                    userId: userID.id,
-                    serviceId: serviceId,
-                },
-                UpdateExpression: "set #quantity=#quantity + :q",
-                ExpressionAttributeNames: {
-                    '#quantity': 'quantity'
-                },
-                ExpressionAttributeValues:{
-                    ":q": 1,
-                },
-                ReturnValues:"UPDATED_NEW"
-            };
-        } else {
-            params = {
-                TableName: 'Carts',
-                Key: {
-                    userId: userID.id,
-                    serviceId: serviceId,
-                },
-                UpdateExpression: "set #quantity=#quantity - :q",
-                ExpressionAttributeNames: {
-                    '#quantity': 'quantity'
-                },
-                ExpressionAttributeValues:{
-                    ":q": 1,
-                },
-                ReturnValues:"UPDATED_NEW"
-            };
-        } 
-
         var data;
+        var cnt = 0;
+        var cnt1 = 0;
+
+        for(var i=0;i<service.length;i++) {
+            exist2 = await serviceVerifier(service[i].id);
+
+            if(exist2.success == false) {
+                cnt1++;
+                continue;
+            }
+            
+            exist3 = await addedBefore(userID.id, service[i].id);
+
+            if(exist3 == false) {
+                cnt++;
+                continue;
+            }
+
+            params = {
+                    TableName: 'Carts',
+                    Key: {
+                        userId: userID.id,
+                        serviceId: service[i].id,
+                    },
+                    UpdateExpression: "set #quantity=:q",
+                    ExpressionAttributeNames: {
+                        '#quantity': 'quantity'
+                    },
+                    ExpressionAttributeValues:{
+                        ":q": service[i].quantity,
+                    },
+                    ReturnValues:"UPDATED_NEW"
+            };
+
+            data = await documentClient.update(params).promise();
+        }
+
         var msg;
 
-        try {
-            data = await documentClient.update(params).promise();
+        if(cnt + cnt1 < service.length) {
+            
             msg = 'Service quantity updated';
 
             return {
@@ -378,16 +377,22 @@ exports.quantity = async (event) => {
                     message: msg,
                 })
             };
-        } catch(err) {
-            console.log("Error: ", err);
-            msg = err;
+        } else if(cnt == serviceId.length) {
             return {
-                statusCode: 500,
+                statusCode: 400,
                 body: JSON.stringify({
                     success: false,
-                    message: msg,
+                    message: 'Services IDs invalid',
                 })
-            };
+            }
+        }else {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Services not in cart',
+                })
+            }
         }
 
         
@@ -484,27 +489,39 @@ exports.deletefromcart = async (event) => {
         }
 
         var data;
-        var msg;
 
         try {
             data = await documentClient.delete(params).promise();
-            msg = 'Item deleted from Cart';
+
+            params = {
+                TableName: 'Carts',
+                KeyConditionExpression: '#user = :u',
+                ExpressionAttributeValues: {
+                    ':u': userID.id,
+                },
+                ExpressionAttributeNames: {
+                    '#user': 'userId'
+                }
+            };
+    
+            
+            data = await documentClient.query(params).promise();
 
             return {
                 statusCode: 200,
                 body: JSON.stringify({
                     success: true,
-                    message: msg,
+                    message: 'Item deleted from Cart',
+                    count: data.Count
                 })
             };
         } catch(err) {
             console.log("Error: ", err);
-            msg = err;
             return {
                 statusCode: 500,
                 body: JSON.stringify({
                     success: false,
-                    message: msg,
+                    message: err,
                 })
             };
         }

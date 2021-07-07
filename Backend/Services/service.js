@@ -7,6 +7,7 @@ var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 var { Buffer } = require('buffer');
+const multipart = require('aws-lambda-multipart-parser');
 const { JWT_SECRET } = process.env;
 const { userVerifier, addedBefore, serviceVerifier } = require("./authentication");
 const s3 = new AWS.S3({
@@ -21,18 +22,23 @@ const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 exports.addservice = async (event) => {
     try {
 
-        var obj = JSON.parse(event.body);
+        var buff = Buffer.from(event.body, 'base64');
+        var decodedEventBody = buff.toString('latin1'); 
+        var decodedEvent = { ...event, body: decodedEventBody };
+        var jsonEvent = multipart.parse(decodedEvent, false);
+        var asset;
+    
         var ID = uuid.v1();
-        var NAME = obj.name;
-        var PRICE = obj.price;
-        var TIME = obj.time;
-        var DET = obj.details;
-        var DISC = obj.discount;
-        var DOD = obj.dod;
-        var GENDER = obj.gender;
-        var TYPE = obj.type;
-        var SUBTYPE = obj.subtype;
-        var TREND = obj.trending;
+        var NAME = jsonEvent.name;
+        var PRICE = jsonEvent.price;
+        var TIME = jsonEvent.time;
+        var DET = (jsonEvent.details==='null') ? null : jsonEvent.details;
+        var CUT = (jsonEvent.cutprice==='null') ? null : jsonEvent.cutprice;
+        var DOD = (jsonEvent.dod==='true') ? true : false;
+        var GENDER = jsonEvent.gender;
+        var TYPE = jsonEvent.type;
+        var SUBTYPE = (jsonEvent.subtype==='null') ? null : jsonEvent.subtype;
+        var TREND = (jsonEvent.trending==='true') ? true : false;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -94,59 +100,48 @@ exports.addservice = async (event) => {
             }
         }
 
-        if (!obj.image || !obj.mime) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    message: 'incorrect body on request'
+        var url;
+
+        if(jsonEvent.image) {
+            asset = Buffer.from(jsonEvent.image.content, 'latin1');
+            var mime = jsonEvent.image.contentType;
+            var fileInfo = await fileType.fromBuffer(asset);
+            var detectedExt = fileInfo.ext;
+            var detectedMime = fileInfo.mime;
+    
+            if (!allowedMimes.includes(mime)) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        message: 'mime is not allowed '
+                    })
+                };
+            }
+
+            if (detectedMime !== mime) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        message: 'mime types dont match'
+                    })
+                };
+            }
+    
+            var name = ID;
+            var key = `${name}.${detectedExt}`;
+    
+            await s3
+                .upload({
+                    Body: asset,
+                    Key: `services/${key}`,
+                    ContentType: mime,
+                    Bucket: 'barbera-image',
+                    ACL: 'public-read',
                 })
-            };
+                .promise();
+    
+            url = `https://barbera-image.s3-ap-south-1.amazonaws.com/services/${key}`;
         }
-
-        if (!allowedMimes.includes(obj.mime)) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    message: 'mime is not allowed '
-                })
-            };
-        }
-
-        let imageData = obj.image;
-        if (obj.image.substr(0, 7) === 'base64,') {
-            imageData = obj.image.substr(7, obj.image.length);
-        }
-
-        const buffer = Buffer.from(imageData, 'base64');
-        const fileInfo = await fileType.fromBuffer(buffer);
-        const detectedExt = fileInfo.ext;
-        const detectedMime = fileInfo.mime;
-
-        if (detectedMime !== obj.mime) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    message: 'mime types dont match'
-                })
-            };
-        }
-
-        const name = ID;
-        const key = `${name}.${detectedExt}`;
-
-        console.log(`writing image to bucket called ${key}`);
-
-        await s3
-            .upload({
-                Body: buffer,
-                Key: `services/${key}`,
-                ContentType: obj.mime,
-                Bucket: 'barbera-image',
-                ACL: 'public-read',
-            })
-            .promise();
-
-        const url = `https://barbera-image.s3-ap-south-1.amazonaws.com/services/${key}`;
 
         var params = {
             TableName: 'Services',
@@ -156,13 +151,13 @@ exports.addservice = async (event) => {
                 price: PRICE,
                 time: TIME,
                 details: DET ? DET : null,
-                discount: DISC ? DISC : null,
+                cutprice: CUT ? CUT : null,
                 icon: url ? url : null,
                 dod: DOD ? DOD : false,
                 type: TYPE,
                 subtype: SUBTYPE,
                 gender: GENDER,
-                trending: TREND
+                trending: TREND ? TREND : false
             }
         }
 
@@ -261,6 +256,27 @@ exports.delservice = async (event) => {
                     message: 'Service doesn\'t exist',
                     success: false,
                 })
+            }
+        }
+
+        if(exist2.service.icon) {
+            var url = new URL(exist2.service.icon);
+            var key = url.pathname.substring(1);
+
+            try {
+                await s3
+                    .deleteObject({
+                        Key: key,
+                        Bucket: 'barbera-image'
+                    })
+                    .promise();
+            } catch(err){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        success: false,
+                    })
+                };
             }
         }
 
@@ -387,18 +403,23 @@ exports.getservicebyid = async (event) => {
 exports.updateservice = async (event) => {
     try {
 
-        var obj = JSON.parse(event.body);
-        var ID = obj.id;
-        var NAME = obj.name;
-        var PRICE = obj.price;
-        var TIME = obj.time;
-        var DET = obj.details;
-        var DISC = obj.discount;
-        var DOD = obj.dod;
-        var GENDER = obj.gender;
-        var TYPE = obj.type;
-        var SUBTYPE = obj.subtype;
-        var TREND = obj.trending;
+        var buff = Buffer.from(event.body, 'base64');
+        var decodedEventBody = buff.toString('latin1'); 
+        var decodedEvent = { ...event, body: decodedEventBody };
+        var jsonEvent = multipart.parse(decodedEvent, false);
+        var asset;
+    
+        var ID = jsonEvent.id;
+        var NAME = jsonEvent.name;
+        var PRICE = jsonEvent.price;
+        var TIME = jsonEvent.time;
+        var DET = (jsonEvent.details==='null') ? null : jsonEvent.details;
+        var CUT = (jsonEvent.cutprice==='null') ? null : jsonEvent.cutprice;
+        var DOD = (jsonEvent.dod==='true') ? true : false;
+        var GENDER = jsonEvent.gender;
+        var TYPE = jsonEvent.type;
+        var SUBTYPE = (jsonEvent.subtype==='null') ? null : jsonEvent.subtype;
+        var TREND = (jsonEvent.trending==='true') ? true : false;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -460,7 +481,9 @@ exports.updateservice = async (event) => {
             }
         }
 
-        if(obj.mime && obj.image) {
+        var url;
+
+        if(jsonEvent.image) {
             if(exist2.service.icon) {
                 var url = new URL(exist2.service.icon);
                 var key = url.pathname.substring(1);
@@ -482,16 +505,13 @@ exports.updateservice = async (event) => {
                 }
             }
 
-            if (!obj.image || !obj.mime) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({
-                        message: 'incorrect body on request'
-                    })
-                };
-            }
+            asset = Buffer.from(jsonEvent.image.content, 'latin1');
+            var mime = jsonEvent.image.contentType;
+            var fileInfo = await fileType.fromBuffer(asset);
+            var detectedExt = fileInfo.ext;
+            var detectedMime = fileInfo.mime;
     
-            if (!allowedMimes.includes(obj.mime)) {
+            if (!allowedMimes.includes(mime)) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
@@ -499,18 +519,8 @@ exports.updateservice = async (event) => {
                     })
                 };
             }
-    
-            let imageData = obj.image;
-            if (obj.image.substr(0, 7) === 'base64,') {
-                imageData = obj.image.substr(7, obj.image.length);
-            }
-    
-            const buffer = Buffer.from(imageData, 'base64');
-            const fileInfo = await fileType.fromBuffer(buffer);
-            const detectedExt = fileInfo.ext;
-            const detectedMime = fileInfo.mime;
-    
-            if (detectedMime !== obj.mime) {
+
+            if (detectedMime !== mime) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
@@ -522,18 +532,17 @@ exports.updateservice = async (event) => {
             var name = ID;
             var key = `${name}.${detectedExt}`;
     
-            console.log(`writing image to bucket called ${key}`);
-    
             await s3
                 .upload({
-                    Body: buffer,
+                    Body: asset,
                     Key: `services/${key}`,
-                    ContentType: obj.mime,
-                    Bucket: 'barbera-images',
+                    ContentType: mime,
+                    Bucket: 'barbera-image',
                     ACL: 'public-read',
                 })
                 .promise();
     
+            url = `https://barbera-image.s3-ap-south-1.amazonaws.com/services/${key}`;
         }
 
         var params = {
@@ -541,14 +550,15 @@ exports.updateservice = async (event) => {
             Key: {
                 id: ID,
             },
-            UpdateExpression: "set #name=:n, #price=:p, #time=:ti, #details=:det, #discount=:dis, #deal=:dod, #type=:t, #subtype=:s, #gender=:g, #trend=:tr",
+            UpdateExpression: "set #name=:n, #price=:p, #time=:ti, #details=:det, #cut=:c, #deal=:dod, #icon=:i, #type=:t, #subtype=:s, #gender=:g, #trend=:tr",
             ExpressionAttributeNames: {
                 '#name': 'name',
                 '#price': 'price',
                 '#time': 'time',
                 '#details': 'details',
-                '#discount': 'discount',
+                '#cut': 'cutprice',
                 '#deal': 'dod',
+                '#icon':'icon',
                 '#type': 'type',
                 '#subtype': 'subtype',
                 '#gender': 'gender',
@@ -559,7 +569,8 @@ exports.updateservice = async (event) => {
                 ":p": PRICE,
                 ":ti": TIME,
                 ":det": DET ? DET : null,
-                ":dis": DISC ? DISC : null,
+                ":c": CUT ? CUT : null,
+                ":i": url ? url : null,
                 ":dod": DOD ? DOD : false,
                 ":t": TYPE,
                 ":s": SUBTYPE,
@@ -737,7 +748,7 @@ exports.gettrending = async (event) => {
                 statusCode: 400,
                 body: JSON.stringify({
                     success: false,
-                    message: 'User not an admin',
+                    message: 'Not an user',
                 })
             }
         }
@@ -753,7 +764,7 @@ exports.gettrending = async (event) => {
 
         if(data.Items.length == 0) {
             return {
-                statusCode: 404,
+                statusCode: 200,
                 body: JSON.stringify({
                     success: false,
                     message: 'No trending services'
@@ -933,7 +944,7 @@ exports.getservicebytype = async (event) => {
 
         if(data.Items.length == 0) {
             return {
-                statusCode: 404,
+                statusCode: 200,
                 body: JSON.stringify({
                     success: false,
                     message: 'No Subtypes found'
@@ -1029,7 +1040,7 @@ exports.getservicebygender = async (event) => {
 
         if(data.Items.length == 0) {
             return {
-                statusCode: 404,
+                statusCode: 200,
                 body: JSON.stringify({
                     success: false,
                     message: 'No Types found'
