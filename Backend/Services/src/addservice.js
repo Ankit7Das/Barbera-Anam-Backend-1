@@ -21,6 +21,8 @@ const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 exports.handler = async (event) => {
     try {
 
+        console.log(event);
+
         // var buff = Buffer.from(event.body, 'base64');
         // var decodedEventBody = buff.toString('latin1'); 
         // var decodedEvent = { ...event, body: decodedEventBody };

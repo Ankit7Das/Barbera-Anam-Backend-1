@@ -141,6 +141,20 @@ Resources:
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
+  ImageUpload:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: file.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /imgupload
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
 
 
 

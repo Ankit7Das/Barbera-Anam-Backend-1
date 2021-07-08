@@ -4,7 +4,7 @@ Resources:
   ProfileUpdate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/286416273c6a84d931ccd94956301bd2
+      CodeUri: s3://barbera-buckets/11f4c3a130869b8b8c412b605de771fa
       Handler: profileupdate.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   AddressUpdate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/286416273c6a84d931ccd94956301bd2
+      CodeUri: s3://barbera-buckets/11f4c3a130869b8b8c412b605de771fa
       Handler: addressupdate.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   GetUser:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/286416273c6a84d931ccd94956301bd2
+      CodeUri: s3://barbera-buckets/11f4c3a130869b8b8c412b605de771fa
       Handler: getuser.handler
       Runtime: nodejs12.x
       Events:
@@ -43,7 +43,7 @@ Resources:
   LoginPhone:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/286416273c6a84d931ccd94956301bd2
+      CodeUri: s3://barbera-buckets/11f4c3a130869b8b8c412b605de771fa
       Handler: loginphone.handler
       Runtime: nodejs12.x
       Events:
@@ -56,7 +56,7 @@ Resources:
   LoginOtp:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/286416273c6a84d931ccd94956301bd2
+      CodeUri: s3://barbera-buckets/11f4c3a130869b8b8c412b605de771fa
       Handler: loginotp.handler
       Runtime: nodejs12.x
       Events:

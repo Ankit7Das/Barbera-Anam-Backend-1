@@ -4,7 +4,7 @@ Resources:
   GetBarbersByDate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e57ce4f3739b7a0b7ba84aaa2c61404c
+      CodeUri: s3://barbera-buckets/42aaa7b6b417635ac1382366cc12eba0
       Handler: barberbyslot.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   BarberSelect:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e57ce4f3739b7a0b7ba84aaa2c61404c
+      CodeUri: s3://barbera-buckets/42aaa7b6b417635ac1382366cc12eba0
       Handler: selectbarber.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   GetBookings:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e57ce4f3739b7a0b7ba84aaa2c61404c
+      CodeUri: s3://barbera-buckets/42aaa7b6b417635ac1382366cc12eba0
       Handler: getbookings.handler
       Runtime: nodejs12.x
       Events:

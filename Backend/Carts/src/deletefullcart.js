@@ -11,10 +11,10 @@ const { userVerifier, addedBefore, serviceVerifier } = require("./authentication
 exports.handler = async (event) => {
     try {
 
-        var tokenArray = event.headers.Authorization.split(" ");
-        var token = tokenArray[1];
         var obj = JSON.parse(event.body);
         var service = obj.service;
+        var tokenArray = event.headers.Authorization.split(" ");
+        var token = tokenArray[1];
 
         if(token == null) {
             return {
@@ -66,74 +66,68 @@ exports.handler = async (event) => {
         var exist3;
         var params;
         var data;
-        var cnt = 0;
-        var cnt1 = 0;
 
         for(var i=0;i<service.length;i++) {
             exist2 = await serviceVerifier(service[i].serviceId);
 
             if(exist2.success == false) {
-                cnt1++;
+                // return {
+                //     statusCode: 404,
+                //     body: JSON.stringify({
+                //         success: false,
+                //         message: 'Service Unavailable',
+                //     })
+                // }
                 continue;
             }
             
             exist3 = await addedBefore(userID.id, service[i].serviceId);
 
             if(exist3 == false) {
-                cnt++;
+                // return {
+                //     statusCode: 404,
+                //     body: JSON.stringify({
+                //         success: false,
+                //         message: 'Service not in cart',
+                //     })
+                // }
                 continue;
             }
 
             params = {
-                    TableName: 'Carts',
-                    Key: {
-                        userId: userID.id,
-                        serviceId: service[i].serviceId,
-                    },
-                    UpdateExpression: "set #quantity=:q",
-                    ExpressionAttributeNames: {
-                        '#quantity': 'quantity'
-                    },
-                    ExpressionAttributeValues:{
-                        ":q": service[i].quantity,
-                    },
-                    ReturnValues:"UPDATED_NEW"
-            };
+                TableName: 'Carts',
+                Key:{
+                    userId: userID.id,
+                    serviceId: service[i].serviceId
+                }
+            }
 
-            data = await documentClient.update(params).promise();
+            data = await documentClient.delete(params).promise();
         }
-
-        var msg;
-
-        if(cnt + cnt1 < service.length) {
             
-            msg = 'Service quantity updated';
 
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    success: true,
-                    message: msg,
-                })
-            };
-        } else if(cnt == serviceId.length) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Services IDs invalid',
-                })
+        params = {
+            TableName: 'Carts',
+            KeyConditionExpression: '#user = :u',
+            ExpressionAttributeValues: {
+                ':u': userID.id,
+            },
+            ExpressionAttributeNames: {
+                '#user': 'userId'
             }
-        }else {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Services not in cart',
-                })
-            }
-        }
+        };
 
+        
+        data = await documentClient.query(params).promise();
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                success: true,
+                message: 'Items deleted from Cart',
+                count: data.Count
+            })
+        };
         
 
     } catch(err) {

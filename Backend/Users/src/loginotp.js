@@ -240,29 +240,47 @@ exports.handler = async (event) => {
                     }
                 } else if(!data.Items[0].role) {
 
-                    params = {
-                        TableName: 'Users',
-                        Key: {
-                            id: id,
-                        },
-                        UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la",
-                        ExpressionAttributeNames: {
-                            '#otp': 'otp',
-                            '#role': 'role',
-                            '#address': 'address',
-                            '#long': 'longitude',
-                            '#lat': 'latitude'
-                        },
-                        ExpressionAttributeValues:{
-                            ":o": null,
-                            ":r": ROLE,
-                            ":a": ADD,
-                            ":lo": LONG,
-                            ":la": LAT
-                        },
-                        ReturnValues:"UPDATED_NEW"
-                    };
-            
+                    if(ROLE == 'admin') {
+                        params = {
+                            TableName: 'Users',
+                            Key: {
+                                id: id,
+                            },
+                            UpdateExpression: "set #otp=:o, #role=:r",
+                            ExpressionAttributeNames: {
+                                '#otp': 'otp',
+                                '#role': 'role'
+                            },
+                            ExpressionAttributeValues:{
+                                ":o": null,
+                                ":r": ROLE
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        };
+                    } else {
+                        params = {
+                            TableName: 'Users',
+                            Key: {
+                                id: id,
+                            },
+                            UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la",
+                            ExpressionAttributeNames: {
+                                '#otp': 'otp',
+                                '#role': 'role',
+                                '#address': 'address',
+                                '#long': 'longitude',
+                                '#lat': 'latitude'
+                            },
+                            ExpressionAttributeValues:{
+                                ":o": null,
+                                ":r": ROLE,
+                                ":a": ADD,
+                                ":lo": LONG,
+                                ":la": LAT
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        };
+                    }
                     
                 } else {
     

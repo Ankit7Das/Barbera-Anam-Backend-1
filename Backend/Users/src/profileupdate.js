@@ -20,15 +20,10 @@ const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 
 exports.handler = async (event) => {
     try {
-        var buff = Buffer.from(event.body, 'base64');
-        var decodedEventBody = buff.toString('latin1'); 
-        var decodedEvent = { ...event, body: decodedEventBody };
-        var jsonEvent = multipart.parse(decodedEvent, false);
-        var asset;
-
-        var EMAIL = jsonEvent.email;
-        var NAME = jsonEvent.name;
-        var ADD = jsonEvent.address;
+        
+        var EMAIL = obj.email;
+        var NAME = obj.name;
+        var ADD = obj.address;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -84,7 +79,7 @@ exports.handler = async (event) => {
         }
 
         var url;
-        if(jsonEvent.image) {
+        if(obj.image) {
             if(exist1.user.pic !== null) {
                 url = new URL(exist1.user.pic);
                 var key = url.pathname.substring(1);
@@ -106,13 +101,17 @@ exports.handler = async (event) => {
                 }
             }
 
-            asset = Buffer.from(jsonEvent.image.content, 'latin1');
-            var mime = jsonEvent.image.contentType;
-            var fileInfo = await fileType.fromBuffer(asset);
+            let imageData = obj.image;
+            if (obj.image.substr(0, 7) === 'base64,') {
+                imageData = obj.image.substr(7, obj.image.length);
+            }
+    
+            var buffer = Buffer.from(imageData, 'base64');
+            var fileInfo = await fileType.fromBuffer(buffer);
             var detectedExt = fileInfo.ext;
             var detectedMime = fileInfo.mime;
-    
-            if (!allowedMimes.includes(mime)) {
+
+            if (!allowedMimes.includes(detectedMime)) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
@@ -120,30 +119,23 @@ exports.handler = async (event) => {
                     })
                 };
             }
-
-            if (detectedMime !== mime) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({
-                        message: 'mime types dont match'
-                    })
-                };
-            }
     
             var name = userID.id;
             var key = `${name}.${detectedExt}`;
     
+            console.log(`writing image to bucket called ${key}`);
+    
             await s3
                 .upload({
-                    Body: asset,
+                    Body: buffer,
                     Key: `profiles/${key}`,
-                    ContentType: mime,
+                    ContentType: detectedMime,
                     Bucket: 'barbera-image',
                     ACL: 'public-read',
                 })
                 .promise();
     
-            url = `https://barbera-image.s3-ap-south-1.amazonaws.com/profiles/${key}`;
+            url = `https://barberaimages.s3-ap-southeast-1.amazonaws.com/profiles/${key}`;
     
         }
         

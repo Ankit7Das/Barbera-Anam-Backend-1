@@ -49,8 +49,8 @@ exports.handler = async (event) => {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'User not found',
                     success: false,
+                    message: 'User not found',
                 })
             }
         }
@@ -59,10 +59,39 @@ exports.handler = async (event) => {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
-                    message: 'User not found or user does not have role as user',
                     success: false,
+                    message: 'Not a user',
                 })
             }
+        }
+
+        var today = new Date();
+        today.setHours(today.getHours() + 5);
+        today.setMinutes(today.getMinutes() + 30);
+
+        console.log(Number(SLOT));
+        console.log(Number(today.getHours()));
+
+        var date = new Date(DATE);
+
+        if(date.getDate()<today.getDate()) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Date chosen is not possible'
+                })
+            };
+        }
+
+        if(Number(SLOT)<Number(today.getHours())) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Slot chosen is not possible'
+                })
+            };
         }
 
         var params = {
