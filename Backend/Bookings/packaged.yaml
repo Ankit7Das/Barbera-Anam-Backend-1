@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  GetBarbersByDate:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/e57ce4f3739b7a0b7ba84aaa2c61404c
+      Handler: barberbyslot.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getbarb/{date}/{slot}
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  BarberSelect:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/e57ce4f3739b7a0b7ba84aaa2c61404c
+      Handler: selectbarber.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /book/{date}/{slot}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetBookings:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/e57ce4f3739b7a0b7ba84aaa2c61404c
+      Handler: getbookings.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getbookings
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser

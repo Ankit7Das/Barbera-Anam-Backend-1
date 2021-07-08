@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  #Stack-Name: Barbera- 
+
+  #---------------------------------------------------------------
+  # Coupon Functions
+  #---------------------------------------------------------------
+  GetReferralCode:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getreferral.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getref
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+
+            
+  

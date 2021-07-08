@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  # Stack-Name: Barbera-Services
+
+  #---------------------------------------------------------------
+  # Login Functions
+  #---------------------------------------------------------------    
+  ProfileUpdate:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: profileupdate.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /profileupd
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  AddressUpdate:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: addressupdate.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /address
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  GetUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getuser.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getuser
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  LoginPhone:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: loginphone.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /loginphone
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  LoginOtp:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: loginotp.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /loginotp
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+
+            
+  

@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+
+  #---------------------------------------------------------------
+  # Cart Functions
+  #---------------------------------------------------------------
+  AddtoCart:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: addtocart.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /addtocart
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  GetCart:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getcart.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getcart
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  Quantity:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: quantityupdate.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /quantity
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+
+  DeleteFromCart:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: deletefromcart.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /deletefromcart/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+            
+  

@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  AddService:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/ea7a2951de11c1915fea4aa18994494a
+      Handler: addservice.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /addservice
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  DelService:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/ea7a2951de11c1915fea4aa18994494a
+      Handler: delservice.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /delservice/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetServiceByID:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/ea7a2951de11c1915fea4aa18994494a
+      Handler: getservicebyid.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getservbyid/{serviceid}
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetAllServiceName:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/ea7a2951de11c1915fea4aa18994494a
+      Handler: getallservicenames.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getallservname
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  UpdateService:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/ea7a2951de11c1915fea4aa18994494a
+      Handler: updateservice.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /updateservice
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetTrending:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/ea7a2951de11c1915fea4aa18994494a
+      Handler: gettrending.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /gettrend
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetServiceByType:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/ea7a2951de11c1915fea4aa18994494a
+      Handler: getservicebytype.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getsubtypes/{gender}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetServiceByGender:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/ea7a2951de11c1915fea4aa18994494a
+      Handler: getservicebygender.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /gettypes/{gender}
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetServiceBySubType:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/ea7a2951de11c1915fea4aa18994494a
+      Handler: getservicebysubtype.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getallserv/{gender}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
