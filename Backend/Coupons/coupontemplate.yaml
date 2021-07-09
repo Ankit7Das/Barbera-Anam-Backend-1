@@ -22,6 +22,36 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  CouponCreate:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: couponcreate.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /couponcreate
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  UseCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: availcoupon.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /usecoupon
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
 
             
   

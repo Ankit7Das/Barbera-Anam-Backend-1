@@ -52,12 +52,53 @@ exports.handler = async(event) => {
                     id: ID,
                     phone: PHONE,
                     otp: random,
-                    referral: code
+                    referral: code,
+                    invites: 0
                 }
             }
 
             try {
                 data = await documentClient.put(params).promise();
+
+                if(obj.ref) {
+                    params = {
+                        TableName: 'Users',
+                        FilterExpression: '#referral = :this_referral',
+                        ExpressionAttributeValues: {':this_referral': obj.ref},
+                        ExpressionAttributeNames: {'#referral': 'referral'}
+                    };
+    
+                    data = await documentClient.scan(params).promise();
+
+                    console.log(data);
+
+                    if(data.Items.length === 0) {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                success: false,
+                                message: 'Referral code is invalid'
+                            })
+                        }
+                    } else {
+                        params = {
+                            TableName: 'Users',
+                            Key: {
+                                id: data.Items[0].id,
+                            },
+                            UpdateExpression: "set #invites=#invites + :i",
+                            ExpressionAttributeNames: {
+                                '#invites': 'invites',
+                            },
+                            ExpressionAttributeValues:{
+                                ":i": 1,
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        };
+
+                        data = await documentClient.update(params).promise();
+                    }
+                }
             } catch(err) {
                 return {
                     statusCode: 500,

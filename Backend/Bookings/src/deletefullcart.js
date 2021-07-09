@@ -6,7 +6,7 @@ var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
-const { userVerifier, addedBefore, serviceVerifier } = require("./authentication");
+const { userVerifier, addedBefore, serviceVerifier } = require("../../Carts/src/authentication");
 
 exports.handler = async (event) => {
     try {

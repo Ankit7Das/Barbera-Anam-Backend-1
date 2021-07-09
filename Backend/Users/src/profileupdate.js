@@ -135,7 +135,7 @@ exports.handler = async (event) => {
                 })
                 .promise();
     
-            url = `https://barberaimages.s3-ap-southeast-1.amazonaws.com/profiles/${key}`;
+            url = `https://barbera-image.s3-ap-south-1.amazonaws.com/profiles/${key}`;
     
         }
         

@@ -4,7 +4,7 @@ Resources:
   AddtoCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/74fecf579481c37aadf4e58f64d503b8
+      CodeUri: s3://barbera-buckets/047669d8071818c8d82ae623368ed7ca
       Handler: addtocart.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   GetCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/74fecf579481c37aadf4e58f64d503b8
+      CodeUri: s3://barbera-buckets/047669d8071818c8d82ae623368ed7ca
       Handler: getcart.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   Quantity:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/74fecf579481c37aadf4e58f64d503b8
+      CodeUri: s3://barbera-buckets/047669d8071818c8d82ae623368ed7ca
       Handler: quantityupdate.handler
       Runtime: nodejs12.x
       Events:
@@ -43,7 +43,7 @@ Resources:
   DeleteFromCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/74fecf579481c37aadf4e58f64d503b8
+      CodeUri: s3://barbera-buckets/047669d8071818c8d82ae623368ed7ca
       Handler: deletefromcart.handler
       Runtime: nodejs12.x
       Events:
@@ -51,18 +51,5 @@ Resources:
           Type: Api
           Properties:
             Path: /deletefromcart/{serviceid}
-            Method: post
-      Role: arn:aws:iam::140544830924:role/BackendUser
-  DeleteFullCart:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: s3://barbera-buckets/74fecf579481c37aadf4e58f64d503b8
-      Handler: deletefullcart.handler
-      Runtime: nodejs12.x
-      Events:
-        apiForLambda:
-          Type: Api
-          Properties:
-            Path: /deletecart
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser

@@ -4,7 +4,7 @@ Resources:
   GetReferralCode:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/2256646581004d97ca6e1838a5e729c5
+      CodeUri: s3://barbera-buckets/65cb26eea94d2696467ec02602e0a6a4
       Handler: getreferral.handler
       Runtime: nodejs12.x
       Events:
@@ -13,4 +13,30 @@ Resources:
           Properties:
             Path: /getref
             Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  CouponCreate:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/65cb26eea94d2696467ec02602e0a6a4
+      Handler: couponcreate.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /couponcreate
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  UseCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/65cb26eea94d2696467ec02602e0a6a4
+      Handler: availcoupon.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /usecoupon
+            Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser

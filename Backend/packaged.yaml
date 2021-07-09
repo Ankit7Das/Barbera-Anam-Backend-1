@@ -78,3 +78,20 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+  myCoupons:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Coupons
+      AttributeDefinitions:
+      - AttributeName: name
+        AttributeType: S
+      - AttributeName: serviceId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: name
+        KeyType: HASH
+      - AttributeName: serviceId
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5

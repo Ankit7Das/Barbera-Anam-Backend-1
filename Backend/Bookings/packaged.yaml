@@ -4,7 +4,7 @@ Resources:
   GetBarbersByDate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/42aaa7b6b417635ac1382366cc12eba0
+      CodeUri: s3://barbera-buckets/cdc2b26764234a5fbeb2811581901f14
       Handler: barberbyslot.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   BarberSelect:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/42aaa7b6b417635ac1382366cc12eba0
+      CodeUri: s3://barbera-buckets/cdc2b26764234a5fbeb2811581901f14
       Handler: selectbarber.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   GetBookings:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/42aaa7b6b417635ac1382366cc12eba0
+      CodeUri: s3://barbera-buckets/cdc2b26764234a5fbeb2811581901f14
       Handler: getbookings.handler
       Runtime: nodejs12.x
       Events:
@@ -39,4 +39,17 @@ Resources:
           Properties:
             Path: /getbookings
             Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  DeleteFullCart:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/cdc2b26764234a5fbeb2811581901f14
+      Handler: deletefullcart.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /deletecart
+            Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser

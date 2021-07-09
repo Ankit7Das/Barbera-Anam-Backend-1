@@ -66,21 +66,5 @@ Resources:
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
-
-  DeleteFullCart:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/
-      Handler: deletefullcart.handler
-      Runtime: nodejs12.x
-      Events:
-        apiForLambda:
-          Type: Api 
-          Properties:
-            Path: /deletecart
-            Method: post
-      Role: arn:aws:iam::140544830924:role/BackendUser
-  #---------------------------------------------------------------
-
             
   
