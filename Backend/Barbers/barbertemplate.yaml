@@ -20,6 +20,21 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  CoinsIncrease:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: coinincrease.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /coininc
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
 
 
 

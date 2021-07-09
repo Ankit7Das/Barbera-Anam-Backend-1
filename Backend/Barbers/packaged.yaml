@@ -4,7 +4,7 @@ Resources:
   CreateNewLog:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/1c853962114f55a38c6dd8592094a18c
+      CodeUri: s3://barbera-buckets/294b1a03ea5b84224bfc9c3e4bfa90bb
       Handler: createnewlog.handler
       Runtime: nodejs12.x
       Events:
@@ -12,5 +12,18 @@ Resources:
           Type: Api
           Properties:
             Path: /newlog
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  CoinsIncrease:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/294b1a03ea5b84224bfc9c3e4bfa90bb
+      Handler: coinincrease.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /coininc
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser

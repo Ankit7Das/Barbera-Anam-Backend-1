@@ -72,7 +72,12 @@ exports.handler = async (event) => {
         console.log(Number(SLOT));
         console.log(Number(today.getHours()));
 
-        var date = new Date(DATE);
+        var date1 = DATE.split('-');
+
+        var date = new Date(date1[2],date1[1],date1[0]);
+
+        console.log(Number(date.getDate()));
+        console.log(Number(today.getDate()));
 
         if(date.getDate()<today.getDate()) {
             return {
@@ -123,13 +128,17 @@ exports.handler = async (event) => {
                     Key: {
                         id: data.Items[i].barberId,
                     },
-                    ProjectionExpression: 'id, address, phone, longitude, latitude'
+                    ProjectionExpression: 'id, address, phone, longitude, latitude, coins'
                 }
 
                 data1 = await documentClient.get(params).promise();
                 data1.Item.distance = await getDistance(lat1,long1,data1.Item.latitude,data1.Item.longitude);
 
-                barbers.push(data1.Item);
+                if(data1.Item.coins > 0) {
+                    barbers.push(data1.Item);
+                } else {
+                    continue;
+                }
             }
 
             barbers.sort((a, b) => {

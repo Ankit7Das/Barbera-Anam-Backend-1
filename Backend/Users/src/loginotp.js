@@ -208,7 +208,7 @@ exports.handler = async (event) => {
                             Key: {
                                 id: id,
                             },
-                            UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #status=:s, #referral=:ref",
+                            UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #status=:s, #referral=:ref, #coins=:c",
                             ExpressionAttributeNames: {
                                 '#otp': 'otp',
                                 '#role': 'role',
@@ -216,7 +216,8 @@ exports.handler = async (event) => {
                                 '#long': 'longitude',
                                 '#lat': 'latitude',
                                 '#status': 'status',
-                                '#referral': 'referral'
+                                '#referral': 'referral',
+                                '#coins':'coins'
                             },
                             ExpressionAttributeValues:{
                                 ":o": null,
@@ -225,7 +226,8 @@ exports.handler = async (event) => {
                                 ":lo": LONG,
                                 ":la": LAT,
                                 ":s": 'free',
-                                ":ref": null
+                                ":ref": null,
+                                ":c": 0
                             },
                             ReturnValues:"UPDATED_NEW"
                         };

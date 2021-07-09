@@ -62,7 +62,7 @@ exports.handler = async (event) => {
                 statusCode: 404,
                 body: JSON.stringify({
                     success: false,
-                    message: 'User does not have role as user',
+                    message: 'Not a user',
                 })
             }
         }
@@ -84,7 +84,7 @@ exports.handler = async (event) => {
                 statusCode: 404,
                 body: JSON.stringify({
                     success: false,
-                    message: 'User does not have role as barber',
+                    message: 'Not a barber',
                 })
             }
         }
@@ -103,6 +103,40 @@ exports.handler = async (event) => {
                     })
                 }
             }
+        }
+
+        var today = new Date();
+        today.setHours(today.getHours() + 5);
+        today.setMinutes(today.getMinutes() + 30);
+
+        console.log(Number(SLOT));
+        console.log(Number(today.getHours()));
+
+        var date1 = DATE.split('-');
+
+        var date = new Date(date1[2],date1[1],date1[0]);
+
+        console.log(Number(date.getDate()));
+        console.log(Number(today.getDate()));
+
+        if(date.getDate()<today.getDate()) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Date chosen is not possible'
+                })
+            };
+        }
+
+        if(Number(SLOT)<Number(today.getHours())) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Slot chosen is not possible'
+                })
+            };
         }
 
         var params;
