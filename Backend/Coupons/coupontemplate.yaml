@@ -2,7 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Resources:
-  #Stack-Name: Barbera- 
+  # Stack-Name: Barbera-Coupons 
+  # Hostname: https://zlhjfiu498.execute-api.ap-south-1.amazonaws.com/Prod
 
   #---------------------------------------------------------------
   # Coupon Functions

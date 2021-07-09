@@ -2,6 +2,9 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Resources:
+  # Stack-Name: Barbera-Barbers
+  # Hostname: https://0dy1hsrsu8.execute-api.ap-south-1.amazonaws.com/Prod
+
   #---------------------------------------------------------------
   # Barber Functions
   #---------------------------------------------------------------

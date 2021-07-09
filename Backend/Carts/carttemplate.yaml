@@ -2,7 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Resources:
-  #Stack-Name: Barbera-Carts
+  # Stack-Name: Barbera-Carts
+  # Hostname: https://cw5yb7094d.execute-api.ap-south-1.amazonaws.com/Prod
 
   #---------------------------------------------------------------
   # Cart Functions
