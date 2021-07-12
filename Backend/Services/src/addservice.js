@@ -23,12 +23,6 @@ exports.handler = async (event) => {
 
         console.log(event);
 
-        // var buff = Buffer.from(event.body, 'base64');
-        // var decodedEventBody = buff.toString('latin1'); 
-        // var decodedEvent = { ...event, body: decodedEventBody };
-        // var jsonEvent = parser.parse(decodedEvent, false);
-        // var asset;
-
         var obj = JSON.parse(event.body);
     
         var ID = uuid.v1();
@@ -106,47 +100,6 @@ exports.handler = async (event) => {
         }
 
         var url;
-
-        // if(jsonEvent.image) {
-        //     asset = Buffer.from(jsonEvent.image.content, 'latin1');
-        //     var mime = jsonEvent.image.contentType;
-        //     var fileInfo = await fileType.fromBuffer(asset);
-        //     var detectedExt = fileInfo.ext;
-        //     var detectedMime = fileInfo.mime;
-    
-        //     if (!allowedMimes.includes(mime)) {
-        //         return {
-        //             statusCode: 400,
-        //             body: JSON.stringify({
-        //                 message: 'mime is not allowed '
-        //             })
-        //         };
-        //     }
-
-        //     if (detectedMime !== mime) {
-        //         return {
-        //             statusCode: 400,
-        //             body: JSON.stringify({
-        //                 message: 'mime types dont match'
-        //             })
-        //         };
-        //     }
-    
-        //     var name = ID;
-        //     var key = `${name}.${detectedExt}`;
-    
-        //     await s3
-        //         .upload({
-        //             Body: asset,
-        //             Key: `services/${key}`,
-        //             ContentType: mime,
-        //             Bucket: 'barbera-image',
-        //             ACL: 'public-read',
-        //         })
-        //         .promise();
-    
-        //     url = `https://barbera-image.s3-ap-south-1.amazonaws.com/services/${key}`;
-        // }
 
         if(obj.image) {
     

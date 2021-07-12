@@ -64,17 +64,71 @@ exports.handler = async (event) => {
 
         var params = {
             TableName: 'Bookings',
+            ProjectionExpression: '#serviceId, #barberId, #Timestamp, #payment_status',
             KeyConditionExpression: '#user = :u',
             ExpressionAttributeValues: {
                 ':u': userID.id,
             },
             ExpressionAttributeNames: {
-                '#user': 'userId'
+                '#user': 'userId',
+                '#serviceId': 'serviceId',
+                '#barberId': 'barberId',
+                '#Timestamp': 'Timestamp',
+                '#payment_status':'payment_status',
             }
         }
 
         try {
             var data = await documentClient.query(params).promise();
+            var data1;
+
+            for(var i=0;i<data.Items.length;i++) {
+                params = {
+                    TableName: 'Services',
+                    Key:{
+                        id: data.Items[i].serviceId
+                    },
+                    ProjectionExpression: "#name, #price, #time, #gender",
+                    ExpressionAttributeNames: {
+                        "#name": "name",
+                        "#price": "price",
+                        "#time": "time",
+                        "#gender": "gender",
+                    }
+                }
+
+                data1 = await documentClient.get(params).promise();
+
+                delete data.Items[i].serviceId;
+                data.Items[i].service = data1.Item;
+
+                params = {
+                    TableName: 'Users',
+                    Key:{
+                        id: data.Items[i].barberId
+                    },
+                    ProjectionExpression: "#id, #phone",
+                    ExpressionAttributeNames: {
+                        "#id": "id",
+                        "#phone": "phone",
+                    }
+                }
+                
+                data1 = await documentClient.get(params).promise();
+
+                delete data.Items[i].barberId;
+                data.Items[i].barber = data1.Item;
+            }
+
+            data.Items.sort((a,b) => {
+                if(a.Timestamp > b.Timestamp) {
+                    return -1;
+                }else if(a.Timestamp < b.Timestamp) {
+                    return 1;
+                }else {
+                    return 0;
+                }
+            });
 
             return {
                 statusCode: 200,

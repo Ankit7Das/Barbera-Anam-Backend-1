@@ -14,7 +14,8 @@ exports.handler = async (event) => {
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
         var obj = JSON.parse(event.body);
-        var service = obj.service;
+        var serviceId = obj.serviceid;
+        var FLOW = obj.flow;
 
         if(token == null) {
             return {
@@ -62,51 +63,71 @@ exports.handler = async (event) => {
             }
         }
 
-        var exist2;
-        var exist3;
-        var params;
-        var data;
-        var cnt = 0;
-        var cnt1 = 0;
+        var exist2 = await serviceVerifier(serviceId);
 
-        for(var i=0;i<service.length;i++) {
-            exist2 = await serviceVerifier(service[i].serviceId);
-
-            if(exist2.success == false) {
-                cnt1++;
-                continue;
+        if(exist2.success == false) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Service Unavailable',
+                })
             }
-            
-            exist3 = await addedBefore(userID.id, service[i].serviceId);
+        }
+        
+        var exist3 = await addedBefore(userID.id, serviceId);
 
-            if(exist3 == false) {
-                cnt++;
-                continue;
+        if(exist3 == false) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Service not in cart',
+                })
             }
-
-            params = {
-                    TableName: 'Carts',
-                    Key: {
-                        userId: userID.id,
-                        serviceId: service[i].serviceId,
-                    },
-                    UpdateExpression: "set #quantity=:q",
-                    ExpressionAttributeNames: {
-                        '#quantity': 'quantity'
-                    },
-                    ExpressionAttributeValues:{
-                        ":q": service[i].quantity,
-                    },
-                    ReturnValues:"UPDATED_NEW"
-            };
-
-            data = await documentClient.update(params).promise();
         }
 
+        var params;
+
+        if(FLOW == true) {
+            params = {
+                TableName: 'Carts',
+                Key: {
+                    userId: userID.id,
+                    serviceId: serviceId,
+                },
+                UpdateExpression: "set #quantity=#quantity + :q",
+                ExpressionAttributeNames: {
+                    '#quantity': 'quantity'
+                },
+                ExpressionAttributeValues:{
+                    ":q": 1,
+                },
+                ReturnValues:"UPDATED_NEW"
+            };
+        } else {
+            params = {
+                TableName: 'Carts',
+                Key: {
+                    userId: userID.id,
+                    serviceId: serviceId,
+                },
+                UpdateExpression: "set #quantity=#quantity - :q",
+                ExpressionAttributeNames: {
+                    '#quantity': 'quantity'
+                },
+                ExpressionAttributeValues:{
+                    ":q": 1,
+                },
+                ReturnValues:"UPDATED_NEW"
+            };
+        } 
+
+        var data;
         var msg;
 
-        if(cnt + cnt1 < service.length) {
-            
+        try {
+            data = await documentClient.update(params).promise();
             msg = 'Service quantity updated';
 
             return {
@@ -116,25 +137,17 @@ exports.handler = async (event) => {
                     message: msg,
                 })
             };
-        } else if(cnt == serviceId.length) {
+        } catch(err) {
+            console.log("Error: ", err);
+            msg = err;
             return {
-                statusCode: 400,
+                statusCode: 500,
                 body: JSON.stringify({
                     success: false,
-                    message: 'Services IDs invalid',
+                    message: msg,
                 })
-            }
-        }else {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Services not in cart',
-                })
-            }
+            };
         }
-
-        
 
     } catch(err) {
         console.log(err);

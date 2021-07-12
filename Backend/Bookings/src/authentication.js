@@ -38,6 +38,31 @@ module.exports.serviceVerifier = async (id) => {
     var data = await documentClient.get(params).promise();
 
     if(!data.Item) {
+        return {
+            success: false
+        };
+    } else {
+        return {
+            success: true,
+            service: data.Item
+        };
+    }
+
+}
+
+module.exports.addedBefore = async (userId, serviceId) => {
+
+    var params = {
+        TableName: 'Carts',
+        Key: {
+            userId: userId,
+            serviceId: serviceId
+        }
+    }
+
+    var data = await documentClient.get(params).promise();
+
+    if(!data.Item) {
         return false;
     } else {
         return true;

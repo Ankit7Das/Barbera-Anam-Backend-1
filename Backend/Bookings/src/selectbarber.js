@@ -16,6 +16,7 @@ exports.handler = async (event) => {
         var obj = JSON.parse(event.body);
         var barberId = obj.barberid;
         var serviceId = obj.serviceid;
+        var AMOUNT = obj.amount;
         var DATE = event.pathParameters.date;
         var SLOT = event.pathParameters.slot;
         var tokenArray = event.headers.Authorization.split(" ");
@@ -90,18 +91,27 @@ exports.handler = async (event) => {
         }
 
         var exist2;
+        var prices = [];
+        var total_price = 0;
         for(var i=0;i<serviceId.length;i++) {
             
             exist2 = await serviceVerifier(serviceId[i]);
 
-            if(exist2 == false) {
-                return {
-                    statusCode: 404,
-                    body: JSON.stringify({
-                        success: false,
-                        message: 'Service not found',
-                    })
-                }
+            if(exist2.success == false) {
+                break;
+            }
+
+            prices.push(exist2.service.price);
+            
+        }
+
+        if(exist2.success == false) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Service not found',
+                })
             }
         }
 
@@ -129,14 +139,16 @@ exports.handler = async (event) => {
             };
         }
 
-        if(Number(SLOT)<Number(today.getHours())) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Slot chosen is not possible'
-                })
-            };
+        if(date.getDate()===today.getDate()) {
+            if(Number(SLOT)<Number(today.getHours())) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        success: false,
+                        message: 'Slot chosen is not possible'
+                    })
+                };
+            }
         }
 
         var params;
@@ -144,7 +156,7 @@ exports.handler = async (event) => {
         var now = new Date();
         now.setHours(now.getHours() + 5);
         now.setMinutes(now.getMinutes() + 30);
-        var timest = now.toLocaleString(); 
+        var timest = now.getTime(); 
 
         for(var i=0;i<serviceId.length;i++){
 
@@ -154,12 +166,84 @@ exports.handler = async (event) => {
                     userId: exist1.user.id,
                     serviceId: serviceId[i],
                     barberId: barberId,
-                    Timestamp: timest
+                    Timestamp: timest,
+                    user_long: exist1.user.longitude,
+                    user_lat: exist1.user.latitude,
+                    amount: prices[i],
+                    payment_status: 'pending'
                 }
             };
 
+            total_price += Number(prices[i]);
+            var percentage = 0.1;
+
             try {
                 data = await documentClient.put(params).promise();
+
+                params = {
+                    TableName: 'Users',
+                    Key: {
+                        id: barberId,
+                    },
+                    UpdateExpression: "set #coins=#coins - :c",
+                    ExpressionAttributeNames: {
+                        '#coins': 'coins', 
+                    },
+                    ExpressionAttributeValues:{
+                        ":c": percentage*exist3.user.coins,
+                    },
+                    ReturnValues:"UPDATED_NEW"
+                }
+
+                try {
+                    data = await documentClient.update(params).promise();
+
+                    params = {
+                        TableName: 'BarbersLog',
+                        Key: {
+                            date: DATE,
+                            barberId: barberId,
+                        },
+                        UpdateExpression: "set #slot=:s",
+                        ExpressionAttributeNames: {
+                            '#slot': SLOT, 
+                        },
+                        ExpressionAttributeValues:{
+                            ":s": true,
+                        },
+                        ReturnValues:"UPDATED_NEW"
+                    }
+            
+                    try {
+                        data = await documentClient.update(params).promise();
+            
+                        return {
+                            statusCode: 200,
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'Booking successful',
+                            })
+                        }
+                    } catch(err) {
+                        console.log("Error: ", err);
+                        return {
+                            statusCode: 500,
+                            body: JSON.stringify({
+                                success: false,
+                                message: err,
+                            })
+                        };
+                    }
+                } catch(err) {
+                    console.log("Error: ", err);
+                    return {
+                        statusCode: 500,
+                        body: JSON.stringify({
+                            success: false,
+                            message: err,
+                        })
+                    };
+                }
             }catch(err) {
                 return {
                     statusCode: 400,
@@ -169,43 +253,6 @@ exports.handler = async (event) => {
                     })
                 };
             }
-        }
-
-        params = {
-            TableName: 'BarbersLog',
-            Key: {
-                date: DATE,
-                barberId: barberId,
-            },
-            UpdateExpression: "set #slot=:s",
-            ExpressionAttributeNames: {
-                '#slot': SLOT, 
-            },
-            ExpressionAttributeValues:{
-                ":s": true,
-            },
-            ReturnValues:"UPDATED_NEW"
-        }
-
-        try {
-            data = await documentClient.update(params).promise();
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    success: true,
-                    message: 'Booking successful',
-                })
-            }
-        } catch(err) {
-            console.log("Error: ", err);
-            return {
-                statusCode: 500,
-                body: JSON.stringify({
-                    success: false,
-                    message: err,
-                })
-            };
         }
 
     } catch(err) {

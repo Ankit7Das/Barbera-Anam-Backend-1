@@ -273,6 +273,33 @@ exports.handler = async (event) => {
                             },
                             ReturnValues:"UPDATED_NEW"
                         };
+
+                        try {
+                            data = await documentClient.update(params).promise();
+        
+                            var user = {
+                                id: id,
+                            }
+                
+                            token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+                
+                            return {
+                                statusCode: 200,
+                                body: JSON.stringify({
+                                    success: true,
+                                    message: 'Login/Signup Success',
+                                    token: token,
+                                })
+                            };
+                        } catch(err) {
+                            return {
+                                statusCode: 500,
+                                body: JSON.stringify({
+                                    success: false,
+                                    message: err,
+                                })
+                            };
+                        }
                     } catch(err) {
                         return {
                             statusCode: 500,
@@ -325,6 +352,33 @@ exports.handler = async (event) => {
                             ReturnValues:"UPDATED_NEW"
                         };
                     }
+
+                    try {
+                        data = await documentClient.update(params).promise();
+    
+                        var user = {
+                            id: id,
+                        }
+            
+                        token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+            
+                        return {
+                            statusCode: 200,
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'Login/Signup Success',
+                                token: token,
+                            })
+                        };
+                    } catch(err) {
+                        return {
+                            statusCode: 500,
+                            body: JSON.stringify({
+                                success: false,
+                                message: err,
+                            })
+                        };
+                    }
                     
                 } else {
     
@@ -342,34 +396,36 @@ exports.handler = async (event) => {
                         },
                         ReturnValues:"UPDATED_NEW"
                     };
-                }
 
-                try {
-                    data = await documentClient.update(params).promise();
-
-                    var user = {
-                        id: id,
+                    try {
+                        data = await documentClient.update(params).promise();
+    
+                        var user = {
+                            id: id,
+                        }
+            
+                        token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+            
+                        return {
+                            statusCode: 200,
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'Login/Signup Success',
+                                token: token,
+                            })
+                        };
+                    } catch(err) {
+                        return {
+                            statusCode: 500,
+                            body: JSON.stringify({
+                                success: false,
+                                message: err,
+                            })
+                        };
                     }
-        
-                    token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
-        
-                    return {
-                        statusCode: 200,
-                        body: JSON.stringify({
-                            success: true,
-                            message: 'Login/Signup Success',
-                            token: token,
-                        })
-                    };
-                } catch(err) {
-                    return {
-                        statusCode: 500,
-                        body: JSON.stringify({
-                            success: false,
-                            message: err,
-                        })
-                    };
+
                 }
+
 
             } else {
                 return {

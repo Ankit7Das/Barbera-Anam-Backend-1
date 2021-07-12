@@ -71,26 +71,12 @@ exports.handler = async (event) => {
             exist2 = await serviceVerifier(service[i].serviceId);
 
             if(exist2.success == false) {
-                // return {
-                //     statusCode: 404,
-                //     body: JSON.stringify({
-                //         success: false,
-                //         message: 'Service Unavailable',
-                //     })
-                // }
                 continue;
             }
             
             exist3 = await addedBefore(userID.id, service[i].serviceId);
 
             if(exist3 == false) {
-                // return {
-                //     statusCode: 404,
-                //     body: JSON.stringify({
-                //         success: false,
-                //         message: 'Service not in cart',
-                //     })
-                // }
                 continue;
             }
 

@@ -89,14 +89,16 @@ exports.handler = async (event) => {
             };
         }
 
-        if(Number(SLOT)<Number(today.getHours())) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Slot chosen is not possible'
-                })
-            };
+        if(date.getDate()===today.getDate()) {
+            if(Number(SLOT)<Number(today.getHours())) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        success: false,
+                        message: 'Slot chosen is not possible'
+                    })
+                };
+            }
         }
 
         var params = {
@@ -134,7 +136,7 @@ exports.handler = async (event) => {
                 data1 = await documentClient.get(params).promise();
                 data1.Item.distance = await getDistance(lat1,long1,data1.Item.latitude,data1.Item.longitude);
 
-                if(data1.Item.coins > 0) {
+                if(data1.Item.coins >= 300 && data1.Item.distance<=10) {
                     barbers.push(data1.Item);
                 } else {
                     continue;
