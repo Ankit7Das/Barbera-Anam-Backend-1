@@ -4,7 +4,7 @@ Resources:
   AddtoCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/047669d8071818c8d82ae623368ed7ca
+      CodeUri: s3://barbera-buckets/0d5b24c9ebc40f637acc9069abea6654
       Handler: addtocart.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   GetCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/047669d8071818c8d82ae623368ed7ca
+      CodeUri: s3://barbera-buckets/0d5b24c9ebc40f637acc9069abea6654
       Handler: getcart.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   Quantity:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/047669d8071818c8d82ae623368ed7ca
+      CodeUri: s3://barbera-buckets/0d5b24c9ebc40f637acc9069abea6654
       Handler: quantityupdate.handler
       Runtime: nodejs12.x
       Events:
@@ -43,7 +43,7 @@ Resources:
   DeleteFromCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/047669d8071818c8d82ae623368ed7ca
+      CodeUri: s3://barbera-buckets/0d5b24c9ebc40f637acc9069abea6654
       Handler: deletefromcart.handler
       Runtime: nodejs12.x
       Events:

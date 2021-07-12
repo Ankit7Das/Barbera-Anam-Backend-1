@@ -127,6 +127,12 @@ exports.handler = async (event) => {
                                             '10': false,
                                             '11': false,
                                             '12': false,
+                                            '13': false,
+                                            '14': false,
+                                            '15': false,
+                                            '16': false,
+                                            '17': false,
+                                            '18': false,
                                         }
                                     }
                                 },
@@ -138,6 +144,12 @@ exports.handler = async (event) => {
                                             '10': false,
                                             '11': false,
                                             '12': false,
+                                            '13': false,
+                                            '14': false,
+                                            '15': false,
+                                            '16': false,
+                                            '17': false,
+                                            '18': false,
                                         }
                                     }
                                 },
@@ -149,6 +161,12 @@ exports.handler = async (event) => {
                                             '10': false,
                                             '11': false,
                                             '12': false,
+                                            '13': false,
+                                            '14': false,
+                                            '15': false,
+                                            '16': false,
+                                            '17': false,
+                                            '18': false,
                                         }
                                     }
                                 },
@@ -160,6 +178,12 @@ exports.handler = async (event) => {
                                             '10': false,
                                             '11': false,
                                             '12': false,
+                                            '13': false,
+                                            '14': false,
+                                            '15': false,
+                                            '16': false,
+                                            '17': false,
+                                            '18': false,
                                         }
                                     }
                                 },
@@ -171,6 +195,12 @@ exports.handler = async (event) => {
                                             '10': false,
                                             '11': false,
                                             '12': false,
+                                            '13': false,
+                                            '14': false,
+                                            '15': false,
+                                            '16': false,
+                                            '17': false,
+                                            '18': false,
                                         }
                                     }
                                 },
@@ -182,6 +212,12 @@ exports.handler = async (event) => {
                                             '10': false,
                                             '11': false,
                                             '12': false,
+                                            '13': false,
+                                            '14': false,
+                                            '15': false,
+                                            '16': false,
+                                            '17': false,
+                                            '18': false,
                                         }
                                     }
                                 },
@@ -193,6 +229,12 @@ exports.handler = async (event) => {
                                             '10': false,
                                             '11': false,
                                             '12': false,
+                                            '13': false,
+                                            '14': false,
+                                            '15': false,
+                                            '16': false,
+                                            '17': false,
+                                            '18': false,
                                         }
                                     }
                                 },

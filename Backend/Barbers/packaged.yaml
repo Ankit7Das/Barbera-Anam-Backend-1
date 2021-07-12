@@ -4,7 +4,7 @@ Resources:
   CreateNewLog:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/294b1a03ea5b84224bfc9c3e4bfa90bb
+      CodeUri: s3://barbera-buckets/aadd4a6f4da0af53da0d77c7807a0583
       Handler: createnewlog.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   CoinsIncrease:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/294b1a03ea5b84224bfc9c3e4bfa90bb
+      CodeUri: s3://barbera-buckets/aadd4a6f4da0af53da0d77c7807a0583
       Handler: coinincrease.handler
       Runtime: nodejs12.x
       Events:

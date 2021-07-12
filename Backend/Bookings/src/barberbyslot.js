@@ -154,7 +154,7 @@ exports.handler = async (event) => {
             for(var i=0;i<barbers.length;i++){
                 delete barbers[i].longitude;
                 delete barbers[i].latitude;
-                delete barbers[i].distance;
+                delete barbers[i].coins;
             }
 
             return {
