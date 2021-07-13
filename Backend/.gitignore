@@ -1,10 +1,5 @@
 .aws-sam
-Users/src/.env
-Carts/src/.env
-Services/src/.env
-Barbers/src/.env
-Coupons/src/.env
-Bookings/src/.env
+.env
 
 # sam build -t <path to cloudformationfile.yaml>
 # sam package --output-template-file packaged.yaml --s3-bucket <create an s3 bucket where your code will be uploaded and put the name here>

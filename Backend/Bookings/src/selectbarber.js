@@ -15,8 +15,7 @@ exports.handler = async (event) => {
 
         var obj = JSON.parse(event.body);
         var barberId = obj.barberid;
-        var serviceId = obj.serviceid;
-        var AMOUNT = obj.amount;
+        var service = obj.service;
         var DATE = event.pathParameters.date;
         var SLOT = event.pathParameters.slot;
         var tokenArray = event.headers.Authorization.split(" ");
@@ -90,12 +89,14 @@ exports.handler = async (event) => {
             }
         }
 
+        console.log(service);
+
         var exist2;
         var prices = [];
         var total_price = 0;
-        for(var i=0;i<serviceId.length;i++) {
+        for(var i=0;i<service.length;i++) {
             
-            exist2 = await serviceVerifier(serviceId[i]);
+            exist2 = await serviceVerifier(service[i].serviceId);
 
             if(exist2.success == false) {
                 break;
@@ -151,34 +152,61 @@ exports.handler = async (event) => {
             }
         }
 
-        var params;
+        var params = {
+            TableName: 'BarbersLog',
+            Key: {
+                date: DATE,
+                barberId: barberId
+            }
+        };
+
         var data;
-        var now = new Date();
-        now.setHours(now.getHours() + 5);
-        now.setMinutes(now.getMinutes() + 30);
-        var timest = now.getTime(); 
 
-        for(var i=0;i<serviceId.length;i++){
+        try {
+            data = await documentClient.get(params).promise();
 
-            params = {
-                TableName: 'Bookings',
-                Item: {
-                    userId: exist1.user.id,
-                    serviceId: serviceId[i],
-                    barberId: barberId,
-                    Timestamp: timest,
-                    user_long: exist1.user.longitude,
-                    user_lat: exist1.user.latitude,
-                    amount: prices[i],
-                    payment_status: 'pending'
+            if(data.Item.SLOT === false) {
+                var now = new Date();
+                now.setHours(now.getHours() + 5);
+                now.setMinutes(now.getMinutes() + 30);
+                var timest = now.getTime(); 
+
+                for(var i=0;i<service.length;i++){
+
+                    params = {
+                        TableName: 'Bookings',
+                        Item: {
+                            userId: exist1.user.id,
+                            serviceId: service[i].serviceId + ',' + timest,
+                            barberId: barberId,
+                            Timestamp: timest,
+                            user_long: exist1.user.longitude,
+                            user_lat: exist1.user.latitude,
+                            user_add: exist1.user.address,
+                            amount: prices[i],
+                            payment_status: 'pending',
+                            date: DATE,
+                            slot: SLOT,
+                            quantity: service[i].quantity
+                        }
+                    };
+
+                    data = await documentClient.put(params).promise();
+
+                    total_price += Number(prices[i]);
                 }
-            };
 
-            total_price += Number(prices[i]);
-            var percentage = 0.1;
+                if(cnt === service.length) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            success: true,
+                            message: 'Booking unsuccessful',
+                        })
+                    }
+                }
 
-            try {
-                data = await documentClient.put(params).promise();
+                var percentage = 0.1;            
 
                 params = {
                     TableName: 'Users',
@@ -244,15 +272,24 @@ exports.handler = async (event) => {
                         })
                     };
                 }
-            }catch(err) {
+            }else {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
                         success: false,
-                        message: 'Booking unsuccessful'
+                        message: 'Booking unsuccessful',
                     })
                 };
             }
+        }catch(err) {
+            console.log("Error: ", err);
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Booking unsuccessful',
+                })
+            };
         }
 
     } catch(err) {

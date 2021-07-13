@@ -37,9 +37,3 @@ Resources:
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
-
-
-
-
-            
-  

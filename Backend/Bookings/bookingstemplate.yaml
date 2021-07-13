@@ -53,6 +53,21 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  GetBookingsForBarbers:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getbookingsbarb.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getbookbarb
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
   DeleteFullCart:
     Type: AWS::Serverless::Function
     Properties:

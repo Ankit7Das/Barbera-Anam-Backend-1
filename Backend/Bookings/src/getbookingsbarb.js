@@ -15,9 +15,6 @@ exports.handler = async (event) => {
 
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
-        var obj = JSON.parse(event.body);
-        // var LONG = obj.longitude;
-        // var LAT = obj.latitude;
         
         if(token == null) {
             return {
@@ -55,48 +52,45 @@ exports.handler = async (event) => {
             }
         }
 
-        if(exist1.user.role != 'user') {
+        if(exist1.user.role != 'barber') {
             return {
                 statusCode: 404,
                 body: JSON.stringify({
                     success: false,
-                    message: 'User does not have role as user',
+                    message: 'Not a barber',
                 })
             }
         }
 
+
         var params = {
             TableName: 'Bookings',
-            ProjectionExpression: '#serviceId, #barberId, #date, #slot, #payment_status, #quantity, #Timestamp',
-            KeyConditionExpression: '#user = :u',
-            ExpressionAttributeValues: {
-                ':u': userID.id,
-            },
+            ProjectionExpression: '#serviceId, #userId, #Timestamp, #payment_status, #user_long, #user_lat, #user_add, #date, #slot, #quantity',
+            FilterExpression: '#barberId = :this_barber',
+            ExpressionAttributeValues: {':this_barber': exist1.user.id},
             ExpressionAttributeNames: {
-                '#user': 'userId',
-                '#serviceId': 'serviceId',
                 '#barberId': 'barberId',
-                '#date': 'date',
-                '#payment_status':'payment_status',
+                '#serviceId': 'serviceId', 
+                '#userId': 'userId', 
+                '#date': 'date', 
+                '#payment_status':'payment_status', 
+                '#user_long':'user_long', 
+                '#user_lat':'user_lat', 
+                '#user_add':'user_add',
                 '#slot':'slot',
                 '#quantity':'quantity',
                 '#Timestamp':'Timestamp'
-            }
+            },
         }
 
         try {
-            var data = await documentClient.query(params).promise();
+            var data = await documentClient.scan(params).promise();
             var data1;
             var info;
-
-            console.log(data);
 
             for(var i=0;i<data.Items.length;i++) {
 
                 info = data.Items[i].serviceId.split(',');
-
-                console.log(info)
-
                 params = {
                     TableName: 'Services',
                     Key:{
@@ -116,22 +110,9 @@ exports.handler = async (event) => {
                 delete data.Items[i].serviceId;
                 data.Items[i].service = data1.Item;
 
-                params = {
-                    TableName: 'Users',
-                    Key:{
-                        id: data.Items[i].barberId
-                    },
-                    ProjectionExpression: "#id, #phone",
-                    ExpressionAttributeNames: {
-                        "#id": "id",
-                        "#phone": "phone",
-                    }
-                }
-                
-                data1 = await documentClient.get(params).promise();
+                delete data.Items[i].userId;
 
-                delete data.Items[i].barberId;
-                data.Items[i].barber = data1.Item;
+                data.Items[i].distance = await getDistance(data.Items[i].user_lat,data.Items[i].user_long,exist1.user.latitude,exist1.user.longitude);
             }
 
             data.Items.sort((a,b) => {
@@ -148,7 +129,7 @@ exports.handler = async (event) => {
                 statusCode: 200,
                 body: JSON.stringify({
                     success: true,
-                    message: 'Booking found',
+                    message: 'Bookings found',
                     data: data.Items,
                 })
             }
@@ -158,7 +139,7 @@ exports.handler = async (event) => {
                 statusCode: 404,
                 body: JSON.stringify({
                     success: false,
-                    message: 'Booking not found'
+                    message: 'Bookings not found'
                 })
             }
         }

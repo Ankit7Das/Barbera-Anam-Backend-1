@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  # Stack-Name: Barbera-Admins
+  # Hostname: https://ivhc87o8xe.execute-api.ap-south-1.amazonaws.com/Prod
+
+  #---------------------------------------------------------------
+  # Barber Functions
+  #---------------------------------------------------------------
+
+  SendMail:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: sendmail.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /sendmail
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
