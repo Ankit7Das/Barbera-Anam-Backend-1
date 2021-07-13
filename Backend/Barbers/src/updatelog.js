@@ -6,16 +6,12 @@ var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
-const { userVerifier } = require("./authentication");
 const { JWT_SECRET } = process.env;
+const { userVerifier } = require("./authentication");
 
 exports.handler = async (event) => {
     try {
 
-        var obj = JSON.parse(event.body);
-        var ADD = obj.address;
-        var LONG = obj.longitude;
-        var LAT = obj.latitude;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -55,61 +51,64 @@ exports.handler = async (event) => {
             }
         }
 
-        if(exist1.user.role == 'admin') {
+        if(exist1.user.role != 'barber') {
             return {
-                statusCode: 404,
+                statusCode: 400,
                 body: JSON.stringify({
                     success: false,
-                    message: 'Not a user or barber',
+                    message: 'Not a barber',
                 })
             }
         }
 
+        var today = new Date();
+        today.setHours(today.getHours() + 5);
+        today.setMinutes(today.getMinutes() + 30);
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+        var day = dd + '-' + mm + '-' + yyyy;
+
         var params = {
-            TableName: 'Users',
+            TableName: 'BarbersLog',
             Key: {
-                id: userID.id,
-            },
-            UpdateExpression: "set #address=:a, #long=:lo, #lat=:la",
-            ExpressionAttributeNames: {
-                '#address': 'address',
-                '#long': 'longitude',
-                '#lat': 'latitude'
-            },
-            ExpressionAttributeValues:{
-                ":a": ADD,
-                ":lo": LONG,
-                ":la": LAT
-            },
-            ReturnValues:"UPDATED_NEW"
-        };
-
-        var data;
-        var msg;
-
-        try {
-            data = await documentClient.update(params).promise();
-            msg = 'User info updated successfully';
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    success: true,
-                    message: msg
-                })
-            };
-        } catch(err) {
-            msg = err;
-            return {
-                statusCode: 500,
-                body: JSON.stringify({
-                    success: false,
-                    message: msg,
-                })
-            };
+                date: day,
+                barberId: userID.id,
+            }
         }
 
-    }catch(err) {
+        try {
+            var data = await documentClient.get(params).promise();
+
+            if(!data.Item) {
+                return {
+                    statusCode: 404,
+                    body: JSON.stringify({
+                        success: false,
+                        message: 'Log for today not found'
+                    })
+                }
+            } else {
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        success: true,
+                        message: 'Log for today found',
+                        data:data.Item
+                    })
+                }
+            }
+        } catch(err) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: err
+                })
+            }
+        }
+
+    } catch(err) {
         console.log(err);
         return err;
     }

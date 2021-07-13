@@ -56,7 +56,7 @@ exports.handler = async (event) => {
                 statusCode: 400,
                 body: JSON.stringify({
                     success: false,
-                    message: 'User not a barber',
+                    message: 'Not a barber',
                 })
             }
         }

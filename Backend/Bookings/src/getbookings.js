@@ -60,7 +60,7 @@ exports.handler = async (event) => {
                 statusCode: 404,
                 body: JSON.stringify({
                     success: false,
-                    message: 'User does not have role as user',
+                    message: 'Not a user',
                 })
             }
         }

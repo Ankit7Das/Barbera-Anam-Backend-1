@@ -4,7 +4,7 @@ Resources:
   SendMail:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/26260d70df914bc25282a1e12c9d54d5
+      CodeUri: s3://barbera-buckets/7f9f790eaa0bd6368592ddfdde873754
       Handler: sendmail.handler
       Runtime: nodejs12.x
       Events:

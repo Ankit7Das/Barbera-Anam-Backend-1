@@ -57,7 +57,7 @@ exports.handler = async (event) => {
                 statusCode: 400,
                 body: JSON.stringify({
                     success: false,
-                    message: 'User not an admin',
+                    message: 'Not an admin',
                 })
             }
         }

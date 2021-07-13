@@ -66,23 +66,14 @@ exports.handler = async (event) => {
         }
 
         var transporter = nodemailer.createTransport({
-            // host: 'smtp.gmail.com',
-            // port: 587,
-            // secure: false, 
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
             auth: {
               user: process.env.EMAIL_USER,
               pass: process.env.EMAIL_PASS
             }
         });
-
-        // var transporter = nodemailer.createTransport(smtpTransport({
-        //     service: 'gmail',
-        //     auth: {
-        //         user: 'itsankit176@gmail.com',
-        //         pass: process.env.EMAIL_PASS
-        //     }
-        // }));
 
         var params = {
             TableName: 'Users',
@@ -93,20 +84,20 @@ exports.handler = async (event) => {
 
         var data = await documentClient.scan(params).promise();
 
-        var emails = [];
+        var emails = "";
 
         for(var i=0;i<data.Items.length;i++) {
             if(data.Items[i].email) {
-                emails.push(data.Items[i].email);
-                // if(i < data.Items.length-1) {
-                //     emails += ', ';
-                // }
+                emails += data.Items[i].email;
+                if(i < data.Items.length-1) {
+                    emails += ', ';
+                }
             }
         }
 
         console.log(emails);
 
-        if(emails === []) {
+        if(emails === "") {
             return {
                 statusCode: 400,
                 body: JSON.stringify({
@@ -117,41 +108,26 @@ exports.handler = async (event) => {
         }
           
         var mailOptions = {
-            from: 'satoupenD@gmail.com',
-            to: 'ankit_1901ee74@iitp.ac.in',
+            from: '"Barbera" <' + process.env.EMAIL_USER + '>',
+            to: emails,
             subject: SUB,
             text: BODY
         };
 
         console.log(mailOptions);
 
+        data = await transporter.sendMail(mailOptions);
 
-        await transporter.sendMail(mailOptions, function(error, info) {
-            if(error) {
-                console.log(error);
-                return {
-                    statusCode: 500,
-                    body: JSON.stringify({
-                        success: false,
-                        message: 'Unable to send emails'
-                    })
-                }
-            
-            } else {
-                console.log('Email sent', info);
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify({
-                        success: true,
-                        message: 'Email sent'
-                    })
-                }
-            }
-        });
+        console.log("data",data);
 
-        // data = await transporter.sendMail(mailOptions);
-
-        // console.log("data",data);
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                success: true,
+                message: 'Email sent',
+                data: data
+            })
+        }
         
         
     } catch(err) {

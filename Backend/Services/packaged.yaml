@@ -4,7 +4,7 @@ Resources:
   AddService:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/505458c83a90addba9d1618d5f72217f
+      CodeUri: s3://barbera-buckets/cfd0a753bd115a89d8dc95af4062a291
       Handler: addservice.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   DelService:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/505458c83a90addba9d1618d5f72217f
+      CodeUri: s3://barbera-buckets/cfd0a753bd115a89d8dc95af4062a291
       Handler: delservice.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   GetServiceByID:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/505458c83a90addba9d1618d5f72217f
+      CodeUri: s3://barbera-buckets/cfd0a753bd115a89d8dc95af4062a291
       Handler: getservicebyid.handler
       Runtime: nodejs12.x
       Events:
@@ -43,7 +43,7 @@ Resources:
   GetAllServiceName:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/505458c83a90addba9d1618d5f72217f
+      CodeUri: s3://barbera-buckets/cfd0a753bd115a89d8dc95af4062a291
       Handler: getallservicenames.handler
       Runtime: nodejs12.x
       Events:
@@ -56,7 +56,7 @@ Resources:
   UpdateService:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/505458c83a90addba9d1618d5f72217f
+      CodeUri: s3://barbera-buckets/cfd0a753bd115a89d8dc95af4062a291
       Handler: updateservice.handler
       Runtime: nodejs12.x
       Events:
@@ -69,7 +69,7 @@ Resources:
   GetTrending:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/505458c83a90addba9d1618d5f72217f
+      CodeUri: s3://barbera-buckets/cfd0a753bd115a89d8dc95af4062a291
       Handler: gettrending.handler
       Runtime: nodejs12.x
       Events:
@@ -82,7 +82,7 @@ Resources:
   GetServiceByType:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/505458c83a90addba9d1618d5f72217f
+      CodeUri: s3://barbera-buckets/cfd0a753bd115a89d8dc95af4062a291
       Handler: getservicebytype.handler
       Runtime: nodejs12.x
       Events:
@@ -95,7 +95,7 @@ Resources:
   GetServiceByGender:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/505458c83a90addba9d1618d5f72217f
+      CodeUri: s3://barbera-buckets/cfd0a753bd115a89d8dc95af4062a291
       Handler: getservicebygender.handler
       Runtime: nodejs12.x
       Events:
@@ -108,7 +108,7 @@ Resources:
   GetServiceBySubType:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/505458c83a90addba9d1618d5f72217f
+      CodeUri: s3://barbera-buckets/cfd0a753bd115a89d8dc95af4062a291
       Handler: getservicebysubtype.handler
       Runtime: nodejs12.x
       Events:
