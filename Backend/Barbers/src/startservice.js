@@ -1,20 +1,20 @@
 require('dotenv').config();
 
 var AWS = require('aws-sdk');
+var uuid = require('uuid');
 var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
-var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
-const { userVerifier, addedBefore, serviceVerifier } = require("./authentication");
+const { userVerifier } = require("./authentication");
 
 exports.handler = async (event) => {
     try {
 
-        var obj = JSON.parse(event.body);
-        var service = obj.service;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
+        var obj = JSON.parse(event.body);
+        var OTP = obj.otp;
 
         if(token == null) {
             return {
@@ -52,69 +52,60 @@ exports.handler = async (event) => {
             }
         }
 
-        if(exist1.user.role != 'user') {
+        if(exist1.user.role != 'barber') {
             return {
                 statusCode: 400,
                 body: JSON.stringify({
                     success: false,
-                    message: 'Not a user',
+                    message: 'Not a barber',
                 })
             }
         }
 
-        var exist2;
-        var exist3;
-        var params;
-        var data;
-
-        for(var i=0;i<service.length;i++) {
-            exist2 = await serviceVerifier(service[i].serviceId);
-
-            if(exist2.success == false) {
-                continue;
-            }
-            
-            exist3 = await addedBefore(userID.id, service[i].serviceId);
-
-            if(exist3 == false) {
-                continue;
+        if( OTP === exist1.user.service_start_otp ) {
+            var params = {
+                TableName: 'Users',
+                Key: {
+                    id: userID.id,
+                },
+                UpdateExpression: "set #service_start_otp=:s",
+                ExpressionAttributeNames: {
+                    '#service_start_otp': 'service_start_otp', 
+                },
+                ExpressionAttributeValues:{
+                    ":s": null,
+                },
+                ReturnValues:"UPDATED_NEW"
             }
 
-            params = {
-                TableName: 'Carts',
-                Key:{
-                    userId: userID.id,
-                    serviceId: service[i].serviceId
-                }
-            }
+            try {
+                var data = await documentClient.update(params).promise();
 
-            data = await documentClient.delete(params).promise();
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        success: true,
+                        message: 'OTP matched'
+                    })
+                };
+            } catch(err) {
+                return {
+                    statusCode: 500,
+                    body: JSON.stringify({
+                        success: false,
+                        message: err
+                    })
+                };
+            }
+        } else {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'OTP mismatch'
+                })
+            };
         }
-            
-
-        params = {
-            TableName: 'Carts',
-            KeyConditionExpression: '#user = :u',
-            ExpressionAttributeValues: {
-                ':u': userID.id,
-            },
-            ExpressionAttributeNames: {
-                '#user': 'userId'
-            }
-        };
-
-        
-        data = await documentClient.query(params).promise();
-
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                success: true,
-                message: 'Items deleted from Cart',
-                count: data.Count
-            })
-        };
-        
 
     } catch(err) {
         console.log(err);

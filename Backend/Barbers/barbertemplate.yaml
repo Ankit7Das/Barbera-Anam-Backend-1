@@ -52,3 +52,33 @@ Resources:
             Method: get
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
+
+  ServiceEndOtpAccept:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: endservice.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /acceptendserv
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  ServiceStartOtpAccept:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: startservice.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /acceptstartserv
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------

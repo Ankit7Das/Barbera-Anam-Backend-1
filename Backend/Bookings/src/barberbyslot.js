@@ -90,7 +90,7 @@ exports.handler = async (event) => {
         }
 
         if(date.getDate()===today.getDate()) {
-            if(Number(SLOT)<Number(today.getHours())) {
+            if(Number(SLOT)-1<=Number(today.getHours())) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({

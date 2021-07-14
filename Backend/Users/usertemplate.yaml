@@ -83,6 +83,36 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  ServiceEndOtp:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: endservice.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /endserv
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  ServiceStartOtp:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: startservice.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /startserv
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
 
             
   

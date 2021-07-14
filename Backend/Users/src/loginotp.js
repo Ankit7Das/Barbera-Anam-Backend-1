@@ -381,21 +381,44 @@ exports.handler = async (event) => {
                     }
                     
                 } else {
-    
-                    params = {
-                        TableName: 'Users',
-                        Key: {
-                            id: id,
-                        },
-                        UpdateExpression: "set #otp=:o",
-                        ExpressionAttributeNames: {
-                            '#otp': 'otp',
-                        },
-                        ExpressionAttributeValues:{
-                            ":o": null,
-                        },
-                        ReturnValues:"UPDATED_NEW"
-                    };
+
+                    if(data.Items[0].role == 'admin') {
+                        params = {
+                            TableName: 'Users',
+                            Key: {
+                                id: id,
+                            },
+                            UpdateExpression: "set #otp=:o",
+                            ExpressionAttributeNames: {
+                                '#otp': 'otp',
+                            },
+                            ExpressionAttributeValues:{
+                                ":o": null,
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        };
+                    } else {
+                        params = {
+                            TableName: 'Users',
+                            Key: {
+                                id: id,
+                            },
+                            UpdateExpression: "set #otp=:o, #address=:a, #long=:lo, #lat=:la",
+                            ExpressionAttributeNames: {
+                                '#otp': 'otp',
+                                '#address': 'address',
+                                '#long': 'longitude',
+                                '#lat': 'latitude'
+                            },
+                            ExpressionAttributeValues:{
+                                ":o": null,
+                                ":a": ADD,
+                                ":lo": LONG,
+                                ":la": LAT
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        };
+                    }
 
                     try {
                         data = await documentClient.update(params).promise();
@@ -423,7 +446,8 @@ exports.handler = async (event) => {
                             })
                         };
                     }
-
+    
+                    
                 }
 
 

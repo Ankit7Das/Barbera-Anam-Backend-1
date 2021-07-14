@@ -19,6 +19,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+  #---------------------------------------------------------------
 
   myCart:
     Type: AWS::DynamoDB::Table
@@ -37,6 +38,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+  #---------------------------------------------------------------
 
   myServices:
     Type: AWS::DynamoDB::Table
@@ -51,6 +53,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+  #---------------------------------------------------------------
 
   BarberLog:
     Type: AWS::DynamoDB::Table
@@ -69,6 +72,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+  #---------------------------------------------------------------
 
   myBookings:
     Type: AWS::DynamoDB::Table
@@ -87,6 +91,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+  #---------------------------------------------------------------
 
   myCoupons:
     Type: AWS::DynamoDB::Table

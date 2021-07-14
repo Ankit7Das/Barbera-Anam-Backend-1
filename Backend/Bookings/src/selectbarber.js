@@ -141,7 +141,7 @@ exports.handler = async (event) => {
         }
 
         if(date.getDate()===today.getDate()) {
-            if(Number(SLOT)<Number(today.getHours())) {
+            if(Number(SLOT)-1<=Number(today.getHours())) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
@@ -165,7 +165,7 @@ exports.handler = async (event) => {
         try {
             data = await documentClient.get(params).promise();
 
-            if(data.Item.SLOT === false) {
+            if(data.Item[SLOT] === false) {
                 var now = new Date();
                 now.setHours(now.getHours() + 5);
                 now.setMinutes(now.getMinutes() + 30);
@@ -194,16 +194,6 @@ exports.handler = async (event) => {
                     data = await documentClient.put(params).promise();
 
                     total_price += Number(prices[i]);
-                }
-
-                if(cnt === service.length) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({
-                            success: true,
-                            message: 'Booking unsuccessful',
-                        })
-                    }
                 }
 
                 var percentage = 0.1;            

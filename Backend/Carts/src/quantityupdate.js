@@ -14,7 +14,7 @@ exports.handler = async (event) => {
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
         var obj = JSON.parse(event.body);
-        var serviceId = obj.serviceid;
+        var serviceId = obj.serviceId;
         var FLOW = obj.flow;
 
         if(token == null) {

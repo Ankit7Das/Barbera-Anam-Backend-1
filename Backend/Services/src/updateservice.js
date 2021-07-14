@@ -22,23 +22,6 @@ const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 exports.handler = async (event) => {
     try {
 
-        // var buff = Buffer.from(event.body, 'base64');
-        // var decodedEventBody = buff.toString('latin1'); 
-        // var decodedEvent = { ...event, body: decodedEventBody };
-        // var jsonEvent = multipart.parse(decodedEvent, false);
-        // var asset;
-    
-        // var ID = jsonEvent.id;
-        // var NAME = jsonEvent.name;
-        // var PRICE = jsonEvent.price;
-        // var TIME = jsonEvent.time;
-        // var DET = (jsonEvent.details==='null') ? null : jsonEvent.details;
-        // var CUT = (jsonEvent.cutprice==='null') ? null : jsonEvent.cutprice;
-        // var DOD = (jsonEvent.dod==='true') ? true : false;
-        // var GENDER = jsonEvent.gender;
-        // var TYPE = jsonEvent.type;
-        // var SUBTYPE = (jsonEvent.subtype==='null') ? null : jsonEvent.subtype;
-        // var TREND = (jsonEvent.trending==='true') ? true : false;
         var obj = JSON.parse(event.body);
     
         var ID = obj.id;
@@ -136,45 +119,6 @@ exports.handler = async (event) => {
                     };
                 }
             }
-
-            // asset = Buffer.from(jsonEvent.image.content, 'latin1');
-            // var mime = jsonEvent.image.contentType;
-            // var fileInfo = await fileType.fromBuffer(asset);
-            // var detectedExt = fileInfo.ext;
-            // var detectedMime = fileInfo.mime;
-    
-            // if (!allowedMimes.includes(mime)) {
-            //     return {
-            //         statusCode: 400,
-            //         body: JSON.stringify({
-            //             message: 'mime is not allowed '
-            //         })
-            //     };
-            // }
-
-            // if (detectedMime !== mime) {
-            //     return {
-            //         statusCode: 400,
-            //         body: JSON.stringify({
-            //             message: 'mime types dont match'
-            //         })
-            //     };
-            // }
-    
-            // var name = ID;
-            // var key = `${name}.${detectedExt}`;
-    
-            // await s3
-            //     .upload({
-            //         Body: asset,
-            //         Key: `services/${key}`,
-            //         ContentType: mime,
-            //         Bucket: 'barbera-image',
-            //         ACL: 'public-read',
-            //     })
-            //     .promise();
-    
-            // url = `https://barbera-image.s3-ap-south-1.amazonaws.com/services/${key}`;
     
             let imageData = obj.image;
             if (obj.image.substr(0, 7) === 'base64,') {

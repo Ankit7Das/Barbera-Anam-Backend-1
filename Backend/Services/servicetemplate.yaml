@@ -143,6 +143,36 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  SliderUploader:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: sliderimguploader.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /sliderupload
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  SliderDeleter:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: sliderimgdeleter.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /sliderdelete
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
 
 
             
