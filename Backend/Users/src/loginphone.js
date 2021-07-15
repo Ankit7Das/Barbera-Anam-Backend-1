@@ -2,7 +2,6 @@ require('dotenv').config();
 
 var AWS = require('aws-sdk');
 var uuid = require('uuid');
-const https = require('https');
 var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
@@ -98,6 +97,86 @@ exports.handler = async(event) => {
                         };
 
                         data = await documentClient.update(params).promise();
+
+                        var user = {
+                            phone: PHONE,
+                        }
+                
+                        var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+                
+                        var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
+                
+                        random = null; 
+                
+                        params = {
+                            Message: msg,
+                            PhoneNumber: '+91' + PHONE,
+                        };
+                    
+                        var sms = await sns.publish(params).promise();
+                
+                        console.log(sms);
+                    
+                        if(sms.MessageId) {
+                            return {
+                                statusCode: 200,
+                                body: JSON.stringify({
+                                    success: true,
+                                    message: 'OTP sent',
+                                    next: 'otp',
+                                    messageId: sms.MessageId,
+                                    token: token,
+                                })
+                            };
+                        } else {
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    success: false,
+                                    message: 'OTP not sent'
+                                })
+                            };
+                        }
+                    }
+                } else {
+                    var user = {
+                        phone: PHONE,
+                    }
+            
+                    var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+            
+                    var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
+            
+                    random = null; 
+            
+                    params = {
+                        Message: msg,
+                        PhoneNumber: '+91' + PHONE,
+                    };
+                
+                    var sms = await sns.publish(params).promise();
+            
+                    console.log(sms);
+                
+                    if(sms.MessageId) {
+                        return {
+                            statusCode: 200,
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'OTP sent',
+                                next: 'otp',
+                                messageId: sms.MessageId,
+                                token: token,
+                            })
+                        };
+                    } else {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                success: false,
+                                message: 'OTP not sent'
+                            })
+                        };
                     }
                 }
             } catch(err) {
@@ -111,107 +190,29 @@ exports.handler = async(event) => {
             }
 
         } else {
-
-            params = {
-                TableName: 'Users',
-                Key: {
-                    id: data.Items[0].id,
-                },
-                UpdateExpression: "set #otp=:o ",
-                ExpressionAttributeNames: {
-                    '#otp': 'otp',
-                },
-                ExpressionAttributeValues:{
-                    ":o": random,
-                },
-                ReturnValues:"UPDATED_NEW"
-            };
-    
-            try {
-                data = await documentClient.update(params).promise();
-            } catch(err) {
-                return {
-                    statusCode: 500,
-                    body: JSON.stringify({
-                        success: false,
-                        message: err,
-                    })
-                };
+            
+            var user = {
+                phone: PHONE,
             }
-            
-        }
-
-        var user = {
-            phone: PHONE,
-        }
-
-        var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
-
-        var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
-
-        random = null; 
-
-        // params = {
-        //     Message: msg,
-        //     PhoneNumber: '+91' + PHONE,
-        // };
     
-        // var sms = await sns.publish(params).promise();
-
-        var fcmnotif = await new Promise((resolve, reject) => {
-            const options = {
-                host: 'fcm.googleapis.com',
-                path: '/fcm/send',
-                method: 'POST',
-                headers: {
-                    'Authorization': 'key=' + process.env.FCM_AUTH,
-                    'Content-Type': 'application/json',
-                },
-            };
-        
-            console.log(options);
-            const req = https.request(options, (res) => {
-                console.log('success');
-                console.log(res.statusCode);
-                resolve('success');
-            });
-        
-            req.on('error', (e) => {
-                console.log('failure' + e.message);
-                reject(e.message);
-            });
-        
-            // const reqBody = '{"to":"' + deviceToken + '", "priority" : "high"}';
-            const reqBody = '{"to":"/topics/' + PHONE + '", "priority": "high", "notification": {"title": "Login OTP", "body":"' + msg + '"}}';
-            console.log(reqBody);
-        
-            req.write(reqBody);
-            req.end();
-            
-        });
-
-        console.log(fcmnotif);
+            var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
     
-        if(fcmnotif === "success") {
+            var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
+    
+            random = null; 
+
             return {
                 statusCode: 200,
                 body: JSON.stringify({
                     success: true,
-                    message: 'OTP sent',
-                    // messageId: sms.MessageId,
-                    fcm: fcmnotif,
+                    next: 'password',
+                    message: 'Phone number exists',
                     token: token,
                 })
             };
-        } else {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'OTP not sent'
-                })
-            };
         }
+
+        
     } catch(err) {
         console.log(err);
         return err;

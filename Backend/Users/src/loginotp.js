@@ -56,12 +56,12 @@ exports.handler = async (event) => {
         
         var data = await documentClient.scan(params).promise();
 
-        if(!data.Items[0]) {
+        if(data.Items.length === 0) {
             return {
                 statusCode: 500,
                 body: JSON.stringify({
                     success: false,
-                    message: 'Invalid token entered'
+                    message: 'User not found'
                 })
             };
         } else {
@@ -69,6 +69,8 @@ exports.handler = async (event) => {
             var id = data.Items[0].id;
 
             if(`${otp}` == OTP){
+
+                console.log(otp);
 
                 if(ROLE == 'barber' && !data.Items[0].role) {
 
@@ -287,7 +289,7 @@ exports.handler = async (event) => {
                                 statusCode: 200,
                                 body: JSON.stringify({
                                     success: true,
-                                    message: 'Login/Signup Success',
+                                    message: 'Signup Successful',
                                     token: token,
                                 })
                             };
@@ -309,7 +311,7 @@ exports.handler = async (event) => {
                             })
                         };
                     }
-                } else if(!data.Items[0].role) {
+                } else {
 
                     if(ROLE == 'admin') {
                         params = {
@@ -351,10 +353,14 @@ exports.handler = async (event) => {
                             },
                             ReturnValues:"UPDATED_NEW"
                         };
+
+                        console.log(params);
                     }
 
                     try {
                         data = await documentClient.update(params).promise();
+
+                        console.log(data);
     
                         var user = {
                             id: id,
@@ -366,7 +372,7 @@ exports.handler = async (event) => {
                             statusCode: 200,
                             body: JSON.stringify({
                                 success: true,
-                                message: 'Login/Signup Success',
+                                message: 'Signup Successful',
                                 token: token,
                             })
                         };
@@ -380,76 +386,7 @@ exports.handler = async (event) => {
                         };
                     }
                     
-                } else {
-
-                    if(data.Items[0].role == 'admin') {
-                        params = {
-                            TableName: 'Users',
-                            Key: {
-                                id: id,
-                            },
-                            UpdateExpression: "set #otp=:o",
-                            ExpressionAttributeNames: {
-                                '#otp': 'otp',
-                            },
-                            ExpressionAttributeValues:{
-                                ":o": null,
-                            },
-                            ReturnValues:"UPDATED_NEW"
-                        };
-                    } else {
-                        params = {
-                            TableName: 'Users',
-                            Key: {
-                                id: id,
-                            },
-                            UpdateExpression: "set #otp=:o, #address=:a, #long=:lo, #lat=:la",
-                            ExpressionAttributeNames: {
-                                '#otp': 'otp',
-                                '#address': 'address',
-                                '#long': 'longitude',
-                                '#lat': 'latitude'
-                            },
-                            ExpressionAttributeValues:{
-                                ":o": null,
-                                ":a": ADD,
-                                ":lo": LONG,
-                                ":la": LAT
-                            },
-                            ReturnValues:"UPDATED_NEW"
-                        };
-                    }
-
-                    try {
-                        data = await documentClient.update(params).promise();
-    
-                        var user = {
-                            id: id,
-                        }
-            
-                        token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
-            
-                        return {
-                            statusCode: 200,
-                            body: JSON.stringify({
-                                success: true,
-                                message: 'Login/Signup Success',
-                                token: token,
-                            })
-                        };
-                    } catch(err) {
-                        return {
-                            statusCode: 500,
-                            body: JSON.stringify({
-                                success: false,
-                                message: err,
-                            })
-                        };
-                    }
-    
-                    
-                }
-
+                } 
 
             } else {
                 return {

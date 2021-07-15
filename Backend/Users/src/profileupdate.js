@@ -21,6 +21,7 @@ const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 exports.handler = async (event) => {
     try {
         
+        var obj = JSON.parse(event.body);
         var EMAIL = obj.email;
         var NAME = obj.name;
         var ADD = obj.address;
@@ -70,17 +71,13 @@ exports.handler = async (event) => {
             exist1.user.email = null;
         }
 
-        if(!exist1.user.pic){
-            exist1.user.pic = null;
-        }
-
         if(!exist1.user.address){
             exist1.user.address = null;
         }
 
         var url;
         if(obj.image) {
-            if(exist1.user.pic !== null) {
+            if(exist1.user.pic) {
                 url = new URL(exist1.user.pic);
                 var key = url.pathname.substring(1);
 
