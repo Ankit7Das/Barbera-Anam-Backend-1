@@ -13,63 +13,63 @@ exports.handler = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
-        var GENDER = event.pathParameters.gender;
+        var CAT = event.pathParameters.category;
         var TYPE = obj.type;
-        var tokenArray = event.headers.Authorization.split(" ");
-        var token = tokenArray[1];
+        // var tokenArray = event.headers.Authorization.split(" ");
+        // var token = tokenArray[1];
 
-        if(token == null) {
-            return {
-                statusCode: 401,
-                body: JSON.stringify({
-                    success: false,
-                    message: "No token passed"
-                })
-            };
-        }
+        // if(token == null) {
+        //     return {
+        //         statusCode: 401,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "No token passed"
+        //         })
+        //     };
+        // }
 
-        var userID;
+        // var userID;
 
-        try {
-            userID = jwt.verify(token, JWT_SECRET);
-        } catch(err) {
-            return {
-                statusCode: 403,
-                body: JSON.stringify({
-                    success: false,
-                    message: "Invalid Token",
-                })
-            };
-        }
+        // try {
+        //     userID = jwt.verify(token, JWT_SECRET);
+        // } catch(err) {
+        //     return {
+        //         statusCode: 403,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "Invalid Token",
+        //         })
+        //     };
+        // }
 
-        var exist1 = await userVerifier(userID.id);
+        // var exist1 = await userVerifier(userID.id);
 
-        if(exist1.success == false) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'User not found',
-                })
-            }
-        }
+        // if(exist1.success == false) {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not found',
+        //         })
+        //     }
+        // }
 
-        if(exist1.user.role != 'user') {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Not an admin',
-                })
-            }
-        }
+        // if(exist1.user.role != 'user') {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'Not an admin',
+        //         })
+        //     }
+        // }
 
         var params = {
             TableName: 'Services',
             ProjectionExpression: '#subtype',
-            FilterExpression: '#gender = :this_gender AND #type = :this_type',
-            ExpressionAttributeValues: {':this_gender': GENDER, ':this_type': TYPE},
-            ExpressionAttributeNames: {'#gender': 'gender', '#type': 'type', '#subtype': 'subtype'},
+            FilterExpression: '#category = :this_category AND #type = :this_type',
+            ExpressionAttributeValues: {':this_category': CAT, ':this_type': TYPE},
+            ExpressionAttributeNames: {'#category': 'category', '#type': 'type', '#subtype': 'subtype'},
         }
 
         var data = await documentClient.scan(params).promise();

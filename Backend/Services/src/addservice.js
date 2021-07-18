@@ -32,7 +32,7 @@ exports.handler = async (event) => {
         var DET = obj.details;
         var CUT = obj.cutprice;
         var DOD = obj.dod;
-        var GENDER = obj.gender;
+        var CAT = obj.category;
         var TYPE = obj.type;
         var SUBTYPE = obj.subtype;
         var TREND = obj.trending;
@@ -153,7 +153,7 @@ exports.handler = async (event) => {
                 dod: DOD ? DOD : false,
                 type: TYPE,
                 subtype: SUBTYPE,
-                gender: GENDER,
+                category: CAT,
                 trending: TREND ? TREND : false
             }
         }

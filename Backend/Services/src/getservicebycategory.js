@@ -12,10 +12,7 @@ const { userVerifier, addedBefore, serviceVerifier } = require("./authentication
 exports.handler = async (event) => {
     try {
 
-        var obj = JSON.parse(event.body);
-        var SUBTYPE = obj.subtype; 
         var CAT = event.pathParameters.category;
-        var TYPE = obj.type;
         // var tokenArray = event.headers.Authorization.split(" ");
         // var token = tokenArray[1];
 
@@ -60,35 +57,44 @@ exports.handler = async (event) => {
         //         statusCode: 400,
         //         body: JSON.stringify({
         //             success: false,
-        //             message: 'Not an user',
+        //             message: 'Not an admin',
         //         })
         //     }
         // }
 
         var params = {
             TableName: 'Services',
-            FilterExpression: '#category = :this_category AND #type = :this_type AND #subtype = :this_subtype',
-            ExpressionAttributeValues: {':this_category': CAT, ':this_type': TYPE, ':this_subtype': SUBTYPE},
-            ExpressionAttributeNames: {'#category': 'category', '#type': 'type', '#subtype': 'subtype'}
+            ProjectionExpression: '#type',
+            FilterExpression: '#category = :this_category',
+            ExpressionAttributeValues: {':this_category': CAT},
+            ExpressionAttributeNames: {'#category': 'category', '#type': 'type'},
         }
 
         var data = await documentClient.scan(params).promise();
 
         if(data.Items.length == 0) {
             return {
-                statusCode: 404,
+                statusCode: 200,
                 body: JSON.stringify({
                     success: false,
-                    message: 'No Services found'
+                    message: 'No Types found'
                 })
             }
         } else {
+
+            var type = [];
+            for(var i=0;i<data.Items.length;i++) {
+                type.push(data.Items[i].type);
+            }
+
+            var unique_type = type.filter((v, i, a) => a.indexOf(v) === i);
+
             return {
                 statusCode: 200,
                 body: JSON.stringify({
                     success: true,
-                    message: 'Services found',
-                    data: data.Items
+                    message: 'Types found',
+                    data: unique_type
                 })
             }
         }
@@ -98,3 +104,5 @@ exports.handler = async (event) => {
         return err;
     }
 }
+
+

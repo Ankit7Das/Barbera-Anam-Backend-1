@@ -14,7 +14,7 @@ exports.handler = async (event) => {
 
         var obj = JSON.parse(event.body);
         var INC = obj.increase;
-        var barberId = obj.barberid;
+        var barberPhone = obj.barberphone;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -66,28 +66,48 @@ exports.handler = async (event) => {
 
         var params = {
             TableName: 'Users',
-            Key: {
-                id: barberId,
-            },
-            UpdateExpression: "set #coins=#coins + :c",
-            ExpressionAttributeNames: {
-                '#coins': 'coins', 
-            },
-            ExpressionAttributeValues:{
-                ":c": INC,
-            },
-            ReturnValues:"UPDATED_NEW"
+            FilterExpression: '#phone = :this_phone',
+            ExpressionAttributeValues: {':this_phone': barberPhone},
+            ExpressionAttributeNames: {'#phone': 'phone'}
         }
 
         try {
-            var data = await documentClient.update(params).promise();
+            var data = await documentClient.scan(params).promise();
 
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    success: true,
-                    message: 'Coins increased',
-                })
+            params = {
+                TableName: 'Users',
+                Key: {
+                    id: data.Items[0].id,
+                },
+                UpdateExpression: "set #coins=#coins + :c",
+                ExpressionAttributeNames: {
+                    '#coins': 'coins', 
+                },
+                ExpressionAttributeValues:{
+                    ":c": INC,
+                },
+                ReturnValues:"UPDATED_NEW"
+            }
+    
+            try {
+                data = await documentClient.update(params).promise();
+    
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        success: true,
+                        message: 'Coins increased',
+                    })
+                }
+            } catch(err) {
+                console.log("Error: ", err);
+                return {
+                    statusCode: 500,
+                    body: JSON.stringify({
+                        success: false,
+                        message: err,
+                    })
+                };
             }
         } catch(err) {
             console.log("Error: ", err);

@@ -14,8 +14,10 @@ const { getDistance } = require('./helper');
 exports.handler = async (event) => {
     try {
 
+        var obj = JSON.parse(event.body);
         var DATE = event.pathParameters.date;
         var SLOT = event.pathParameters.slot;
+        var service = obj.service;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -61,6 +63,31 @@ exports.handler = async (event) => {
                 body: JSON.stringify({
                     success: false,
                     message: 'Not a user',
+                })
+            }
+        }
+
+        var exist2;
+        var prices = [];
+        var total_price = 0;
+        for(var i=0;i<service.length;i++) {
+            
+            exist2 = await serviceVerifier(service[i].serviceId);
+
+            if(exist2.success == false) {
+                break;
+            }
+
+            prices.push(exist2.service.price);
+            
+        }
+
+        if(exist2.success == false) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Service not found',
                 })
             }
         }
@@ -130,7 +157,7 @@ exports.handler = async (event) => {
                     Key: {
                         id: data.Items[i].barberId,
                     },
-                    ProjectionExpression: 'id, address, phone, longitude, latitude, coins'
+                    ProjectionExpression: 'id, longitude, latitude, coins'
                 }
 
                 data1 = await documentClient.get(params).promise();
@@ -153,19 +180,134 @@ exports.handler = async (event) => {
                 }
             });
 
-            for(var i=0;i<barbers.length;i++){
-                delete barbers[i].longitude;
-                delete barbers[i].latitude;
-                delete barbers[i].coins;
-            }
+            var barberId = data.Items[0].id;
 
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    success: true,
-                    message: 'List of free barbers',
-                    barbers: barbers,
-                })
+            params = {
+                TableName: 'BarbersLog',
+                Key: {
+                    date: DATE,
+                    barberId: barberId
+                }
+            };
+    
+            try {
+                data = await documentClient.get(params).promise();
+    
+                if(data.Item[SLOT] === false) {
+                    var now = new Date();
+                    now.setHours(now.getHours() + 5);
+                    now.setMinutes(now.getMinutes() + 30);
+                    var timestamp = now.getTime(); 
+    
+                    for(var i=0;i<service.length;i++){
+    
+                        params = {
+                            TableName: 'Bookings',
+                            Item: {
+                                userId: exist1.user.id,
+                                serviceId: service[i].serviceId + ',' + timestamp,
+                                barberId: barberId,
+                                Timestamp: timestamp,
+                                user_long: exist1.user.longitude,
+                                user_lat: exist1.user.latitude,
+                                user_add: exist1.user.address,
+                                amount: prices[i],
+                                payment_status: 'pending',
+                                date: DATE,
+                                slot: SLOT,
+                                quantity: service[i].quantity
+                            }
+                        };
+    
+                        data = await documentClient.put(params).promise();
+    
+                        total_price += Number(prices[i]);
+                    }
+    
+                    var percentage = 0.1;            
+    
+                    params = {
+                        TableName: 'Users',
+                        Key: {
+                            id: barberId,
+                        },
+                        UpdateExpression: "set #coins=#coins - :c",
+                        ExpressionAttributeNames: {
+                            '#coins': 'coins', 
+                        },
+                        ExpressionAttributeValues:{
+                            ":c": percentage*exist3.user.coins,
+                        },
+                        ReturnValues:"UPDATED_NEW"
+                    }
+    
+                    try {
+                        data = await documentClient.update(params).promise();
+    
+                        params = {
+                            TableName: 'BarbersLog',
+                            Key: {
+                                date: DATE,
+                                barberId: barberId,
+                            },
+                            UpdateExpression: "set #slot=:s",
+                            ExpressionAttributeNames: {
+                                '#slot': SLOT, 
+                            },
+                            ExpressionAttributeValues:{
+                                ":s": true,
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        }
+                
+                        try {
+                            data = await documentClient.update(params).promise();
+                
+                            return {
+                                statusCode: 200,
+                                body: JSON.stringify({
+                                    success: true,
+                                    message: 'Booking successful',
+                                })
+                            }
+                        } catch(err) {
+                            console.log("Error: ", err);
+                            return {
+                                statusCode: 500,
+                                body: JSON.stringify({
+                                    success: false,
+                                    message: err,
+                                })
+                            };
+                        }
+                    } catch(err) {
+                        console.log("Error: ", err);
+                        return {
+                            statusCode: 500,
+                            body: JSON.stringify({
+                                success: false,
+                                message: err,
+                            })
+                        };
+                    }
+                }else {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            success: false,
+                            message: 'Booking unsuccessful',
+                        })
+                    };
+                }
+            }catch(err) {
+                console.log("Error: ", err);
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        success: false,
+                        message: 'Booking unsuccessful',
+                    })
+                };
             }
         } catch(err) {
             return {

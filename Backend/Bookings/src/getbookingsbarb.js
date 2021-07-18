@@ -96,12 +96,12 @@ exports.handler = async (event) => {
                     Key:{
                         id: info[0]
                     },
-                    ProjectionExpression: "#name, #price, #time, #gender",
+                    ProjectionExpression: "#name, #price, #time, #category",
                     ExpressionAttributeNames: {
                         "#name": "name",
                         "#price": "price",
                         "#time": "time",
-                        "#gender": "gender",
+                        "#category": "category",
                     }
                 }
 

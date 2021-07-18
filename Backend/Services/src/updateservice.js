@@ -7,8 +7,6 @@ var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 var { Buffer } = require('buffer');
-const multipart = require('aws-lambda-multipart-parser');
-const parser = require('lambda-multipart-parser');
 const { JWT_SECRET } = process.env;
 const { userVerifier, addedBefore, serviceVerifier } = require("./authentication");
 const s3 = new AWS.S3({
@@ -31,7 +29,7 @@ exports.handler = async (event) => {
         var DET = obj.details;
         var CUT = obj.cutprice;
         var DOD = obj.dod;
-        var GENDER = obj.gender;
+        var CAT = obj.category;
         var TYPE = obj.type;
         var SUBTYPE = obj.subtype;
         var TREND = obj.trending;
@@ -162,7 +160,7 @@ exports.handler = async (event) => {
             Key: {
                 id: ID,
             },
-            UpdateExpression: "set #name=:n, #price=:p, #time=:ti, #details=:det, #cut=:c, #deal=:dod, #image=:i, #type=:t, #subtype=:s, #gender=:g, #trend=:tr",
+            UpdateExpression: "set #name=:n, #price=:p, #time=:ti, #details=:det, #cut=:c, #deal=:dod, #image=:i, #type=:t, #subtype=:s, #category=:g, #trend=:tr",
             ExpressionAttributeNames: {
                 '#name': 'name',
                 '#price': 'price',
@@ -173,7 +171,7 @@ exports.handler = async (event) => {
                 '#image':'image',
                 '#type': 'type',
                 '#subtype': 'subtype',
-                '#gender': 'gender',
+                '#category': 'category',
                 '#trend': 'trending', 
             },
             ExpressionAttributeValues:{
@@ -186,7 +184,7 @@ exports.handler = async (event) => {
                 ":dod": DOD ? DOD : false,
                 ":t": TYPE,
                 ":s": SUBTYPE,
-                ":g": GENDER,
+                ":g": CAT,
                 ":tr": TREND
             },
             ReturnValues:"UPDATED_NEW"

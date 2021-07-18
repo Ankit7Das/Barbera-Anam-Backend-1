@@ -21,6 +21,8 @@ exports.handler = async (event) => {
         var LAT = obj.latitude;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
+
+        console.log(event.headers);
         
 
         if(token == null) {
@@ -56,12 +58,12 @@ exports.handler = async (event) => {
         
         var data = await documentClient.scan(params).promise();
 
-        if(data.Items.length === 0) {
+        if(!data.Items[0]) {
             return {
                 statusCode: 500,
                 body: JSON.stringify({
                     success: false,
-                    message: 'User not found'
+                    message: 'Invalid token entered'
                 })
             };
         } else {
@@ -69,8 +71,6 @@ exports.handler = async (event) => {
             var id = data.Items[0].id;
 
             if(`${otp}` == OTP){
-
-                console.log(otp);
 
                 if(ROLE == 'barber' && !data.Items[0].role) {
 
@@ -289,7 +289,7 @@ exports.handler = async (event) => {
                                 statusCode: 200,
                                 body: JSON.stringify({
                                     success: true,
-                                    message: 'Signup Successful',
+                                    message: 'Login/Signup Success',
                                     token: token,
                                 })
                             };
@@ -311,7 +311,7 @@ exports.handler = async (event) => {
                             })
                         };
                     }
-                } else {
+                } else if(!data.Items[0].role) {
 
                     if(ROLE == 'admin') {
                         params = {
@@ -353,26 +353,62 @@ exports.handler = async (event) => {
                             },
                             ReturnValues:"UPDATED_NEW"
                         };
-
-                        console.log(params);
                     }
 
                     try {
                         data = await documentClient.update(params).promise();
-
-                        console.log(data);
     
                         var user = {
                             id: id,
                         }
             
                         token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+
+                        if(obj.ref && ROLE == 'user') {
+                            params = {
+                                TableName: 'Users',
+                                FilterExpression: '#referral = :this_referral',
+                                ExpressionAttributeValues: {':this_referral': obj.ref},
+                                ExpressionAttributeNames: {'#referral': 'referral'}
+                            };
+            
+                            data = await documentClient.scan(params).promise();
+        
+                            console.log(data);
+        
+                            if(data.Items.length === 0) {
+                                return {
+                                    statusCode: 400,
+                                    body: JSON.stringify({
+                                        success: false,
+                                        message: 'Referral code is invalid'
+                                    })
+                                }
+                            } else {
+                                params = {
+                                    TableName: 'Users',
+                                    Key: {
+                                        id: data.Items[0].id,
+                                    },
+                                    UpdateExpression: "set #invites=#invites + :i",
+                                    ExpressionAttributeNames: {
+                                        '#invites': 'invites',
+                                    },
+                                    ExpressionAttributeValues:{
+                                        ":i": 1,
+                                    },
+                                    ReturnValues:"UPDATED_NEW"
+                                };
+        
+                                data = await documentClient.update(params).promise();
+                            }
+                        }
             
                         return {
                             statusCode: 200,
                             body: JSON.stringify({
                                 success: true,
-                                message: 'Signup Successful',
+                                message: 'Login/Signup Success',
                                 token: token,
                             })
                         };
@@ -386,7 +422,76 @@ exports.handler = async (event) => {
                         };
                     }
                     
-                } 
+                } else {
+
+                    if(data.Items[0].role == 'admin') {
+                        params = {
+                            TableName: 'Users',
+                            Key: {
+                                id: id,
+                            },
+                            UpdateExpression: "set #otp=:o",
+                            ExpressionAttributeNames: {
+                                '#otp': 'otp',
+                            },
+                            ExpressionAttributeValues:{
+                                ":o": null,
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        };
+                    } else {
+                        params = {
+                            TableName: 'Users',
+                            Key: {
+                                id: id,
+                            },
+                            UpdateExpression: "set #otp=:o, #address=:a, #long=:lo, #lat=:la",
+                            ExpressionAttributeNames: {
+                                '#otp': 'otp',
+                                '#address': 'address',
+                                '#long': 'longitude',
+                                '#lat': 'latitude'
+                            },
+                            ExpressionAttributeValues:{
+                                ":o": null,
+                                ":a": ADD,
+                                ":lo": LONG,
+                                ":la": LAT
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        };
+                    }
+
+                    try {
+                        data = await documentClient.update(params).promise();
+    
+                        var user = {
+                            id: id,
+                        }
+            
+                        token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+            
+                        return {
+                            statusCode: 200,
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'Login/Signup Success',
+                                token: token,
+                            })
+                        };
+                    } catch(err) {
+                        return {
+                            statusCode: 500,
+                            body: JSON.stringify({
+                                success: false,
+                                message: err,
+                            })
+                        };
+                    }
+    
+                    
+                }
+
 
             } else {
                 return {

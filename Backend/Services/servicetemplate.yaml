@@ -108,22 +108,22 @@ Resources:
         apiForLambda:
           Type: Api 
           Properties:
-            Path: /getsubtypes/{gender}
+            Path: /getsubtypes/{category}
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
-  GetServiceByGender:
+  GetServiceByCategory:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
-      Handler: getservicebygender.handler
+      Handler: getservicebycategory.handler
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api 
           Properties:
-            Path: /gettypes/{gender}
+            Path: /gettypes/{category}
             Method: get
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
@@ -138,7 +138,7 @@ Resources:
         apiForLambda:
           Type: Api 
           Properties:
-            Path: /getallserv/{gender}
+            Path: /getallserv/{category}
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
@@ -169,6 +169,36 @@ Resources:
           Type: Api 
           Properties:
             Path: /sliderdelete
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  TypeImgUploader:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: typeimguploader.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /typeupload
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  TypeImgDeleter:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: typeimgdeleter.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /typedelete
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------

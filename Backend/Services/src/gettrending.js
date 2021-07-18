@@ -12,54 +12,54 @@ const { userVerifier, addedBefore, serviceVerifier } = require("./authentication
 exports.handler = async (event) => {
     try {
 
-        var tokenArray = event.headers.Authorization.split(" ");
-        var token = tokenArray[1];
+        // var tokenArray = event.headers.Authorization.split(" ");
+        // var token = tokenArray[1];
 
-        if(token == null) {
-            return {
-                statusCode: 401,
-                body: JSON.stringify({
-                    success: false,
-                    message: "No token passed"
-                })
-            };
-        }
+        // if(token == null) {
+        //     return {
+        //         statusCode: 401,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "No token passed"
+        //         })
+        //     };
+        // }
 
-        var userID;
+        // var userID;
 
-        try {
-            userID = jwt.verify(token, JWT_SECRET);
-        } catch(err) {
-            return {
-                statusCode: 403,
-                body: JSON.stringify({
-                    success: false,
-                    message: "Invalid Token",
-                })
-            };
-        }
+        // try {
+        //     userID = jwt.verify(token, JWT_SECRET);
+        // } catch(err) {
+        //     return {
+        //         statusCode: 403,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: "Invalid Token",
+        //         })
+        //     };
+        // }
 
-        var exist1 = await userVerifier(userID.id);
+        // var exist1 = await userVerifier(userID.id);
 
-        if(exist1.success == false) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'User not found',
-                })
-            }
-        }
+        // if(exist1.success == false) {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'User not found',
+        //         })
+        //     }
+        // }
 
-        if(exist1.user.role != 'user') {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Not an user',
-                })
-            }
-        }
+        // if(exist1.user.role != 'user') {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'Not an user',
+        //         })
+        //     }
+        // }
 
         var params = {
             TableName: 'Services',

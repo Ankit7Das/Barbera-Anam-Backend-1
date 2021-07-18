@@ -83,21 +83,6 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
-  LoginPassword:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/
-      Handler: loginpass.handler
-      Runtime: nodejs12.x
-      Events:
-        apiForLambda:
-          Type: Api 
-          Properties:
-            Path: /loginpass
-            Method: post
-      Role: arn:aws:iam::140544830924:role/BackendUser
-  #---------------------------------------------------------------
-
   ServiceEndOtp:
     Type: AWS::Serverless::Function
     Properties:

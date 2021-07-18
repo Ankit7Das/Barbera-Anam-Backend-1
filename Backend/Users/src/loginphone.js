@@ -12,9 +12,11 @@ const { JWT_SECRET } = process.env;
 
 exports.handler = async(event) => {
     try {
+        console.log(event);
         var obj = JSON.parse(event.body);
 
         var PHONE = obj.phone;
+        var MODE = obj.mode;
 
         var params = {
             TableName: 'Users',
@@ -25,10 +27,12 @@ exports.handler = async(event) => {
         
         var data = await documentClient.scan(params).promise();
         var random = Math.floor(100000 + Math.random() * 900000);
+        var time;
 
         if(data.Items.length == 0) {
             var code;
             var data1;
+            time = 'first';
 
             do {
                 code = Math.round((Math.pow(36, 6 + 1) - Math.random() * Math.pow(36, 6))).toString(36).slice(1);
@@ -60,125 +64,6 @@ exports.handler = async(event) => {
             try {
                 data = await documentClient.put(params).promise();
 
-                if(obj.ref) {
-                    params = {
-                        TableName: 'Users',
-                        FilterExpression: '#referral = :this_referral',
-                        ExpressionAttributeValues: {':this_referral': obj.ref},
-                        ExpressionAttributeNames: {'#referral': 'referral'}
-                    };
-    
-                    data = await documentClient.scan(params).promise();
-
-                    console.log(data);
-
-                    if(data.Items.length === 0) {
-                        return {
-                            statusCode: 400,
-                            body: JSON.stringify({
-                                success: false,
-                                message: 'Referral code is invalid'
-                            })
-                        }
-                    } else {
-                        params = {
-                            TableName: 'Users',
-                            Key: {
-                                id: data.Items[0].id,
-                            },
-                            UpdateExpression: "set #invites=#invites + :i",
-                            ExpressionAttributeNames: {
-                                '#invites': 'invites',
-                            },
-                            ExpressionAttributeValues:{
-                                ":i": 1,
-                            },
-                            ReturnValues:"UPDATED_NEW"
-                        };
-
-                        data = await documentClient.update(params).promise();
-
-                        var user = {
-                            phone: PHONE,
-                        }
-                
-                        var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
-                
-                        var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
-                
-                        random = null; 
-                
-                        params = {
-                            Message: msg,
-                            PhoneNumber: '+91' + PHONE,
-                        };
-                    
-                        var sms = await sns.publish(params).promise();
-                
-                        console.log(sms);
-                    
-                        if(sms.MessageId) {
-                            return {
-                                statusCode: 200,
-                                body: JSON.stringify({
-                                    success: true,
-                                    message: 'OTP sent',
-                                    next: 'otp',
-                                    messageId: sms.MessageId,
-                                    token: token,
-                                })
-                            };
-                        } else {
-                            return {
-                                statusCode: 400,
-                                body: JSON.stringify({
-                                    success: false,
-                                    message: 'OTP not sent'
-                                })
-                            };
-                        }
-                    }
-                } else {
-                    var user = {
-                        phone: PHONE,
-                    }
-            
-                    var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
-            
-                    var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
-            
-                    random = null; 
-            
-                    params = {
-                        Message: msg,
-                        PhoneNumber: '+91' + PHONE,
-                    };
-                
-                    var sms = await sns.publish(params).promise();
-            
-                    console.log(sms);
-                
-                    if(sms.MessageId) {
-                        return {
-                            statusCode: 200,
-                            body: JSON.stringify({
-                                success: true,
-                                message: 'OTP sent',
-                                next: 'otp',
-                                messageId: sms.MessageId,
-                                token: token,
-                            })
-                        };
-                    } else {
-                        return {
-                            statusCode: 400,
-                            body: JSON.stringify({
-                                success: false,
-                                message: 'OTP not sent'
-                            })
-                        };
-                    }
-                }
             } catch(err) {
                 return {
                     statusCode: 500,
@@ -190,29 +75,129 @@ exports.handler = async(event) => {
             }
 
         } else {
-            
-            var user = {
-                phone: PHONE,
-            }
-    
-            var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
-    
-            var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
-    
-            random = null; 
+            time = 'not first';
 
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    success: true,
-                    next: 'password',
-                    message: 'Phone number exists',
-                    token: token,
-                })
+            params = {
+                TableName: 'Users',
+                Key: {
+                    id: data.Items[0].id,
+                },
+                UpdateExpression: "set #otp=:o ",
+                ExpressionAttributeNames: {
+                    '#otp': 'otp',
+                },
+                ExpressionAttributeValues:{
+                    ":o": random,
+                },
+                ReturnValues:"UPDATED_NEW"
             };
+    
+            try {
+                data = await documentClient.update(params).promise();
+            } catch(err) {
+                return {
+                    statusCode: 500,
+                    body: JSON.stringify({
+                        success: false,
+                        message: err,
+                    })
+                };
+            }
+            
         }
 
+        var user = {
+            phone: PHONE,
+        }
+
+        var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+
+        var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
+
+        random = null; 
+
+        if(time === 'first' || MODE === 'web') {
+            params = {
+                Message: msg,
+                PhoneNumber: '+91' + PHONE,
+            };
         
+            var sms = await sns.publish(params).promise();
+        
+            if(sms.MessageId) {
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        success: true,
+                        message: 'OTP sent',
+                        messageId: sms.MessageId,
+                        token: token,
+                    })
+                };
+            } else {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        success: false,
+                        message: 'OTP not sent'
+                    })
+                };
+            }
+        } else {
+            var fcmnotif = await new Promise((resolve, reject) => {
+                const options = {
+                    host: 'fcm.googleapis.com',
+                    path: '/fcm/send',
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'key=' + process.env.FCM_AUTH,
+                        'Content-Type': 'application/json',
+                    },
+                };
+            
+                console.log(options);
+                const req = https.request(options, (res) => {
+                    console.log('success');
+                    console.log(res.statusCode);
+                    resolve('success');
+                });
+            
+                req.on('error', (e) => {
+                    console.log('failure' + e.message);
+                    reject(e.message);
+                });
+            
+                // const reqBody = '{"to":"' + deviceToken + '", "priority" : "high"}';
+                const reqBody = '{"to":"/topics/' + PHONE + '", "priority": "high", "notification": {"title": "Barbera Home Salon", "body":"' + msg + '"}}';
+                console.log(reqBody);
+            
+                req.write(reqBody);
+                req.end();
+                
+            });
+
+            console.log(fcmnotif);
+        
+            if(sms.MessageId) {
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        success: true,
+                        message: 'OTP sent',
+                        fcm: fcmnotif,
+                        token: token,
+                    })
+                };
+            } else {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        success: false,
+                        message: 'OTP not sent'
+                    })
+                };
+            }
+        }
     } catch(err) {
         console.log(err);
         return err;
