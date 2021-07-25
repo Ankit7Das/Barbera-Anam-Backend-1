@@ -8,32 +8,62 @@ Resources:
   #---------------------------------------------------------------
   # Booking Functions
   #---------------------------------------------------------------
-  GetBarbersByDate:
+  # GetBarbersByDate:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: src/
+  #     Handler: barberbyslot.handler
+  #     Runtime: nodejs12.x
+  #     Events:
+  #       apiForLambda:
+  #         Type: Api 
+  #         Properties:
+  #           Path: /getbarb/{date}/{slot}
+  #           Method: get
+  #     Role: arn:aws:iam::140544830924:role/BackendUser
+  # #---------------------------------------------------------------
+
+  BookSlotWise:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
-      Handler: barberbyslot.handler
+      Handler: bookslot.handler
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api 
           Properties:
-            Path: /getbarb/{date}/{slot}
-            Method: get
+            Path: /bookslot/{date}/{slot}
+            Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
-  BarberSelect:
+  InstantBooking:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
-      Handler: selectbarber.handler
+      Handler: bookinstant.handler
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api 
           Properties:
-            Path: /book/{date}/{slot}
+            Path: /bookinst
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  ConfirmBooking:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: bookconfirm.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /bookconfirm
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------

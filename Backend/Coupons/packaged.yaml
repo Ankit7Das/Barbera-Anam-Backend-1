@@ -4,7 +4,7 @@ Resources:
   GetReferralCode:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/1a0013e92f5317c94d1e28f038f04d49
+      CodeUri: s3://barbera-buckets/397194666278e4369c7da3fd4f26d859
       Handler: getreferral.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   CouponCreate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/1a0013e92f5317c94d1e28f038f04d49
+      CodeUri: s3://barbera-buckets/397194666278e4369c7da3fd4f26d859
       Handler: couponcreate.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   UseCoupon:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/1a0013e92f5317c94d1e28f038f04d49
+      CodeUri: s3://barbera-buckets/397194666278e4369c7da3fd4f26d859
       Handler: availcoupon.handler
       Runtime: nodejs12.x
       Events:
@@ -38,5 +38,57 @@ Resources:
           Type: Api
           Properties:
             Path: /usecoupon
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetAllCoupons:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/397194666278e4369c7da3fd4f26d859
+      Handler: getallcoupons.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getallcoupons
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/397194666278e4369c7da3fd4f26d859
+      Handler: getcoupon.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getcoupon/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  DeleteCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/397194666278e4369c7da3fd4f26d859
+      Handler: deletecoupon.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /delcoupon
+            Method: delete
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  UpdateCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/397194666278e4369c7da3fd4f26d859
+      Handler: updatecoupon.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /updcoupon/{serviceid}
             Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser

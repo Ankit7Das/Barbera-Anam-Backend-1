@@ -2,6 +2,7 @@ require('dotenv').config();
 
 var AWS = require('aws-sdk');
 var uuid = require('uuid');
+var https = require('https');
 var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
@@ -178,7 +179,7 @@ exports.handler = async(event) => {
 
             console.log(fcmnotif);
         
-            if(sms.MessageId) {
+            if(fcmnotif === 'success') {
                 return {
                     statusCode: 200,
                     body: JSON.stringify({

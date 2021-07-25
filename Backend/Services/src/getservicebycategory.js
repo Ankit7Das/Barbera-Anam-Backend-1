@@ -72,32 +72,22 @@ exports.handler = async (event) => {
 
         var data = await documentClient.scan(params).promise();
 
-        if(data.Items.length == 0) {
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'No Types found'
-                })
-            }
-        } else {
-
-            var type = [];
-            for(var i=0;i<data.Items.length;i++) {
-                type.push(data.Items[i].type);
-            }
-
-            var unique_type = type.filter((v, i, a) => a.indexOf(v) === i);
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    success: true,
-                    message: 'Types found',
-                    data: unique_type
-                })
-            }
+        var type = [];
+        for(var i=0;i<data.Items.length;i++) {
+            type.push(data.Items[i].type);
         }
+
+        var unique_type = type.filter((v, i, a) => a.indexOf(v) === i);
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                success: true,
+                message: 'Types found',
+                data: unique_type
+            })
+        }
+        
 
     } catch(err) {
         console.log(err);

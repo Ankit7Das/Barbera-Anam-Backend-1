@@ -13,7 +13,7 @@ exports.handler = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
-        var SUBTYPE = obj.subtype; 
+        // var SUBTYPE = obj.subtype; 
         var CAT = event.pathParameters.category;
         var TYPE = obj.type;
         // var tokenArray = event.headers.Authorization.split(" ");
@@ -67,9 +67,9 @@ exports.handler = async (event) => {
 
         var params = {
             TableName: 'Services',
-            FilterExpression: '#category = :this_category AND #type = :this_type AND #subtype = :this_subtype',
-            ExpressionAttributeValues: {':this_category': CAT, ':this_type': TYPE, ':this_subtype': SUBTYPE},
-            ExpressionAttributeNames: {'#category': 'category', '#type': 'type', '#subtype': 'subtype'}
+            FilterExpression: '#category = :this_category AND #type = :this_type',
+            ExpressionAttributeValues: {':this_category': CAT, ':this_type': TYPE },
+            ExpressionAttributeNames: {'#category': 'category', '#type': 'type' }
         }
 
         var data = await documentClient.scan(params).promise();

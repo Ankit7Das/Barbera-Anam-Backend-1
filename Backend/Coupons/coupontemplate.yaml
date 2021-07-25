@@ -53,6 +53,66 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  GetAllCoupons:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getallcoupons.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getallcoupons
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  GetCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getcoupon.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getcoupon/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  DeleteCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: deletecoupon.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /delcoupon
+            Method: delete
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  UpdateCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: updatecoupon.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /updcoupon/{serviceid}
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
 
             
   
