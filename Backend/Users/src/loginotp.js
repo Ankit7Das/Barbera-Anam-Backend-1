@@ -28,6 +28,11 @@ exports.handler = async (event) => {
         if(token == null) {
             return {
                 statusCode: 401,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
                 body: JSON.stringify({
                     success: false,
                     message: "No token passed"
@@ -42,6 +47,11 @@ exports.handler = async (event) => {
         } catch(err) {
             return {
                 statusCode: 403,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
                 body: JSON.stringify({
                     success: false,
                     message: "Invalid Token",
@@ -61,6 +71,11 @@ exports.handler = async (event) => {
         if(!data.Items[0]) {
             return {
                 statusCode: 500,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
                 body: JSON.stringify({
                     success: false,
                     message: 'Invalid token entered'
@@ -609,6 +624,11 @@ exports.handler = async (event) => {
                 
                             return {
                                 statusCode: 200,
+                                headers: {
+                                    "Access-Control-Allow-Headers" : "Content-Type",
+                                    "Access-Control-Allow-Origin": "*",
+                                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                                },
                                 body: JSON.stringify({
                                     success: true,
                                     message: 'Login/Signup Success',
@@ -618,6 +638,11 @@ exports.handler = async (event) => {
                         } catch(err) {
                             return {
                                 statusCode: 500,
+                                headers: {
+                                    "Access-Control-Allow-Headers" : "Content-Type",
+                                    "Access-Control-Allow-Origin": "*",
+                                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                                },
                                 body: JSON.stringify({
                                     success: false,
                                     message: err,
@@ -627,6 +652,11 @@ exports.handler = async (event) => {
                     } catch(err) {
                         return {
                             statusCode: 500,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
                             body: JSON.stringify({
                                 success: false,
                                 message: err,
@@ -701,6 +731,11 @@ exports.handler = async (event) => {
                             if(data.Items.length === 0) {
                                 return {
                                     statusCode: 400,
+                                    headers: {
+                                        "Access-Control-Allow-Headers" : "Content-Type",
+                                        "Access-Control-Allow-Origin": "*",
+                                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                                    },
                                     body: JSON.stringify({
                                         success: false,
                                         message: 'Referral code is invalid'
@@ -728,6 +763,11 @@ exports.handler = async (event) => {
             
                         return {
                             statusCode: 200,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
                             body: JSON.stringify({
                                 success: true,
                                 message: 'Login/Signup Success',
@@ -737,6 +777,11 @@ exports.handler = async (event) => {
                     } catch(err) {
                         return {
                             statusCode: 500,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
                             body: JSON.stringify({
                                 success: false,
                                 message: err,
@@ -796,6 +841,11 @@ exports.handler = async (event) => {
                 
                             return {
                                 statusCode: 200,
+                                headers: {
+                                    "Access-Control-Allow-Headers" : "Content-Type",
+                                    "Access-Control-Allow-Origin": "*",
+                                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                                },
                                 body: JSON.stringify({
                                     success: true,
                                     message: 'Login/Signup Success',
@@ -805,6 +855,11 @@ exports.handler = async (event) => {
                         } catch(err) {
                             return {
                                 statusCode: 500,
+                                headers: {
+                                    "Access-Control-Allow-Headers" : "Content-Type",
+                                    "Access-Control-Allow-Origin": "*",
+                                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                                },
                                 body: JSON.stringify({
                                     success: false,
                                     message: err,
@@ -815,6 +870,11 @@ exports.handler = async (event) => {
                     } else {
                         return {
                             statusCode: 400,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
                             body: JSON.stringify({
                                 success: false,
                                 message: 'User not allowed to enter'
@@ -827,6 +887,11 @@ exports.handler = async (event) => {
             } else {
                 return {
                     statusCode: 400,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
                     body: JSON.stringify({
                         success: false,
                         message: 'Wrong OTP'

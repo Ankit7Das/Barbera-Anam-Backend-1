@@ -68,6 +68,11 @@ exports.handler = async(event) => {
             } catch(err) {
                 return {
                     statusCode: 500,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
                     body: JSON.stringify({
                         success: false,
                         message: err,
@@ -128,6 +133,11 @@ exports.handler = async(event) => {
             if(sms.MessageId) {
                 return {
                     statusCode: 200,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
                     body: JSON.stringify({
                         success: true,
                         message: 'OTP sent',
@@ -138,6 +148,11 @@ exports.handler = async(event) => {
             } else {
                 return {
                     statusCode: 400,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
                     body: JSON.stringify({
                         success: false,
                         message: 'OTP not sent'
@@ -182,6 +197,11 @@ exports.handler = async(event) => {
             if(fcmnotif === 'success') {
                 return {
                     statusCode: 200,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
                     body: JSON.stringify({
                         success: true,
                         message: 'OTP sent',
@@ -192,6 +212,11 @@ exports.handler = async(event) => {
             } else {
                 return {
                     statusCode: 400,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
                     body: JSON.stringify({
                         success: false,
                         message: 'OTP not sent'

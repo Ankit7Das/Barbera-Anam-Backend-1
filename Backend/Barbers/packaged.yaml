@@ -4,7 +4,7 @@ Resources:
   CreateNewLog:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7b83b22c8ab313985d676e90104de3c8
+      CodeUri: s3://barbera-buckets/7b4704215e129210adac220aa043725a
       Handler: createnewlog.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   CoinsIncrease:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7b83b22c8ab313985d676e90104de3c8
+      CodeUri: s3://barbera-buckets/7b4704215e129210adac220aa043725a
       Handler: coinincrease.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   DistanceModeToggler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7b83b22c8ab313985d676e90104de3c8
+      CodeUri: s3://barbera-buckets/7b4704215e129210adac220aa043725a
       Handler: distancemode.handler
       Runtime: nodejs12.x
       Events:
@@ -43,7 +43,7 @@ Resources:
   UpdateLog:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7b83b22c8ab313985d676e90104de3c8
+      CodeUri: s3://barbera-buckets/7b4704215e129210adac220aa043725a
       Handler: updatelog.handler
       Runtime: nodejs12.x
       Events:
@@ -56,7 +56,7 @@ Resources:
   ServiceEndOtpAccept:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7b83b22c8ab313985d676e90104de3c8
+      CodeUri: s3://barbera-buckets/7b4704215e129210adac220aa043725a
       Handler: endservice.handler
       Runtime: nodejs12.x
       Events:
@@ -69,7 +69,7 @@ Resources:
   ServiceStartOtpAccept:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7b83b22c8ab313985d676e90104de3c8
+      CodeUri: s3://barbera-buckets/7b4704215e129210adac220aa043725a
       Handler: startservice.handler
       Runtime: nodejs12.x
       Events:

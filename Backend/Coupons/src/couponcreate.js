@@ -21,6 +21,11 @@ exports.handler = async (event) => {
         if(token == null) {
             return {
                 statusCode: 401,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
                 body: JSON.stringify({
                     success: false,
                     message: "No token passed"
@@ -35,6 +40,11 @@ exports.handler = async (event) => {
         } catch(err) {
             return {
                 statusCode: 403,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
                 body: JSON.stringify({
                     success: false,
                     message: "Invalid Token",
@@ -47,6 +57,11 @@ exports.handler = async (event) => {
         if(exist1.success == false) {
             return {
                 statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
                 body: JSON.stringify({
                     success: false,
                     message: 'User not found',
@@ -57,6 +72,11 @@ exports.handler = async (event) => {
         if(exist1.user.role != 'admin') {
             return {
                 statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
                 body: JSON.stringify({
                     success: false,
                     message: 'Not an admin',
@@ -79,6 +99,11 @@ exports.handler = async (event) => {
 
             return {
                 statusCode: 200,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
                 body: JSON.stringify({
                     success: true,
                     message: 'Coupon entered successfully'
@@ -87,6 +112,11 @@ exports.handler = async (event) => {
         } catch(err) {
             return {
                 statusCode: 500,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
                 body: JSON.stringify({
                     success: false,
                     message: err
