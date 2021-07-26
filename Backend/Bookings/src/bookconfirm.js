@@ -115,7 +115,9 @@ exports.handler = async (event) => {
             }
         }
 
-        total_time += 10;
+        if(SLOT !== 1000) {
+            total_time += 10;
+        }
 
         var today = new Date();
         today.setHours(today.getHours() + 5);
@@ -125,23 +127,23 @@ exports.handler = async (event) => {
         var yyyy = today.getFullYear();
         var day = dd + '-' + mm + '-' + yyyy;
 
-        if(Number(today.getHours())>=19) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'The service time is over'
-                })
-            }
-        } else if(Number(today.getHours())<9) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'The service time has not started'
-                })
-            }
-        }
+        // if(Number(today.getHours())>=19) {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'The service time is over'
+        //         })
+        //     }
+        // } else if(Number(today.getHours())<9) {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'The service time has not started'
+        //         })
+        //     }
+        // }
 
         console.log(day);
 
@@ -165,8 +167,12 @@ exports.handler = async (event) => {
                 cnt++;
 
                 if( data.Item[String(i)] !== 'p') {
-                    falg = false;
+                    flag = false;
                     break;
+                }
+
+                if(i % 100 === 50) {
+                    i += 40;
                 }
 
                 if( cnt > Math.ceil(total_time/10) ) {

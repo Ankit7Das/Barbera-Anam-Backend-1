@@ -75,6 +75,7 @@ exports.handler = async (event) => {
             Item: {
                 date: day,
                 barberId: userID.id,
+                distance: 0,
                 '1000': 'n',
                 '1010': 'n',
                 '1020': 'n',

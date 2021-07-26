@@ -126,6 +126,7 @@ exports.handler = async (event) => {
                                         Item: {
                                             date: day1,
                                             barberId: id,
+                                            distance: 0,
                                             '1000': 'n',
                                             '1010': 'n',
                                             '1020': 'n',
@@ -188,6 +189,7 @@ exports.handler = async (event) => {
                                         Item: {
                                             date: day2,
                                             barberId: id,
+                                            distance: 0,
                                             '1000': 'n',
                                             '1010': 'n',
                                             '1020': 'n',
@@ -250,6 +252,7 @@ exports.handler = async (event) => {
                                         Item: {
                                             date: day3,
                                             barberId: id,
+                                            distance: 0,
                                             '1000': 'n',
                                             '1010': 'n',
                                             '1020': 'n',
@@ -312,6 +315,7 @@ exports.handler = async (event) => {
                                         Item: {
                                             date: day4,
                                             barberId: id,
+                                            distance: 0,
                                             '1000': 'n',
                                             '1010': 'n',
                                             '1020': 'n',
@@ -374,6 +378,7 @@ exports.handler = async (event) => {
                                         Item: {
                                             date: day5,
                                             barberId: id,
+                                            distance: 0,
                                             '1000': 'n',
                                             '1010': 'n',
                                             '1020': 'n',
@@ -436,6 +441,7 @@ exports.handler = async (event) => {
                                         Item: {
                                             date: day6,
                                             barberId: id,
+                                            distance: 0,
                                             '1000': 'n',
                                             '1010': 'n',
                                             '1020': 'n',
@@ -498,6 +504,7 @@ exports.handler = async (event) => {
                                         Item: {
                                             date: day7,
                                             barberId: id,
+                                            distance: 0,
                                             '1000': 'n',
                                             '1010': 'n',
                                             '1020': 'n',

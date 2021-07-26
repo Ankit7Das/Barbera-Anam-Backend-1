@@ -6,17 +6,14 @@ var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
-const { userVerifier } = require("./authentication");
-const { getDistance } = require('./helper');
 const { JWT_SECRET } = process.env;
+const { userVerifier } = require("./authentication");
 
 exports.handler = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
-        var ADD = obj.address;
-        var LONG = obj.longitude;
-        var LAT = obj.latitude;
+        var MODE = obj.mode;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -56,79 +53,66 @@ exports.handler = async (event) => {
             }
         }
 
-        if(exist1.user.role == 'admin') {
+        if(exist1.user.role != 'barber') {
             return {
-                statusCode: 404,
+                statusCode: 400,
                 body: JSON.stringify({
                     success: false,
-                    message: 'Not a user or barber',
+                    message: 'Not an barber',
                 })
             }
         }
 
         var params;
-        var data;
-        var today = new Date();
-        today.setHours(today.getHours() + 5);
-        today.setMinutes(today.getMinutes() + 30);
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-        var day = dd + '-' + mm + '-' + yyyy;
 
-        if (exist1.user.mode === 'start') {
-
-            var DIST = await getDistance(exist1.user.latitude, exist1.user.longitude, LAT, LONG);
+        if (MODE === 'start') {
 
             params = {
-                TableName: 'BarbersLog',
+                TableName: 'Users',
                 Key: {
-                    date: day,
-                    barberId: exist1.user.id
+                    id: exist1.user.id,
                 },
-                UpdateExpression: "set #distance=#distance + :d",
+                UpdateExpression: "set #mode=:m",
                 ExpressionAttributeNames: {
-                    '#distance': 'distance'
+                    '#mode': 'mode', 
                 },
                 ExpressionAttributeValues:{
-                    ":d": DIST,
+                    ":m": MODE,
                 },
                 ReturnValues:"UPDATED_NEW"
             }
 
-            data = await documentClient.update(params).promise();
+        } else if (MODE === 'end') {
+            
+            params = {
+                TableName: 'Users',
+                Key: {
+                    id: exist1.user.id,
+                },
+                UpdateExpression: "set #mode=:m",
+                ExpressionAttributeNames: {
+                    '#mode': 'mode', 
+                },
+                ExpressionAttributeValues:{
+                    ":m": MODE,
+                },
+                ReturnValues:"UPDATED_NEW"
+            }
+
         }
 
-        params = {
-            TableName: 'Users',
-            Key: {
-                id: userID.id,
-            },
-            UpdateExpression: "set #address=:a, #long=:lo, #lat=:la",
-            ExpressionAttributeNames: {
-                '#address': 'address',
-                '#long': 'longitude',
-                '#lat': 'latitude'
-            },
-            ExpressionAttributeValues:{
-                ":a": ADD,
-                ":lo": LONG,
-                ":la": LAT
-            },
-            ReturnValues:"UPDATED_NEW"
-        };
-
         try {
-            data = await documentClient.update(params).promise();
+            var data = await documentClient.update(params).promise();
 
             return {
                 statusCode: 200,
                 body: JSON.stringify({
                     success: true,
-                    message: 'User info updated successfully'
+                    message: 'Barber mode updated',
                 })
-            };
+            }
         } catch(err) {
+            console.log("Error: ", err);
             return {
                 statusCode: 500,
                 body: JSON.stringify({
@@ -138,7 +122,7 @@ exports.handler = async (event) => {
             };
         }
 
-    }catch(err) {
+    } catch(err) {
         console.log(err);
         return err;
     }

@@ -67,7 +67,31 @@ exports.handler = async (event) => {
             }
         }
 
+        var exist3 = await userVerifier(barberId);
+
+        if(exist3.success == false) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Barber not found',
+                })
+            }
+        }
+
+        if(exist3.user.role != 'barber') {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Not a barber',
+                })
+            }
+        }
+
         var exist2;
+        var prices = [];
+        var total_price = 0;
         var total_time = 0;
         for(var i=0;i<service.length;i++) {
             
@@ -77,6 +101,7 @@ exports.handler = async (event) => {
                 break;
             }
 
+            prices.push(service[i].price);
             total_time+=Number(exist2.service.time);
         }
 
@@ -90,34 +115,35 @@ exports.handler = async (event) => {
             }
         }
 
-        total_time += 10;
+        if(SLOT !== 1000) {
+            total_time += 10;
+        }
 
         var today = new Date();
         today.setHours(today.getHours() + 5);
         today.setMinutes(today.getMinutes() + 30);
-        var now = new Date();
         var dd = String(today.getDate()).padStart(2, '0');
         var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
         var yyyy = today.getFullYear();
         var day = dd + '-' + mm + '-' + yyyy;
 
-        if(Number(today.getHours())>=19) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'The service time is over'
-                })
-            }
-        } else if(Number(today.getHours())<10) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'The service time has not started'
-                })
-            }
-        }
+        // if(Number(today.getHours())>=19) {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'The service time is over'
+        //         })
+        //     }
+        // } else if(Number(today.getHours())<9) {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'The service time has not started'
+        //         })
+        //     }
+        // }
 
         console.log(day);
 
@@ -141,8 +167,12 @@ exports.handler = async (event) => {
                 cnt++;
 
                 if( data.Item[String(i)] !== 'p') {
-                    falg = false;
+                    flag = false;
                     break;
+                }
+
+                if(i % 100 === 50) {
+                    i += 40;
                 }
 
                 if( cnt > Math.ceil(total_time/10) ) {
@@ -152,6 +182,7 @@ exports.handler = async (event) => {
             }
 
             if(flag) {
+
                 cnt = 0;
 
                 for(var i = Number(SLOT) ;  ; i += 10) {
@@ -170,14 +201,14 @@ exports.handler = async (event) => {
                             '#slot': i, 
                         },
                         ExpressionAttributeValues:{
-                            ":s": 'b',
+                            ":s": 'n',
                         },
                         ReturnValues:"UPDATED_NEW"
                     }
         
                     data = await documentClient.update(params).promise();
         
-                    if(i % 100 === 60) {
+                    if(i % 100 === 50) {
                         i += 40;
                     }
         
@@ -191,7 +222,7 @@ exports.handler = async (event) => {
                     statusCode: 200,
                     body: JSON.stringify({
                         success: true,
-                        message: 'Booking successful'
+                        message: 'Booking reverted'
                     })
                 }
             } else {

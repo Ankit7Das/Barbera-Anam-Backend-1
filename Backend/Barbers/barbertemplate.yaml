@@ -38,6 +38,21 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  DistanceModeToggler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: distancemode.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /dismode
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
   UpdateLog:
     Type: AWS::Serverless::Function
     Properties:
