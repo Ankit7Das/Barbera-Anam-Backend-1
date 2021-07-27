@@ -143,6 +143,36 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  GetSliders:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getslider.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getslider
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  GetTabs:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: gettabs.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /gettabs
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
   SliderUploader:
     Type: AWS::Serverless::Function
     Properties:

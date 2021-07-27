@@ -122,6 +122,18 @@ exports.handler = async (event) => {
             var url;
 
             if(obj.image) {
+
+                if(data.Items[0].slider) {
+                    var url = new URL(data.Items[0].slider);
+                    var key = url.pathname.substring(1);
+
+                    await s3
+                        .deleteObject({
+                            Key: key,
+                            Bucket: 'barbera-image'
+                        })
+                        .promise();
+                }
         
                 let imageData = obj.image;
                 if (obj.image.substr(0, 7) === 'base64,') {
@@ -142,6 +154,7 @@ exports.handler = async (event) => {
                             "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                         },
                         body: JSON.stringify({
+                            success: false,
                             message: 'mime is not allowed '
                         })
                     };

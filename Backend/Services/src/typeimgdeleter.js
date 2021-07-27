@@ -26,7 +26,6 @@ exports.handler = async (event) => {
         var obj = JSON.parse(event.body);
         var CAT = obj.category;
         var TYPE = obj.type;
-        var SUB = obj.subtype;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -98,77 +97,7 @@ exports.handler = async (event) => {
             }
         }
 
-        if (SUB) {
-            var params = {
-                TableName: 'Services',
-                FilterExpression: '#category = :this_category AND #type = :this_type AND #subtype = :this_subtype',
-                ExpressionAttributeValues: {':this_category': CAT, ':this_type': TYPE, ':this_subtype': SUB},
-                ExpressionAttributeNames: {'#category': 'category', '#type': 'type', '#subtype': 'subtype'}
-            }
-        
-            var data = await documentClient.scan(params).promise();
-    
-            if(data.Items.length === 0) {
-                return {
-                    statusCode: 400,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: `No service exists in ${TYPE} and ${SUB}`
-                    })
-                }
-            } else {
-
-                var CAT_ARR = CAT.split(' ');
-                    var CATS = CAT_ARR.join('_');
-                    var TYPE_ARR = TYPE.split(' ');
-                    var TYPES = TYPE_ARR.join('_');
-                    var SUB_ARR = SUB.split(' ');
-                    var SUBS = SUB_ARR.join('_');
-                    var name = CATS + TYPES + SUBS;
-                    var key = `${name}`;
-
-                try {
-                    await s3
-                        .deleteObject({
-                            Key: key,
-                            Bucket: 'barbera-image'
-                        })
-                        .promise();
-
-                    return {
-                        statusCode: 200,
-                        headers: {
-                            "Access-Control-Allow-Headers" : "Content-Type",
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                        },
-                        body: JSON.stringify({
-                            success: true,
-                            message: 'Image deleted'
-                        })
-                    }
-                } catch(err){
-                    return {
-                        statusCode: 400,
-                        headers: {
-                            "Access-Control-Allow-Headers" : "Content-Type",
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                        },
-                        body: JSON.stringify({
-                            success: false,
-                            message: err
-                        })
-                    };
-                }
-    
-            }
-        } else {
+        if (TYPE) {
             var params = {
                 TableName: 'Services',
                 FilterExpression: '#category = :this_category AND #type = :this_type',
@@ -233,6 +162,112 @@ exports.handler = async (event) => {
                             message: err
                         })
                     };
+                }
+    
+            }
+        } else {
+            var params = {
+                TableName: 'Services',
+                FilterExpression: '#category = :this_category',
+                ExpressionAttributeValues: {':this_category': CAT },
+                ExpressionAttributeNames: {'#category': 'category'}
+            }
+        
+            var data = await documentClient.scan(params).promise();
+    
+            if(data.Items.length === 0) {
+                
+                params = {
+                    TableName: 'Stock',
+                    Key: {
+                        type: 'Tabs',
+                        name: CAT
+                    }
+                }
+
+                try {
+                    data = await documentClient.get(params).promise();
+
+                    if(data.Item) {
+                        if(data.Item.image) {
+                            var url = new URL(data.Item.image);
+                            var key = url.pathname.substring(1);
+    
+                            await s3
+                                .deleteObject({
+                                    Key: `tabs/${key}`,
+                                    Bucket: 'barbera-image'
+                                })
+                                .promise();
+                        }
+
+                    }
+
+                    params = {
+                        TableName: 'Stock',
+                        Key: {
+                            type: 'Tabs',
+                            name: CAT
+                        }
+                    }
+
+                    try {
+                        data = await documentClient.delete(params).promise();
+
+                        return {
+                            statusCode: 200,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'Image deleted'
+                            })
+                        }
+                    } catch(err) {
+                        return {
+                            statusCode: 500,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: false,
+                                message: err
+                            })
+                        };
+                    }
+                }catch(err) {
+                    return {
+                        statusCode: 500,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: false,
+                            message: err
+                        })
+                    };
+                }
+
+            } else {
+
+                return {
+                    statusCode: 400,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
+                    body: JSON.stringify({
+                        success: false,
+                        message: `No service exists in ${TYPE}`
+                    })
                 }
                 
             }

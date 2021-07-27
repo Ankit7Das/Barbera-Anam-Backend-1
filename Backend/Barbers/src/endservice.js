@@ -15,10 +15,8 @@ exports.handler = async (event) => {
         var token = tokenArray[1];
         var obj = JSON.parse(event.body);
         var OTP = obj.otp;
-        var PAY = obj.payment;
-        var id = obj.userId;
-        var DATE = obj.date;
-        var SLOT = pbj.slot;
+        var userId = obj.userId;
+        var serviceId = obj.serviceId;
 
         if(token == null) {
             return {
@@ -85,69 +83,97 @@ exports.handler = async (event) => {
             try {
                 var data = await documentClient.update(params).promise();
 
-                params = {
-                    TableName: 'Bookings',
-                    KeyConditionExpression: '#userId = :u',
-                    FilterExpression: '#slot = :s, #date = :d',
-                    ExpressionAttributeValues: {
-                        ':d': DATE,
-                        ':s': SLOT,
-                        ':u': id
-                    },
-                    ExpressionAttributeNames: {
-                        '#date': 'date',
-                        '#slot': 'slot',
-                        '#userId': 'userId'
-                    }
-                }
-
-                data = await documentClient.query(params).promise();
-
-                if(data.Items.length === 0) {
-                    return {
-                        statusCode: 500,
-                        body: JSON.stringify({
-                            success: false,
-                            message: 'No such booking exists'
-                        })
-                    };
-                } else {
+                for(var i=0; i<serviceId.length; i++) {
                     params = {
                         TableName: 'Bookings',
                         Key: {
-                            userId: id,
-                            serviceId: data.Items[0].serviceId
+                            userId: userId,
+                            serviceId: serviceId[i]
                         },
                         UpdateExpression: "set #payment_status=:p",
                         ExpressionAttributeNames: {
                             '#payment_status': 'payment_status', 
                         },
                         ExpressionAttributeValues:{
-                            ":p": PAY,
+                            ":p": 'paid',
                         },
                         ReturnValues:"UPDATED_NEW"
                     }
 
-                    try {
-                        data = await documentClient.update(params).promise();
-
-                        return {
-                            statusCode: 200,
-                            body: JSON.stringify({
-                                success: true,
-                                message: 'OTP matched'
-                            })
-                        }
-                    } catch(err) {
-                        return {
-                            statusCode: 400,
-                            body: JSON.stringify({
-                                success: false,
-                                message: err
-                            })
-                        }
-                    }
+                    data = await documentClient.update(params).promise();
                 }
+
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        success: true,
+                        message: 'OTP matched'
+                    })
+                }
+
+                // params = {
+                //     TableName: 'Bookings',
+                //     KeyConditionExpression: '#userId = :u',
+                //     FilterExpression: '#slot = :s, #date = :d',
+                //     ExpressionAttributeValues: {
+                //         ':d': DATE,
+                //         ':s': SLOT,
+                //         ':u': id
+                //     },
+                //     ExpressionAttributeNames: {
+                //         '#date': 'date',
+                //         '#slot': 'slot',
+                //         '#userId': 'userId'
+                //     }
+                // }
+
+                // data = await documentClient.query(params).promise();
+
+                // if(data.Items.length === 0) {
+                //     return {
+                //         statusCode: 500,
+                //         body: JSON.stringify({
+                //             success: false,
+                //             message: 'No such booking exists'
+                //         })
+                //     };
+                // } else {
+                //     params = {
+                //         TableName: 'Bookings',
+                //         Key: {
+                //             userId: id,
+                //             serviceId: data.Items[0].serviceId
+                //         },
+                //         UpdateExpression: "set #payment_status=:p",
+                //         ExpressionAttributeNames: {
+                //             '#payment_status': 'payment_status', 
+                //         },
+                //         ExpressionAttributeValues:{
+                //             ":p": PAY,
+                //         },
+                //         ReturnValues:"UPDATED_NEW"
+                //     }
+
+                //     try {
+                //         data = await documentClient.update(params).promise();
+
+                //         return {
+                //             statusCode: 200,
+                //             body: JSON.stringify({
+                //                 success: true,
+                //                 message: 'OTP matched'
+                //             })
+                //         }
+                //     } catch(err) {
+                //         return {
+                //             statusCode: 400,
+                //             body: JSON.stringify({
+                //                 success: false,
+                //                 message: err
+                //             })
+                //         }
+                //     }
+                // }
             } catch(err) {
                 return {
                     statusCode: 500,

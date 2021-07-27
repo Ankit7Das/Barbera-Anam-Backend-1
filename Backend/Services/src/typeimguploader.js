@@ -26,7 +26,6 @@ exports.handler = async (event) => {
         var obj = JSON.parse(event.body);
         var CAT = obj.category;
         var TYPE = obj.type;
-        var SUB = obj.subtype;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -98,107 +97,7 @@ exports.handler = async (event) => {
             }
         }
 
-        if (SUB) {
-            var params = {
-                TableName: 'Services',
-                FilterExpression: '#category = :this_category AND #type = :this_type AND #subtype = :this_subtype',
-                ExpressionAttributeValues: {':this_category': CAT, ':this_type': TYPE, ':this_subtype': SUB},
-                ExpressionAttributeNames: {'#category': 'category', '#type': 'type', '#subtype': 'subtype'}
-            }
-        
-            var data = await documentClient.scan(params).promise();
-    
-            if(data.Items.length === 0) {
-                return {
-                    statusCode: 400,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: `No service exists in ${TYPE} and ${SUB}`
-                    })
-                }
-            } else {
-    
-                if(obj.image) {
-            
-                    let imageData = obj.image;
-                    if (obj.image.substr(0, 7) === 'base64,') {
-                        imageData = obj.image.substr(7, obj.image.length);
-                    }
-            
-                    var buffer = Buffer.from(imageData, 'base64');
-                    var fileInfo = await fileType.fromBuffer(buffer);
-                    var detectedExt = fileInfo.ext;
-                    var detectedMime = fileInfo.mime;
-    
-                    if (!allowedMimes.includes(detectedMime)) {
-                        return {
-                            statusCode: 400,
-                            headers: {
-                                "Access-Control-Allow-Headers" : "Content-Type",
-                                "Access-Control-Allow-Origin": "*",
-                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                            },
-                            body: JSON.stringify({
-                                message: 'mime is not allowed '
-                            })
-                        };
-                    }
-            
-                    var CAT_ARR = CAT.split(' ');
-                    var CATS = CAT_ARR.join('_');
-                    var TYPE_ARR = TYPE.split(' ');
-                    var TYPES = TYPE_ARR.join('_');
-                    var SUB_ARR = SUB.split(' ');
-                    var SUBS = SUB_ARR.join('_');
-                    var name = CATS + TYPES + SUBS;
-                    var key = `${name}`;
-            
-                    console.log(`writing image to bucket called ${key}`);
-            
-                    await s3
-                        .upload({
-                            Body: buffer,
-                            Key: `${key}`,
-                            ContentType: detectedMime,
-                            Bucket: 'barbera-image',
-                            ACL: 'public-read',
-                        })
-                        .promise();
-
-                    return {
-                        statusCode: 200,
-                        headers: {
-                            "Access-Control-Allow-Headers" : "Content-Type",
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                        },
-                        body: JSON.stringify({
-                            success: true,
-                            message: 'Image uploaded'
-                        })
-                    }
-    
-                } else {
-                    return {
-                        statusCode: 400,
-                        headers: {
-                            "Access-Control-Allow-Headers" : "Content-Type",
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                        },
-                        body: JSON.stringify({
-                            success: false,
-                            message: 'No image was uploaded'
-                        })
-                    }
-                }
-            }
-        } else {
+        if (TYPE) {
             var params = {
                 TableName: 'Services',
                 FilterExpression: '#category = :this_category AND #type = :this_type',
@@ -291,11 +190,160 @@ exports.handler = async (event) => {
                         },
                         body: JSON.stringify({
                             success: false,
-                            message: 'No image was sent'
+                            message: 'No image was uploaded'
                         })
                     }
                 }
             }
+        } else {
+
+            var params = {
+                TableName: 'Stock',
+                Key: {
+                    type: 'Tabs',
+                    name: CAT
+                }
+            }
+
+            try {
+                var data = await documentClient.get(params).promise();
+
+                console.log(data.Item);
+
+                if(obj.image) {
+
+                    console.log("image");
+
+                    if(data.Item && data.Item.image !== null) {
+
+                        console.log("delete image");
+                        var url = new URL(data.Item.image);
+                        var key = url.pathname.substring(1);
+
+                        await s3
+                            .deleteObject({
+                                Key: `tabs/${key}`,
+                                Bucket: 'barbera-image'
+                            })
+                            .promise();
+                    }
+        
+                    let imageData = obj.image;
+                    if (obj.image.substr(0, 7) === 'base64,') {
+                        imageData = obj.image.substr(7, obj.image.length);
+                    }
+            
+                    var buffer = Buffer.from(imageData, 'base64');
+                    var fileInfo = await fileType.fromBuffer(buffer);
+                    var detectedExt = fileInfo.ext;
+                    var detectedMime = fileInfo.mime;
+    
+                    if (!allowedMimes.includes(detectedMime)) {
+                        return {
+                            statusCode: 400,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                message: 'mime is not allowed '
+                            })
+                        };
+                    }
+            
+                    var CAT_ARR = CAT.split(' ');
+                    var CATS = CAT_ARR.join('_');
+                    var name = CATS;
+                    var key = `${name}.${detectedExt}`;
+            
+                    console.log(`writing image to bucket called ${key}`);
+            
+                    await s3
+                        .upload({
+                            Body: buffer,
+                            Key: `tabs/${key}`,
+                            ContentType: detectedMime,
+                            Bucket: 'barbera-image',
+                            ACL: 'public-read',
+                        })
+                        .promise();
+
+                    var url = `https://barbera-image.s3-ap-south-1.amazonaws.com/tabs/${key}`;
+
+                    params = {
+                        TableName: 'Stock',
+                        Item: {
+                            type: 'Tabs',
+                            name: CAT,
+                            image: url
+                        }
+                    }
+
+                    try {
+                        data = await documentClient.put(params).promise();
+
+                        console.log("done");
+                    
+                        return {
+                            statusCode: 200,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'Image uploaded'
+                            })
+                        }
+                    } catch(err) {
+                        console.log("inside");
+                        return {
+                            statusCode: 500,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: false,
+                                message: err,
+                            })
+                        };
+                    }
+    
+                } else {
+                    return {
+                        statusCode: 400,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: false,
+                            message: 'No image was sent'
+                        })
+                    }
+                }
+            } catch(err) {
+                console.log("outside");
+                return {
+                    statusCode: 500,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
+                    body: JSON.stringify({
+                        success: false,
+                        message: err,
+                    })
+                };
+            }
+    
+            
         }
 
     } catch(err) {

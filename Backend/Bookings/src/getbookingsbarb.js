@@ -110,8 +110,6 @@ exports.handler = async (event) => {
                 delete data.Items[i].serviceId;
                 data.Items[i].service = data1.Item;
 
-                delete data.Items[i].userId;
-
                 data.Items[i].distance = await getDistance(data.Items[i].user_lat,data.Items[i].user_long,exist1.user.latitude,exist1.user.longitude);
             }
 

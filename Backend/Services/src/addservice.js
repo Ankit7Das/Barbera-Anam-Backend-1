@@ -147,6 +147,7 @@ exports.handler = async (event) => {
                         "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                     },
                     body: JSON.stringify({
+                        success: false,
                         message: 'mime is not allowed '
                     })
                 };
@@ -195,18 +196,57 @@ exports.handler = async (event) => {
             data = await documentClient.put(params).promise();
             msg = 'Service added to database';
 
-            return {
-                statusCode: 200,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: true,
-                    message: msg,
-                })
-            };
+            params = {
+                TableName: 'Stock',
+                Key: {
+                    type: 'Tabs',
+                    name: CAT
+                }
+            }
+
+            try {
+                data = await documentClient.get(params).promise();
+
+                if(!data.Item) {
+                    params = {
+                        TableName: 'Stock',
+                        Item: {
+                            type: 'Tabs',
+                            name: CAT
+                        }
+                    }
+
+                    data = await documentClient.put(params).promise();
+                }
+
+                return {
+                    statusCode: 200,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
+                    body: JSON.stringify({
+                        success: true,
+                        message: msg,
+                    })
+                };
+
+            } catch(err) {
+                return {
+                    statusCode: 500,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
+                    body: JSON.stringify({
+                        success: false,
+                        message: err,
+                    })
+                };
+            }
+
         } catch(err) {
             console.log("Error: ", err);
             msg = err;

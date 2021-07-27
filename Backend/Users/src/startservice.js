@@ -15,7 +15,7 @@ exports.handler = async (event) => {
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
         var obj = JSON.parse(event.body);
-        var barberId = obj.barberid;
+        var barberId = obj.barberId;
 
         if(token == null) {
             return {
