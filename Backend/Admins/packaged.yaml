@@ -4,7 +4,7 @@ Resources:
   SendMail:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/99a6056ec4494816b278f33616db3895
+      CodeUri: s3://barbera-buckets/213c4b700aceab43340b1a990f1e328c
       Handler: sendmail.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   GetAllBarberLogs:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/99a6056ec4494816b278f33616db3895
+      CodeUri: s3://barbera-buckets/213c4b700aceab43340b1a990f1e328c
       Handler: getbarberlogs.handler
       Runtime: nodejs12.x
       Events:

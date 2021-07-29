@@ -97,15 +97,16 @@ exports.handler = async (event) => {
         }
         
         var params = {
-            TableName: 'Services',
-            FilterExpression: '#name = :this_name',
-            ExpressionAttributeValues: {':this_name': NAME},
-            ExpressionAttributeNames: {'#name': 'name'}
+            TableName: 'Stock',
+            Key: {
+                type: 'Sliders',
+                name: NAME
+            }
         }
     
-        var data = await documentClient.scan(params).promise();
+        var data = await documentClient.get(params).promise();
 
-        if(data.Items.length === 0) {
+        if(!data.Item) {
             return {
                 statusCode: 400,
                 headers: {
@@ -121,30 +122,31 @@ exports.handler = async (event) => {
         } else {
             var url;
 
-            if(data.Items[0].slider) {
+            if(data.Item.image) {
         
-                var url = new URL(data.Items[0].slider);
+                var url = new URL(data.Item.image);
                 var key = url.pathname.substring(1);
 
                 try {
                     await s3
                         .deleteObject({
-                            Key: key,
+                            Key: `sliders/${key}`,
                             Bucket: 'barbera-image'
                         })
                         .promise();
 
                     params = {
-                        TableName: 'Services',
+                        TableName: 'Stock',
                         Key: {
-                            id: data.Items[0].id,
+                            type: 'Sliders',
+                            name: NAME
                         },
-                        UpdateExpression: "set #slider=:s",
+                        UpdateExpression: "set #image=:i",
                         ExpressionAttributeNames: {
-                            '#slider': 'slider', 
+                            '#image': 'image', 
                         },
                         ExpressionAttributeValues:{
-                            ":s": null,
+                            ":i": null,
                         },
                         ReturnValues:"UPDATED_NEW"
                     }

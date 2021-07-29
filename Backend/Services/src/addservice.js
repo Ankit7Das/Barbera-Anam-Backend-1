@@ -124,63 +124,15 @@ exports.handler = async (event) => {
             }
         }
 
-        var url;
-
-        if(obj.image) {
-    
-            let imageData = obj.image;
-            if (obj.image.substr(0, 7) === 'base64,') {
-                imageData = obj.image.substr(7, obj.image.length);
-            }
-    
-            var buffer = Buffer.from(imageData, 'base64');
-            var fileInfo = await fileType.fromBuffer(buffer);
-            var detectedExt = fileInfo.ext;
-            var detectedMime = fileInfo.mime;
-
-            if (!allowedMimes.includes(detectedMime)) {
-                return {
-                    statusCode: 400,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: 'mime is not allowed '
-                    })
-                };
-            }
-    
-            var name = ID;
-            var key = `${name}.${detectedExt}`;
-    
-            console.log(`writing image to bucket called ${key}`);
-    
-            await s3
-                .upload({
-                    Body: buffer,
-                    Key: `services/${key}`,
-                    ContentType: detectedMime,
-                    Bucket: 'barbera-image',
-                    ACL: 'public-read',
-                })
-                .promise();
-    
-            url = `https://barbera-image.s3-ap-south-1.amazonaws.com/services/${key}`;
-        }
-
         var params = {
             TableName: 'Services',
             Item: {
                 id: ID,
                 name: NAME,
                 price: PRICE,
-                time: TIME,
+                time: TIME ? TIME : null,
                 details: DET ? DET : null,
                 cutprice: CUT ? CUT : null,
-                image: url ? url : null,
                 dod: DOD ? DOD : false,
                 type: TYPE,
                 subtype: SUBTYPE,
@@ -219,18 +171,58 @@ exports.handler = async (event) => {
                     data = await documentClient.put(params).promise();
                 }
 
-                return {
-                    statusCode: 200,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: true,
-                        message: msg,
-                    })
-                };
+                params = {
+                    TableName: 'Stock',
+                    Key: {
+                        type: 'Sliders',
+                        name: NAME
+                    }
+                }
+    
+                try {
+                    data = await documentClient.get(params).promise();
+    
+                    if(!data.Item) {
+                        params = {
+                            TableName: 'Stock',
+                            Item: {
+                                type: 'Sliders',
+                                name: NAME,
+                                category: CAT,
+                                types: TYPE
+                            }
+                        }
+    
+                        data = await documentClient.put(params).promise();
+                    }
+    
+                    return {
+                        statusCode: 200,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: true,
+                            message: msg,
+                        })
+                    };
+    
+                } catch(err) {
+                    return {
+                        statusCode: 500,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: false,
+                            message: err,
+                        })
+                    };
+                }
 
             } catch(err) {
                 return {

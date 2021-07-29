@@ -62,6 +62,9 @@ exports.handler = async (event) => {
         //     }
         // }
 
+        var CATS = CAT.split('_');
+        CAT = CATS.join(' ');
+
         var params = {
             TableName: 'Services',
             ProjectionExpression: '#type',

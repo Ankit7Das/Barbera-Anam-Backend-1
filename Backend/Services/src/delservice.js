@@ -104,60 +104,7 @@ exports.handler = async (event) => {
         }
 
         var prevCat = exist2.service.category;
-
-        if(exist2.service.icon) {
-            var url = new URL(exist2.service.icon);
-            var key = url.pathname.substring(1);
-
-            try {
-                await s3
-                    .deleteObject({
-                        Key: key,
-                        Bucket: 'barbera-image'
-                    })
-                    .promise();
-            } catch(err){
-                return {
-                    statusCode: 400,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: err
-                    })
-                };
-            }
-        }
-
-        if(exist2.service.slider) {
-            var url = new URL(exist2.service.slider);
-            var key = url.pathname.substring(1);
-
-            try {
-                await s3
-                    .deleteObject({
-                        Key: key,
-                        Bucket: 'barbera-image'
-                    })
-                    .promise();
-            } catch(err){
-                return {
-                    statusCode: 400,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: err
-                    })
-                };
-            }
-        }
+        var prevName = exist2.service.name;
 
         var params = {
             TableName: 'Services',
@@ -201,7 +148,29 @@ exports.handler = async (event) => {
 
                         await s3
                             .deleteObject({
-                                Key: key,
+                                Key: `tabs/${key}`,
+                                Bucket: 'barbera-image'
+                            })
+                            .promise();
+                    }
+
+                    params = {
+                        TableName: 'Stock',
+                        Item: {
+                            type: 'Sliders',
+                            name: prevName
+                        }
+                    }
+
+                    data = await documentClient.get(params).promise();
+
+                    if(data.Item.image) {
+                        var url = new URL(data.Item.image);
+                        var key = url.pathname.substring(1);
+
+                        await s3
+                            .deleteObject({
+                                Key: `sliders/${key}`,
                                 Bucket: 'barbera-image'
                             })
                             .promise();
@@ -212,6 +181,16 @@ exports.handler = async (event) => {
                         Item: {
                             type: 'Tabs',
                             name: prevCat
+                        }
+                    }
+
+                    data = await documentClient.delete(params).promise();
+
+                    params = {
+                        TableName: 'Stock',
+                        Item: {
+                            type: 'Sliders',
+                            name: prevName
                         }
                     }
 

@@ -63,10 +63,17 @@ exports.handler = async (event) => {
         // }
 
         var params = {
-            TableName: 'Services',
+            TableName: 'Stock',
+            KeyConditionExpression: '#type = :t',
+            ExpressionAttributeValues: {
+                ':t': 'Sliders',
+            },
+            ExpressionAttributeNames: {
+                '#type': 'type',
+            }
         }
 
-        var data = await documentClient.scan(params).promise();
+        var data = await documentClient.query(params).promise();
 
         if(data.Items.length == 0) {
             return {
@@ -78,11 +85,11 @@ exports.handler = async (event) => {
             }
         } else {
 
-            var services = [];
+            var sliders = [];
 
             for(var i=0; i<data.Items.length; i++) {
-                if(data.Items[i].slider) {
-                    services.push(data.Items[i]);
+                if(data.Items[i].image) {
+                    sliders.push(data.Items[i]);
                 }
             }
 
@@ -91,7 +98,7 @@ exports.handler = async (event) => {
                 body: JSON.stringify({
                     success: true,
                     message: 'Services with sliders found',
-                    data: services
+                    data: sliders
                 })
             }
         }

@@ -83,7 +83,7 @@ exports.handler = async (event) => {
         try {
             var data = await documentClient.update(params).promise();
 
-            var msg = `Service ending code for Barbera: Salon Service at your Home is ${random}.`;
+            var msg = `${random}.`;
 
             random = null;
 

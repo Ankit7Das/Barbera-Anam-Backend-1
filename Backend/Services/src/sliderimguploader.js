@@ -95,17 +95,37 @@ exports.handler = async (event) => {
                 })
             }
         }
+
+        var exist3 = await addedBefore(NAME);
+
+        if(exist3 == false) {
+            return {
+                statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Service not found',
+                })
+            }
+        }
+
+        console.log(exist3);
         
         var params = {
-            TableName: 'Services',
-            FilterExpression: '#name = :this_name',
-            ExpressionAttributeValues: {':this_name': NAME},
-            ExpressionAttributeNames: {'#name': 'name'}
+            TableName: 'Stock',
+            Key: {
+                type: 'Sliders',
+                name: NAME
+            }
         }
     
-        var data = await documentClient.scan(params).promise();
+        var data = await documentClient.get(params).promise();
 
-        if(data.Items.length === 0) {
+        if(!data.Item) {
             return {
                 statusCode: 400,
                 headers: {
@@ -123,13 +143,13 @@ exports.handler = async (event) => {
 
             if(obj.image) {
 
-                if(data.Items[0].slider) {
-                    var url = new URL(data.Items[0].slider);
+                if(data.Item.image) {
+                    var url = new URL(data.Item.image);
                     var key = url.pathname.substring(1);
 
                     await s3
                         .deleteObject({
-                            Key: key,
+                            Key: `sliders/${key}`,
                             Bucket: 'barbera-image'
                         })
                         .promise();
@@ -160,8 +180,9 @@ exports.handler = async (event) => {
                     };
                 }
         
-                var name = data.Items[0].id;
-                var key = `${name}.${detectedExt}`;
+                var name = NAME.split(' ');
+                var names = name.join('_');
+                var key = `${names}.${detectedExt}`;
         
                 console.log(`writing image to bucket called ${key}`);
         
@@ -178,16 +199,17 @@ exports.handler = async (event) => {
                 url = `https://barbera-image.s3-ap-south-1.amazonaws.com/sliders/${key}`;
 
                 params = {
-                    TableName: 'Services',
+                    TableName: 'Stock',
                     Key: {
-                        id: data.Items[0].id,
+                        type: 'Sliders',
+                        name: NAME
                     },
-                    UpdateExpression: "set #slider=:s",
+                    UpdateExpression: "set #image=:i",
                     ExpressionAttributeNames: {
-                        '#slider': 'slider', 
+                        '#image': 'image', 
                     },
                     ExpressionAttributeValues:{
-                        ":s": url,
+                        ":i": url,
                     },
                     ReturnValues:"UPDATED_NEW"
                 }

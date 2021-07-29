@@ -166,17 +166,33 @@ exports.handler = async (event) => {
     
             }
         } else {
-            var params = {
-                TableName: 'Services',
-                FilterExpression: '#category = :this_category',
-                ExpressionAttributeValues: {':this_category': CAT },
-                ExpressionAttributeNames: {'#category': 'category'}
-            }
-        
-            var data = await documentClient.scan(params).promise();
-    
-            if(data.Items.length === 0) {
                 
+            params = {
+                TableName: 'Stock',
+                Key: {
+                    type: 'Tabs',
+                    name: CAT
+                }
+            }
+
+            try {
+                data = await documentClient.get(params).promise();
+
+                if(data.Item) {
+                    if(data.Item.image) {
+                        var url = new URL(data.Item.image);
+                        var key = url.pathname.substring(1);
+
+                        await s3
+                            .deleteObject({
+                                Key: `tabs/${key}`,
+                                Bucket: 'barbera-image'
+                            })
+                            .promise();
+                    }
+
+                }
+
                 params = {
                     TableName: 'Stock',
                     Key: {
@@ -186,61 +202,21 @@ exports.handler = async (event) => {
                 }
 
                 try {
-                    data = await documentClient.get(params).promise();
+                    data = await documentClient.delete(params).promise();
 
-                    if(data.Item) {
-                        if(data.Item.image) {
-                            var url = new URL(data.Item.image);
-                            var key = url.pathname.substring(1);
-    
-                            await s3
-                                .deleteObject({
-                                    Key: `tabs/${key}`,
-                                    Bucket: 'barbera-image'
-                                })
-                                .promise();
-                        }
-
+                    return {
+                        statusCode: 200,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: true,
+                            message: 'Image deleted'
+                        })
                     }
-
-                    params = {
-                        TableName: 'Stock',
-                        Key: {
-                            type: 'Tabs',
-                            name: CAT
-                        }
-                    }
-
-                    try {
-                        data = await documentClient.delete(params).promise();
-
-                        return {
-                            statusCode: 200,
-                            headers: {
-                                "Access-Control-Allow-Headers" : "Content-Type",
-                                "Access-Control-Allow-Origin": "*",
-                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                            },
-                            body: JSON.stringify({
-                                success: true,
-                                message: 'Image deleted'
-                            })
-                        }
-                    } catch(err) {
-                        return {
-                            statusCode: 500,
-                            headers: {
-                                "Access-Control-Allow-Headers" : "Content-Type",
-                                "Access-Control-Allow-Origin": "*",
-                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                            },
-                            body: JSON.stringify({
-                                success: false,
-                                message: err
-                            })
-                        };
-                    }
-                }catch(err) {
+                } catch(err) {
                     return {
                         statusCode: 500,
                         headers: {
@@ -254,11 +230,9 @@ exports.handler = async (event) => {
                         })
                     };
                 }
-
-            } else {
-
+            }catch(err) {
                 return {
-                    statusCode: 400,
+                    statusCode: 500,
                     headers: {
                         "Access-Control-Allow-Headers" : "Content-Type",
                         "Access-Control-Allow-Origin": "*",
@@ -266,11 +240,11 @@ exports.handler = async (event) => {
                     },
                     body: JSON.stringify({
                         success: false,
-                        message: `No service exists in ${TYPE}`
+                        message: err
                     })
-                }
-                
+                };
             }
+
         }
 
     } catch(err) {

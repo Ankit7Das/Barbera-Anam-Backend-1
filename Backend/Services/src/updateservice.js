@@ -120,85 +120,15 @@ exports.handler = async (event) => {
         }
 
         var prevCat = exist2.service.category;
-
-        var url;
-
-        if(obj.image) {
-            if(exist2.service.icon) {
-                var url = new URL(exist2.service.icon);
-                var key = url.pathname.substring(1);
-
-                try {
-                    await s3
-                        .deleteObject({
-                            Key: key,
-                            Bucket: 'barbera-image'
-                        })
-                        .promise();
-                } catch(err){
-                    return {
-                        statusCode: 400,
-                        headers: {
-                            "Access-Control-Allow-Headers" : "Content-Type",
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                        },
-                        body: JSON.stringify({
-                            success: false,
-                        })
-                    };
-                }
-            }
-    
-            let imageData = obj.image;
-            if (obj.image.substr(0, 7) === 'base64,') {
-                imageData = obj.image.substr(7, obj.image.length);
-            }
-    
-            var buffer = Buffer.from(imageData, 'base64');
-            var fileInfo = await fileType.fromBuffer(buffer);
-            var detectedExt = fileInfo.ext;
-            var detectedMime = fileInfo.mime;
-    
-            if (!allowedMimes.includes(detectedMime)) {
-                return {
-                    statusCode: 400,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: 'mime is not allowed '
-                    })
-                };
-            }
-    
-            var name = ID;
-            var key = `${name}.${detectedExt}`;
-    
-            console.log(`writing image to bucket called ${key}`);
-    
-            await s3
-                .upload({
-                    Body: buffer,
-                    Key: `services/${key}`,
-                    ContentType: detectedMime,
-                    Bucket: 'barbera-image',
-                    ACL: 'public-read',
-                })
-                .promise();
-    
-            url = `https://barbera-image.s3-ap-south-1.amazonaws.com/services/${key}`;
-        }
+        var prevName = exist2.service.name;
+        var prevType = exist2.service.type;
 
         var params = {
             TableName: 'Services',
             Key: {
                 id: ID,
             },
-            UpdateExpression: "set #name=:n, #price=:p, #time=:ti, #details=:det, #cut=:c, #deal=:dod, #image=:i, #type=:t, #subtype=:s, #category=:g, #trend=:tr",
+            UpdateExpression: "set #name=:n, #price=:p, #time=:ti, #details=:det, #cut=:c, #deal=:dod, #type=:t, #subtype=:s, #category=:g, #trend=:tr",
             ExpressionAttributeNames: {
                 '#name': 'name',
                 '#price': 'price',
@@ -206,7 +136,6 @@ exports.handler = async (event) => {
                 '#details': 'details',
                 '#cut': 'cutprice',
                 '#deal': 'dod',
-                '#image':'image',
                 '#type': 'type',
                 '#subtype': 'subtype',
                 '#category': 'category',
@@ -218,7 +147,6 @@ exports.handler = async (event) => {
                 ":ti": TIME,
                 ":det": DET ? DET : null,
                 ":c": CUT ? CUT : null,
-                ":i": url ? url : null,
                 ":dod": DOD ? DOD : false,
                 ":t": TYPE,
                 ":s": SUBTYPE,
@@ -263,7 +191,7 @@ exports.handler = async (event) => {
 
                         await s3
                             .deleteObject({
-                                Key: key,
+                                Key: `tabs/${key}`,
                                 Bucket: 'barbera-image'
                             })
                             .promise();
@@ -278,6 +206,88 @@ exports.handler = async (event) => {
                     }
 
                     data = await documentClient.delete(params).promise();
+                }
+
+                var na = prevName;
+
+                if(prevName !== NAME) {
+                    params = {
+                        TableName: 'Stock',
+                        Item: {
+                            type: 'Sliders',
+                            name: prevName
+                        }
+                    }
+
+                    data = await documentClient.get(params).promise();
+
+                    var img = data.Item.image;
+                    na = NAME;
+
+                    params = {
+                        TableName: 'Stock',
+                        Item: {
+                            type: 'Sliders',
+                            name: prevName
+                        }
+                    }
+
+                    data = await documentClient.delete(params).promise();
+
+                    params = {
+                        TableName: 'Stock',
+                        Key: {
+                            type: 'Sliders',
+                            name: NAME,
+                            image: img
+                        }
+                    }
+
+                    data = await documentClient.put(params).promise();
+                }
+
+                if(prevCat !== CAT) {
+                    params = {
+                        TableName: 'Stock',
+                        Item: {
+                            type: 'Sliders',
+                            name: na
+                        },
+                        UpdateExpression: "set #category=:c",
+                        ExpressionAttributeNames: {
+                            '#category': 'category', 
+                        },
+                        ExpressionAttributeValues:{
+                            ":c": CAT,
+                        },
+                        ReturnValues:"UPDATED_NEW"
+
+                    }
+
+                    data = await documentClient.update(params).promise();
+
+                }
+
+                if(prevType !== TYPE) {
+                    params = {
+                        TableName: 'Stock',
+                        Item: {
+                            type: 'Sliders',
+                            name: na
+                        },
+                        UpdateExpression: "set #type=:t",
+                        ExpressionAttributeNames: {
+                            '#type': 'type', 
+                        },
+                        ExpressionAttributeValues:{
+                            ":t": TYPE,
+                        },
+                        ReturnValues:"UPDATED_NEW"
+
+                    }
+
+                    data = await documentClient.update(params).promise();
+
                 }
 
                 params = {

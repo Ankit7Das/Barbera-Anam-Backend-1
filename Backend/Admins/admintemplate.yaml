@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 
 Resources:
   # Stack-Name: Barbera-Admins
-  # Hostname: https://ivhc87o8xe.execute-api.ap-south-1.amazonaws.com/Prod
+  # Hostname: https://xwtij1tqrc.execute-api.ap-south-1.amazonaws.com/Prod
 
   #---------------------------------------------------------------
   # Barber Functions

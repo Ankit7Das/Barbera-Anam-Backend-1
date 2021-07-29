@@ -92,33 +92,18 @@ exports.handler = async (event) => {
 
         var data = await documentClient.scan(params).promise();
 
-        if(data.Items.length != 0) {
-            return {
-                statusCode: 200,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: true,
-                    message: 'Service list',
-                    data: data.Items
-                })
-            }
-        } else {
-            return {
-                statusCode: 404,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: 'No service entered'
-                })
-            }
+        return {
+            statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Headers" : "Content-Type",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+            },
+            body: JSON.stringify({
+                success: true,
+                message: 'Service list',
+                data: data.Items
+            })
         }
         
     } catch(err) {
