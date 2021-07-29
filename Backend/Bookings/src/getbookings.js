@@ -67,7 +67,7 @@ exports.handler = async (event) => {
 
         var params = {
             TableName: 'Bookings',
-            ProjectionExpression: '#serviceId, #barberId, #date, #slot, #payment_status, #quantity, #Timestamp',
+            ProjectionExpression: '#serviceId, #barberId, #date, #slot, #payment_status, #service_status, #quantity, #Timestamp',
             KeyConditionExpression: '#user = :u',
             ExpressionAttributeValues: {
                 ':u': userID.id,
@@ -78,6 +78,7 @@ exports.handler = async (event) => {
                 '#barberId': 'barberId',
                 '#date': 'date',
                 '#payment_status':'payment_status',
+                '#service_status':'service_status',
                 '#slot':'slot',
                 '#quantity':'quantity',
                 '#Timestamp':'Timestamp'

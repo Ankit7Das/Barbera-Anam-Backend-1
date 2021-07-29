@@ -16,6 +16,7 @@ exports.handler = async (event) => {
         var token = tokenArray[1];
         var obj = JSON.parse(event.body);
         var barberId = obj.barberId;
+        var serviceId = obj.serviceId;
 
         if(token == null) {
             return {
@@ -83,7 +84,7 @@ exports.handler = async (event) => {
         try {
             var data = await documentClient.update(params).promise();
 
-            var msg = `${random}.`;
+            var msg = `${random}`;
 
             random = null;
 
@@ -118,6 +119,26 @@ exports.handler = async (event) => {
                 req.end();
                 
             });
+
+            for(var i=0; i<serviceId.length; i++) {
+                params = {
+                    TableName: 'Bookings',
+                    Key: {
+                        userId: userID.id,
+                        serviceId: serviceId[i]
+                    },
+                    UpdateExpression: "set #service_status=:s",
+                    ExpressionAttributeNames: {
+                        '#service_status': 'service_status', 
+                    },
+                    ExpressionAttributeValues:{
+                        ":s": 'ongoing',
+                    },
+                    ReturnValues:"UPDATED_NEW"
+                }
+
+                data = await documentClient.update(params).promise();
+            }
 
             console.log(fcmnotif);
         

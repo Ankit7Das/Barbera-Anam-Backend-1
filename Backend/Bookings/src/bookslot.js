@@ -289,6 +289,7 @@ exports.handler = async (event) => {
                                 user_add: exist1.user.address,
                                 amount: prices[i],
                                 payment_status: 'pending',
+                                service_status: 'pending',
                                 date: DATE,
                                 slot: SLOT,
                                 quantity: service[i].quantity
