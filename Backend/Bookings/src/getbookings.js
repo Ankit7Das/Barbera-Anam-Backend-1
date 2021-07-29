@@ -102,37 +102,30 @@ exports.handler = async (event) => {
                     TableName: 'Services',
                     Key:{
                         id: info[0]
-                    },
-                    ProjectionExpression: "#name, #price, #time, #category",
-                    ExpressionAttributeNames: {
-                        "#name": "name",
-                        "#price": "price",
-                        "#time": "time",
-                        "#category": "category",
                     }
                 }
 
                 data1 = await documentClient.get(params).promise();
 
-                delete data.Items[i].serviceId;
                 data.Items[i].service = data1.Item;
 
                 params = {
                     TableName: 'Users',
                     Key:{
                         id: data.Items[i].barberId
-                    },
-                    ProjectionExpression: "#id, #phone",
-                    ExpressionAttributeNames: {
-                        "#id": "id",
-                        "#phone": "phone",
                     }
                 }
                 
                 data1 = await documentClient.get(params).promise();
 
                 delete data.Items[i].barberId;
+
+                if(!data1.Item.name) {
+                    data1.Item.name = '';
+                }
+                data1.Item.distance = await getDistance(exist1.user.latitude, exist1.user.longitude, data1.Item.latitude, data1.Item.longitude);
                 data.Items[i].barber = data1.Item;
+
             }
 
             data.Items.sort((a,b) => {

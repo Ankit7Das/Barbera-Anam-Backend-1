@@ -14,6 +14,9 @@ exports.handler = async (event) => {
         var serviceId = obj.serviceid;
         var DIS = obj.discount;
         var NAME = obj.name;
+        var LowerLimit = obj.lowerlimit;
+        var UpperLimit = obj.upperlimit;
+        var UserLimit = obj.userlimit;
 
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
@@ -90,7 +93,10 @@ exports.handler = async (event) => {
                 name: NAME,
                 serviceId: serviceId,
                 discount: DIS,
-                used_by: ''
+                used_by: '',
+                lower_price_limit: LowerLimit,
+                upper_price_limit: UpperLimit ? UpperLimit : -1,
+                user_limit: UserLimit ? UserLimit : -1
             }
         }
 

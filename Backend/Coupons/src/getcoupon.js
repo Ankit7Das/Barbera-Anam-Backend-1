@@ -93,22 +93,55 @@ exports.handler = async (event) => {
         try {
             var data = await documentClient.get(params).promise();
 
-            params = {
-                TableName: 'Services',
-                Key:{
-                    id: data.Item.serviceId
+            if(serviceId !== 'all') {
+                params = {
+                    TableName: 'Services',
+                    Key:{
+                        id: data.Item.serviceId
+                    }
                 }
-            }
+    
+                try {
+                    data1 = await documentClient.get(params).promise();
+    
+                    data.Item.service = data1.Item;
+    
+                    delete data.Item.serviceId;
+    
+                    console.log(data.Item);
+                    
+                    return {
+                        statusCode: 200,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: true,
+                            message: 'Coupon found',
+                            data: data.Item
+                        })
+                    } 
+                } catch(err) {
+                    return {
+                        statusCode: 500,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: false,
+                            message: err,
+                        })
+                    }
+                }
+            } else {
 
-            try {
-                data1 = await documentClient.get(params).promise();
-
-                data.Item.service = data1.Item;
-
+                data.Item.service.name = data.Item.serviceId;
                 delete data.Item.serviceId;
 
-                console.log(data.Item);
-                
                 return {
                     statusCode: 200,
                     headers: {
@@ -122,19 +155,7 @@ exports.handler = async (event) => {
                         data: data.Item
                     })
                 } 
-            } catch(err) {
-                return {
-                    statusCode: 500,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: err,
-                    })
-                }
+            
             }
         } catch(err) {
             return {

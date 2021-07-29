@@ -4,7 +4,7 @@ Resources:
   GetReferralCode:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/392fd4e7e81a249e810f5b97f8c72270
+      CodeUri: s3://barbera-buckets/b24f1f4cbee4fe1ec51861f2c6e588d4
       Handler: getreferral.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   CouponCreate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/392fd4e7e81a249e810f5b97f8c72270
+      CodeUri: s3://barbera-buckets/b24f1f4cbee4fe1ec51861f2c6e588d4
       Handler: couponcreate.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   UseCoupon:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/392fd4e7e81a249e810f5b97f8c72270
+      CodeUri: s3://barbera-buckets/b24f1f4cbee4fe1ec51861f2c6e588d4
       Handler: availcoupon.handler
       Runtime: nodejs12.x
       Events:
@@ -43,7 +43,7 @@ Resources:
   GetAllCoupons:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/392fd4e7e81a249e810f5b97f8c72270
+      CodeUri: s3://barbera-buckets/b24f1f4cbee4fe1ec51861f2c6e588d4
       Handler: getallcoupons.handler
       Runtime: nodejs12.x
       Events:
@@ -56,7 +56,7 @@ Resources:
   GetCoupon:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/392fd4e7e81a249e810f5b97f8c72270
+      CodeUri: s3://barbera-buckets/b24f1f4cbee4fe1ec51861f2c6e588d4
       Handler: getcoupon.handler
       Runtime: nodejs12.x
       Events:
@@ -69,7 +69,7 @@ Resources:
   DeleteCoupon:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/392fd4e7e81a249e810f5b97f8c72270
+      CodeUri: s3://barbera-buckets/b24f1f4cbee4fe1ec51861f2c6e588d4
       Handler: deletecoupon.handler
       Runtime: nodejs12.x
       Events:
@@ -82,7 +82,7 @@ Resources:
   UpdateCoupon:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/392fd4e7e81a249e810f5b97f8c72270
+      CodeUri: s3://barbera-buckets/b24f1f4cbee4fe1ec51861f2c6e588d4
       Handler: updatecoupon.handler
       Runtime: nodejs12.x
       Events:

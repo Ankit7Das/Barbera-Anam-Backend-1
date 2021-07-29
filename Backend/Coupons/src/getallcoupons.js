@@ -85,22 +85,6 @@ exports.handler = async (event) => {
 
         try {
             var data = await documentClient.scan(params).promise();
-            var data1;
-
-            for(var i=0;i<data.Items.length;i++) {
-                params = {
-                    TableName: 'Services',
-                    Key:{
-                        id: data.Items[i].serviceId
-                    }
-                }
-
-                data1 = await documentClient.get(params).promise();
-
-                data.Items[i].service = data1.Item;
-
-                delete data.Items[i].serviceId;
-            }
 
             return {
                 statusCode: 200,

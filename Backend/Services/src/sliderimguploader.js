@@ -25,6 +25,7 @@ exports.handler = async (event) => {
 
         var obj = JSON.parse(event.body);
         var NAME = obj.name;
+        var CLICK = obj.clickable;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -204,12 +205,14 @@ exports.handler = async (event) => {
                         type: 'Sliders',
                         name: NAME
                     },
-                    UpdateExpression: "set #image=:i",
+                    UpdateExpression: "set #image=:i, #clickable=:c",
                     ExpressionAttributeNames: {
                         '#image': 'image', 
+                        '#clickable': 'clickable'
                     },
                     ExpressionAttributeValues:{
                         ":i": url,
+                        ":c": CLICK
                     },
                     ReturnValues:"UPDATED_NEW"
                 }
@@ -245,17 +248,51 @@ exports.handler = async (event) => {
                     };
                 }
             } else {
-                return {
-                    statusCode: 400,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                params = {
+                    TableName: 'Stock',
+                    Key: {
+                        type: 'Sliders',
+                        name: NAME
                     },
-                    body: JSON.stringify({
-                        success: false,
-                        message: 'No image was sent'
-                    })
+                    UpdateExpression: "set #clickable=:c",
+                    ExpressionAttributeNames: {
+                        '#clickable': 'clickable'
+                    },
+                    ExpressionAttributeValues:{
+                        ":c": CLICK
+                    },
+                    ReturnValues:"UPDATED_NEW"
+                }
+        
+                try {
+                    data = await documentClient.update(params).promise();
+        
+                    return {
+                        statusCode: 200,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: true,
+                            message: 'Slider pic uploaded',
+                        })
+                    }
+                } catch(err) {
+                    console.log("Error: ", err);
+                    return {
+                        statusCode: 500,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: false,
+                            message: err,
+                        })
+                    };
                 }
             }
         }
