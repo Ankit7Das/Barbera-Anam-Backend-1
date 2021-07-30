@@ -102,7 +102,7 @@ exports.handler = async (event) => {
             }
 
             prices.push(service[i].price);
-            total_time+=Number(exist2.service.time);
+            total_time += service[i].quantity*Number(exist2.service.time);
         }
 
         if(exist2.success == false) {
@@ -113,10 +113,6 @@ exports.handler = async (event) => {
                     message: 'Service not found',
                 })
             }
-        }
-
-        if(SLOT !== 1000) {
-            total_time += 10;
         }
 
         var today = new Date();
@@ -163,19 +159,15 @@ exports.handler = async (event) => {
 
             var cnt = 0;
 
-            for(var i = Number(SLOT) ;  ; i += 10) {
-                cnt++;
+            for(var i = Number(SLOT) ;  ; i++) {
+                cnt+=60;
 
                 if( data.Item[String(i)] !== 'p') {
                     flag = false;
                     break;
                 }
 
-                if(i % 100 === 50) {
-                    i += 40;
-                }
-
-                if( cnt > Math.ceil(total_time/10) ) {
+                if( cnt >= total_time) ) {
                     break;
                 }
     
@@ -185,10 +177,10 @@ exports.handler = async (event) => {
 
                 cnt = 0;
 
-                for(var i = Number(SLOT) ;  ; i += 10) {
+                for(var i = Number(SLOT) ;  ; i++) {
                     console.log(i);
         
-                    cnt++;
+                    cnt+=60;
                    
                     params = {
                         TableName: 'BarbersLog',
@@ -208,11 +200,7 @@ exports.handler = async (event) => {
         
                     data = await documentClient.update(params).promise();
         
-                    if(i % 100 === 50) {
-                        i += 40;
-                    }
-        
-                    if( cnt > Math.ceil(total_time/10) ) {
+                    if( cnt >= total_time) {
                         break;
                     }
         

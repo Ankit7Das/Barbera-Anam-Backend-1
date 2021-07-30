@@ -34,7 +34,22 @@ Resources:
         apiForLambda:
           Type: Api 
           Properties:
-            Path: /getlogs
+            Path: /getlogs/{barberId}
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  GetAllBarbers:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getbarbers.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getbarbs
             Method: get
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------

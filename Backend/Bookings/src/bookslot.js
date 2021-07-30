@@ -80,7 +80,7 @@ exports.handler = async (event) => {
             }
 
             prices.push(service[i].price);
-            total_time+=Number(exist2.service.time);
+            total_time += service[i].quantity*Number(exist2.service.time);
         }
 
         if(exist2.success == false) {
@@ -110,19 +110,19 @@ exports.handler = async (event) => {
         console.log(Number(date.getDate()));
         console.log(Number(today.getDate()));
 
-        var slot = Number(SLOT) - 10;
+        var slot = Number(SLOT);
 
-        if(slot%100 === 90) {
-            slot = ((slot/100))*100 + 50;
-        }
+        // if(slot%100 === 90) {
+        //     slot = ((slot/100))*100 + 50;
+        // }
 
-        if(slot === 950) {
-            slot = 1000;
-            SLOT = String(slot);
-        } else {
-            SLOT = String(slot);
-            total_time += 10;
-        }
+        // if(slot === 950) {
+        //     slot = 1000;
+        //     SLOT = String(slot);
+        // } else {
+        //     SLOT = String(slot);
+        //     total_time += 10;
+        // }
 
         console.log("slot",slot);
         console.log("SLOT",SLOT);
@@ -138,7 +138,7 @@ exports.handler = async (event) => {
         }
 
         if(date.getDate()===today.getDate()) {
-            if(slot/100 <= Number(today.getHours())) {
+            if(slot <= Number(today.getHours())) {
                 return {
                     statusCode: 400,
                     body: JSON.stringify({
@@ -146,17 +146,7 @@ exports.handler = async (event) => {
                         message: 'Slot chosen is not possible'
                     })
                 };
-            } else if(slot/100 === Number(today.getHours())) {
-                if(slot%100 <= Number(today.getMinutes())) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({
-                            success: false,
-                            message: 'Slot chosen is not possible'
-                        })
-                    }
-                }
-            }
+            } 
         }
 
         var params = {
@@ -190,19 +180,15 @@ exports.handler = async (event) => {
 
             var cnt = 0;
 
-            for(var i = slot ; ; i += 10) {
+            for(var i = slot ; ; i++) {
 
-                cnt++;
+                cnt+=60;
 
                 data.Items = data.Items.filter((barber) => {
                     return barber[String(i)] === 'n';
                 });
-                
-                if(i % 100 === 50) {
-                    i += 40;
-                } 
 
-                if(cnt > Math.ceil(total_time/10)) {
+                if(cnt >= total_time) {
                     break;
                 }
                 
@@ -331,7 +317,7 @@ exports.handler = async (event) => {
 
                     for(var i = slot ; ; i += 10) {
 
-                        cnt++;
+                        cnt+=60;
 
                         params = {
                             TableName: 'BarbersLog',
@@ -351,11 +337,7 @@ exports.handler = async (event) => {
             
                         data = await documentClient.update(params).promise();
 
-                        if(i % 100 === 50) {
-                            i += 40;
-                        }
-
-                        if(cnt > Math.ceil(total_time/10)) {
+                        if(cnt > total_time) {
                             break;
                         }
                         

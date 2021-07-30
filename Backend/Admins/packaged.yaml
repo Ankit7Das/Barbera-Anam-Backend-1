@@ -4,7 +4,7 @@ Resources:
   SendMail:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/213c4b700aceab43340b1a990f1e328c
+      CodeUri: s3://barbera-buckets/3954bb9b4d563f55e30b1552d01303a4
       Handler: sendmail.handler
       Runtime: nodejs12.x
       Events:
@@ -17,13 +17,26 @@ Resources:
   GetAllBarberLogs:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/213c4b700aceab43340b1a990f1e328c
+      CodeUri: s3://barbera-buckets/3954bb9b4d563f55e30b1552d01303a4
       Handler: getbarberlogs.handler
       Runtime: nodejs12.x
       Events:
         apiForLambda:
           Type: Api
           Properties:
-            Path: /getlogs
+            Path: /getlogs/{barberId}
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetAllBarbers:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/3954bb9b4d563f55e30b1552d01303a4
+      Handler: getbarbers.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getbarbs
             Method: get
       Role: arn:aws:iam::140544830924:role/BackendUser

@@ -2,7 +2,6 @@ require('dotenv').config();
 
 var AWS = require('aws-sdk');
 var uuid = require('uuid');
-var https = require('https');
 var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
@@ -122,108 +121,43 @@ exports.handler = async(event) => {
 
         random = null; 
 
-        if(time === 'first' || MODE === 'web') {
-            params = {
-                Message: msg,
-                PhoneNumber: '+91' + PHONE,
+        params = {
+            Message: msg,
+            PhoneNumber: '+91' + PHONE,
+        };
+    
+        var sms = await sns.publish(params).promise();
+    
+        if(sms.MessageId) {
+            return {
+                statusCode: 200,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                body: JSON.stringify({
+                    success: true,
+                    message: 'OTP sent',
+                    messageId: sms.MessageId,
+                    token: token,
+                })
             };
-        
-            var sms = await sns.publish(params).promise();
-        
-            if(sms.MessageId) {
-                return {
-                    statusCode: 200,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: true,
-                        message: 'OTP sent',
-                        messageId: sms.MessageId,
-                        token: token,
-                    })
-                };
-            } else {
-                return {
-                    statusCode: 400,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: 'OTP not sent'
-                    })
-                };
-            }
         } else {
-            var fcmnotif = await new Promise((resolve, reject) => {
-                const options = {
-                    host: 'fcm.googleapis.com',
-                    path: '/fcm/send',
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'key=' + process.env.FCM_AUTH,
-                        'Content-Type': 'application/json',
-                    },
-                };
-            
-                console.log(options);
-                const req = https.request(options, (res) => {
-                    console.log('success');
-                    console.log(res.statusCode);
-                    resolve('success');
-                });
-            
-                req.on('error', (e) => {
-                    console.log('failure' + e.message);
-                    reject(e.message);
-                });
-            
-                // const reqBody = '{"to":"' + deviceToken + '", "priority" : "high"}';
-                const reqBody = '{"to":"/topics/' + PHONE + '", "priority": "high", "notification": {"title": "Barbera Home Salon", "body":"' + msg + '"}}';
-                console.log(reqBody);
-            
-                req.write(reqBody);
-                req.end();
-                
-            });
-
-            console.log(fcmnotif);
-        
-            if(fcmnotif === 'success') {
-                return {
-                    statusCode: 200,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: true,
-                        message: 'OTP sent',
-                        fcm: fcmnotif,
-                        token: token,
-                    })
-                };
-            } else {
-                return {
-                    statusCode: 400,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: 'OTP not sent'
-                    })
-                };
-            }
+            return {
+                statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                body: JSON.stringify({
+                    success: false,
+                    message: 'OTP not sent'
+                })
+            };
         }
+
     } catch(err) {
         console.log(err);
         return err;

@@ -12,7 +12,6 @@ exports.handler = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
-        var barberId = event.pathParameters.barberId;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -82,62 +81,49 @@ exports.handler = async (event) => {
             }
         }
 
-        var today = new Date();
-        today.setHours(today.getHours() + 5);
-        today.setMinutes(today.getMinutes() + 30);
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-        var day = dd + '-' + mm + '-' + yyyy;
-        var params;
-        var data;
-        var logs = [];
+        var params = {
+            TableName: 'Users',
+            FilterExpression: '#role = :this_role',
+            ExpressionAttributeValues: {':this_role': 'barber'},
+            ExpressionAttributeNames: {'#role': 'role'},
+        }
 
-        console.log("user verification");
+        try {
+            var data = await documentClient.scan(params).promise();
 
-        for(var i = 0; i < 30; i++) {
-            params = {
-                TableName: 'BarbersLog',
-                ProjectionExpression: '#date, #barberId, #distance',
-                Key: {
-                    date: day,
-                    barberId: barberId
-                },
-                ExpressionAttributeNames: {
-                    '#date': 'date',
-                    '#barberId':'barberId',
-                    '#distance':'distance'
+            for(var i=0; i<data.Items.length; i++) {
+                if(!data.Items[i].name) {
+                    data.Items[i].name = '';
                 }
             }
 
-            data = await documentClient.get(params).promise();
-
-            if(!data.Item) {
-                break;
+            return {
+                statusCode: 200,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                body: JSON.stringify({
+                    success: true,
+                    message: 'Barbers found',
+                    data: data.Items
+                })
             }
 
-            logs.push(data.Item);
-            
-
-            today.setDate(today.getDate() - 1);
-            dd = String(today.getDate()).padStart(2, '0');
-            mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-            yyyy = today.getFullYear();
-            day = dd + '-' + mm + '-' + yyyy;
-        }
-
-        return {
-            statusCode: 200,
-            headers: {
-                "Access-Control-Allow-Headers" : "Content-Type",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-            },
-            body: JSON.stringify({
-                success: true,
-                message: 'Barber Logs found',
-                logs: logs.reverse(),
-            })
+        } catch(err) {
+            return {
+                statusCode: 500,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                body: JSON.stringify({
+                    success: false,
+                    message: err,
+                })
+            }
         }
         
     } catch(err) {

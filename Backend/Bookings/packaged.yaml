@@ -4,7 +4,7 @@ Resources:
   BookSlotWise:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/c3d682a0c4f9a72ac8b63813e8332ce1
+      CodeUri: s3://barbera-buckets/a09454a69ce6c8255eaa4294918fac30
       Handler: bookslot.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   InstantBooking:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/c3d682a0c4f9a72ac8b63813e8332ce1
+      CodeUri: s3://barbera-buckets/a09454a69ce6c8255eaa4294918fac30
       Handler: bookinstant.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   ConfirmBooking:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/c3d682a0c4f9a72ac8b63813e8332ce1
+      CodeUri: s3://barbera-buckets/a09454a69ce6c8255eaa4294918fac30
       Handler: bookconfirm.handler
       Runtime: nodejs12.x
       Events:
@@ -43,7 +43,7 @@ Resources:
   RevertBooking:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/c3d682a0c4f9a72ac8b63813e8332ce1
+      CodeUri: s3://barbera-buckets/a09454a69ce6c8255eaa4294918fac30
       Handler: bookrevert.handler
       Runtime: nodejs12.x
       Events:
@@ -56,7 +56,7 @@ Resources:
   GetBookings:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/c3d682a0c4f9a72ac8b63813e8332ce1
+      CodeUri: s3://barbera-buckets/a09454a69ce6c8255eaa4294918fac30
       Handler: getbookings.handler
       Runtime: nodejs12.x
       Events:
@@ -69,7 +69,7 @@ Resources:
   GetBookingsForBarbers:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/c3d682a0c4f9a72ac8b63813e8332ce1
+      CodeUri: s3://barbera-buckets/a09454a69ce6c8255eaa4294918fac30
       Handler: getbookingsbarb.handler
       Runtime: nodejs12.x
       Events:
@@ -82,7 +82,7 @@ Resources:
   DeleteFullCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/c3d682a0c4f9a72ac8b63813e8332ce1
+      CodeUri: s3://barbera-buckets/a09454a69ce6c8255eaa4294918fac30
       Handler: deletefullcart.handler
       Runtime: nodejs12.x
       Events:
