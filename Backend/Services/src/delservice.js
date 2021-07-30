@@ -134,7 +134,7 @@ exports.handler = async (event) => {
 
                     params = {
                         TableName: 'Stock',
-                        Item: {
+                        Key: {
                             type: 'Tabs',
                             name: prevCat
                         }
@@ -156,7 +156,7 @@ exports.handler = async (event) => {
 
                     params = {
                         TableName: 'Stock',
-                        Item: {
+                        Key: {
                             type: 'Sliders',
                             name: prevName
                         }
@@ -178,7 +178,7 @@ exports.handler = async (event) => {
 
                     params = {
                         TableName: 'Stock',
-                        Item: {
+                        Key: {
                             type: 'Tabs',
                             name: prevCat
                         }
@@ -188,7 +188,7 @@ exports.handler = async (event) => {
 
                     params = {
                         TableName: 'Stock',
-                        Item: {
+                        Key: {
                             type: 'Sliders',
                             name: prevName
                         }

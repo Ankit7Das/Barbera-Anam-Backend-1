@@ -177,7 +177,7 @@ exports.handler = async (event) => {
 
                     params = {
                         TableName: 'Stock',
-                        Item: {
+                        Key: {
                             type: 'Tabs',
                             name: prevCat
                         }
@@ -213,7 +213,7 @@ exports.handler = async (event) => {
                 if(prevName !== NAME) {
                     params = {
                         TableName: 'Stock',
-                        Item: {
+                        Key: {
                             type: 'Sliders',
                             name: prevName
                         }
@@ -226,7 +226,7 @@ exports.handler = async (event) => {
 
                     params = {
                         TableName: 'Stock',
-                        Item: {
+                        Key: {
                             type: 'Sliders',
                             name: prevName
                         }
@@ -236,7 +236,7 @@ exports.handler = async (event) => {
 
                     params = {
                         TableName: 'Stock',
-                        Key: {
+                        Item: {
                             type: 'Sliders',
                             name: NAME,
                             image: img
@@ -249,7 +249,7 @@ exports.handler = async (event) => {
                 if(prevCat !== CAT) {
                     params = {
                         TableName: 'Stock',
-                        Item: {
+                        Key: {
                             type: 'Sliders',
                             name: na
                         },
@@ -268,16 +268,19 @@ exports.handler = async (event) => {
 
                 }
 
+                console.log(na, typeof na);
+                console.log(prevType, TYPE);
+
                 if(prevType !== TYPE) {
                     params = {
                         TableName: 'Stock',
-                        Item: {
+                        Key: {
                             type: 'Sliders',
                             name: na
                         },
-                        UpdateExpression: "set #type=:t",
+                        UpdateExpression: "set #types=:t",
                         ExpressionAttributeNames: {
-                            '#type': 'type', 
+                            '#types': 'types', 
                         },
                         ExpressionAttributeValues:{
                             ":t": TYPE,
@@ -288,6 +291,7 @@ exports.handler = async (event) => {
 
                     data = await documentClient.update(params).promise();
 
+                    console.log(TYPE);
                 }
 
                 params = {
