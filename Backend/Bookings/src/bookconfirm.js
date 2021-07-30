@@ -93,6 +93,72 @@ exports.handler = async (event) => {
         var prices = [];
         var total_price = 0;
         var total_time = 0;
+        var data;
+        var params;
+        var serviceId;
+        var discount;
+        var type;
+
+        if(obj.couponName){
+            if(obj.couponName === 'BARBERAREF') {
+
+                if(exist1.user.invites > 0) {
+                    type = 'ref';
+                    serviceId = 'all';
+                    discount = 100;
+                } else {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            success: false,
+                            message: 'Wrong Coupon Entered'
+                        })
+                    };
+                }
+
+            } else {
+
+                params = {
+                    TableName: 'Coupons',
+                    KeyConditionExpression: '#name = :n',
+                    ExpressionAttributeValues: {
+                        ':n': obj.couponName,
+                    },
+                    ExpressionAttributeNames: {
+                        '#name': 'name'
+                    }
+                }
+
+                try {
+                    data = await documentClient.query(params).promise();
+
+                    if(data.Items[0].used_by.includes(userID.id)) {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                success: false,
+                                message: 'Coupon already used by user'
+                            })
+                        };
+                    }
+
+                    type = 'coupon';
+                    serviceId = data.Items[0].serviceId;
+                    discount = data.Items[0].discount;
+                } catch(err) {
+                    return {
+                        statusCode: 500,
+                        body: JSON.stringify({
+                            success: false,
+                            message: err
+                        })
+                    };
+                }
+            }
+        }
+
+        var flag = false;
+
         for(var i=0;i<service.length;i++) {
             
             exist2 = await serviceVerifier(service[i].serviceId);
@@ -101,8 +167,88 @@ exports.handler = async (event) => {
                 break;
             }
 
-            prices.push(service[i].price);
+            if(service[i].serviceId === serviceId) {
+                if(exist2.service.price >= data.Items[0].lower_price_limit) {
+                    if(data.Items[0].upper_price_limit !== -1) {
+                        if(exist2.service.price <= data.Items[0].upper_price_limit) {
+                            prices.push(service[i].quantity*exist2.service.price);
+                            total_price += service[i].quantity*exist2.service.price;
+                            flag = true;
+                        } 
+                    } else {
+                        prices.push(service[i].quantity*exist2.service.price);
+                        total_price += service[i].quantity*exist2.service.price;
+                        flag = true;
+                    }
+                } 
+            } else {
+                prices.push(service[i].quantity*exist2.service.price);
+                total_price += service[i].quantity*exist2.service.price;
+                flag = true;
+            }
+
             total_time += service[i].quantity*Number(exist2.service.time);
+        }
+
+        if(serviceId === 'all') {
+            if(type === 'ref') {
+                if(total_price - discount !== obj.totalprice) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            success: false,
+                            message: 'Wrong prices sent',
+                        })
+                    }
+                } 
+                
+                flag = true;
+                
+            } else {
+                if(total_price - discount !== obj.totalprice) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            success: false,
+                            message: 'Wrong prices sent',
+                        })
+                    }
+                }
+    
+                if(total_price < data.Items[0].lower_price_limit) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            success: false,
+                            message: 'Wrong prices sent',
+                        })
+                    }
+                }
+
+                if(data.Items[0].upper_price_limit !== -1) {
+                    if(total_price > data.Items[0].upper_price_limit) {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                success: false,
+                                message: 'Wrong prices sent',
+                            })
+                        }
+                    }
+                }
+
+                flag = true;
+            }
+        }
+
+        if(!flag) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Wrong prices sent',
+                })
+            }
         }
 
         if(exist2.success == false) {
@@ -143,7 +289,7 @@ exports.handler = async (event) => {
 
         console.log(day);
 
-        var params = {
+        params = {
             TableName: 'BarbersLog',
             Key: {
                 date: day,
@@ -152,17 +298,17 @@ exports.handler = async (event) => {
         }
 
         try {
-            var data = await documentClient.get(params).promise();
+            var data1 = await documentClient.get(params).promise();
             var flag = true;
 
-            console.log(data.Item);
+            console.log(data1.Item);
 
             var cnt = 0;
 
             for(var i = Number(SLOT) ;  ; i++) {
                 cnt+=60;
 
-                if( data.Item[String(i)] !== 'p') {
+                if( data1.Item[String(i)] !== 'p') {
                     flag = false;
                     break;
                 }
@@ -190,6 +336,7 @@ exports.handler = async (event) => {
                             user_lat: exist1.user.latitude,
                             user_add: exist1.user.address,
                             amount: prices[i],
+                            total_price: total_price,
                             payment_status: 'pending',
                             service_status: 'pending',
                             date: day,
@@ -198,9 +345,90 @@ exports.handler = async (event) => {
                         }
                     };
 
-                    data = await documentClient.put(params).promise();
+                    data1 = await documentClient.put(params).promise();
 
-                    total_price += Number(prices[i]);
+                }
+
+                if(obj.couponName) {
+                    if(obj.couponName === 'BARBERAREF') {
+                        params = {
+                            TableName: 'Users',
+                            Key: {
+                                id: userID.id,
+                            },
+                            UpdateExpression: "set #invites=#invites - :i",
+                            ExpressionAttributeNames: {
+                                '#invites': 'invites', 
+                            },
+                            ExpressionAttributeValues:{
+                                ":i": 1,
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        }
+    
+                        
+                        data1 = await documentClient.update(params).promise();
+                    } else {
+
+                        var usedby = data.Items[0].used_by.split(",").length - 1;
+
+                        console.log(usedby);
+
+                        if(data.Items[0].user_limit === -1) {
+                            params = {
+                                TableName: 'Coupons',
+                                Key: {
+                                    name: obj.couponName,
+                                    serviceId: data.Items[0].serviceId
+                                },
+                                UpdateExpression: "set #used_by=:u",
+                                ExpressionAttributeNames: {
+                                    '#used_by': 'used_by', 
+                                },
+                                ExpressionAttributeValues:{
+                                    ":u": data.Items[0].used_by + ',' + userID.id,
+                                },
+                                ReturnValues:"UPDATED_NEW"
+                            }
+        
+                            
+                            data1 = await documentClient.update(params).promise();
+                        } else {
+                            if(usedby + 1 === data.Items[0].user_limit) {
+
+                                params = {
+                                    TableName: 'Coupons',
+                                    Key: {
+                                        name: obj.couponName,
+                                        serviceId: data.Items[0].serviceId
+                                    }
+                                }
+                                
+                                data1 = await documentClient.delete(params).promise();
+
+                            } else {
+                                params = {
+                                    TableName: 'Coupons',
+                                    Key: {
+                                        name: obj.couponName,
+                                        serviceId: data.Items[0].serviceId
+                                    },
+                                    UpdateExpression: "set #used_by=:u",
+                                    ExpressionAttributeNames: {
+                                        '#used_by': 'used_by', 
+                                    },
+                                    ExpressionAttributeValues:{
+                                        ":u": data.Items[0].used_by + ',' + userID.id,
+                                    },
+                                    ReturnValues:"UPDATED_NEW"
+                                }
+            
+                                
+                                data1 = await documentClient.update(params).promise();
+                            }
+                        }
+                        
+                    }
                 }
 
                 var percentage = 0.1;            
@@ -220,7 +448,7 @@ exports.handler = async (event) => {
                     ReturnValues:"UPDATED_NEW"
                 }
     
-                data = await documentClient.update(params).promise();
+                data1 = await documentClient.update(params).promise();
 
                 for(var i = Number(SLOT) ;  ; i++ ) {
                     console.log(i);
@@ -243,7 +471,7 @@ exports.handler = async (event) => {
                         ReturnValues:"UPDATED_NEW"
                     }
         
-                    data = await documentClient.update(params).promise();
+                    data1 = await documentClient.update(params).promise();
         
                     if( cnt >= total_time) {
                         break;

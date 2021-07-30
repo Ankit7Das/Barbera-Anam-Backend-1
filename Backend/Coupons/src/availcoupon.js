@@ -12,7 +12,6 @@ exports.handler = async (event) => {
 
         var obj = JSON.parse(event.body);
         var NAME = obj.name;
-        var serviceId = obj.serviceid;
 
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
@@ -66,41 +65,44 @@ exports.handler = async (event) => {
         if(NAME === 'BARBERAREF') {
 
             if(exist1.user.invites > 0) {
-                var params = {
-                    TableName: 'Users',
-                    Key: {
-                        id: userID.id,
-                    },
-                    UpdateExpression: "set #invites=#invites - :i",
-                    ExpressionAttributeNames: {
-                        '#invites': 'invites', 
-                    },
-                    ExpressionAttributeValues:{
-                        ":i": 1,
-                    },
-                    ReturnValues:"UPDATED_NEW"
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        success: true,
+                        message: 'Coupon successful',
+                        discount: 100,
+                        serviceId: 'all'
+                    })
                 }
+                // var params = {
+                //     TableName: 'Users',
+                //     Key: {
+                //         id: userID.id,
+                //     },
+                //     UpdateExpression: "set #invites=#invites - :i",
+                //     ExpressionAttributeNames: {
+                //         '#invites': 'invites', 
+                //     },
+                //     ExpressionAttributeValues:{
+                //         ":i": 1,
+                //     },
+                //     ReturnValues:"UPDATED_NEW"
+                // }
         
-                try {
-                    var data = await documentClient.update(params).promise();
+                // try {
+                //     var data = await documentClient.update(params).promise();
         
-                    return {
-                        statusCode: 200,
-                        body: JSON.stringify({
-                            success: true,
-                            message: 'Coupon successful',
-                        })
-                    }
-                } catch(err) {
-                    console.log("Error: ", err);
-                    return {
-                        statusCode: 500,
-                        body: JSON.stringify({
-                            success: false,
-                            message: err,
-                        })
-                    };
-                }
+                    
+                // } catch(err) {
+                //     console.log("Error: ", err);
+                //     return {
+                //         statusCode: 500,
+                //         body: JSON.stringify({
+                //             success: false,
+                //             message: err,
+                //         })
+                //     };
+                // }
             } else {
                 return {
                     statusCode: 400,
@@ -115,16 +117,19 @@ exports.handler = async (event) => {
 
             var params = {
                 TableName: 'Coupons',
-                Key: {
-                    name: NAME,
-                    serviceId: serviceId
+                KeyConditionExpression: '#name = :n',
+                ExpressionAttributeValues: {
+                    ':n': NAME,
+                },
+                ExpressionAttributeNames: {
+                    '#name': 'name'
                 }
             }
     
             try {
-                var data = await documentClient.get(params).promise();
+                var data = await documentClient.query(params).promise();
 
-                if(!data.Item) {
+                if(data.Items.length === 0) {
                     return {
                         statusCode: 400,
                         body: JSON.stringify({
@@ -134,50 +139,52 @@ exports.handler = async (event) => {
                     };
                 } else {
 
-                    if(data.Item.used_by.includes(userID.id)) {
+                    if(data.Items[0].used_by.includes(userID.id)) {
                         return {
-                            statusCode: 200,
+                            statusCode: 400,
                             body: JSON.stringify({
                                 success: false,
                                 message: 'Coupon already used'
                             })
                         };
                     } else {
-                        params = {
-                            TableName: 'Coupons',
-                            Key: {
-                                name: NAME,
-                                serviceId: serviceId
-                            },
-                            UpdateExpression: "set #used_by=:u",
-                            ExpressionAttributeNames: {
-                                '#used_by': 'used_by', 
-                            },
-                            ExpressionAttributeValues:{
-                                ":u": data.Item.used_by + userID.id + ',',
-                            },
-                            ReturnValues:"UPDATED_NEW"
+                        return {
+                            statusCode: 200,
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'Coupon successful',
+                                data: data.Items[0].discount,
+                                serviceId: data.Items[0].serviceId 
+                            })
                         }
+                        // params = {
+                        //     TableName: 'Coupons',
+                        //     Key: {
+                        //         name: NAME,
+                        //         serviceId: serviceId
+                        //     },
+                        //     UpdateExpression: "set #used_by=:u",
+                        //     ExpressionAttributeNames: {
+                        //         '#used_by': 'used_by', 
+                        //     },
+                        //     ExpressionAttributeValues:{
+                        //         ":u": data.Item.used_by + userID.id + ',',
+                        //     },
+                        //     ReturnValues:"UPDATED_NEW"
+                        // }
     
-                        try {
-                            var data1 = await documentClient.update(params).promise();
-                            return {
-                                statusCode: 200,
-                                body: JSON.stringify({
-                                    success: true,
-                                    message: 'Coupon successful',
-                                    data: data.Item.discount 
-                                })
-                            }
-                        } catch(err) {
-                            return {
-                                statusCode: 500,
-                                body: JSON.stringify({
-                                    success: false,
-                                    message: 'Coupon unsuccessful'
-                                })
-                            }
-                        }
+                        // try {
+                        //     var data1 = await documentClient.update(params).promise();
+                            
+                        // } catch(err) {
+                        //     return {
+                        //         statusCode: 500,
+                        //         body: JSON.stringify({
+                        //             success: false,
+                        //             message: 'Coupon unsuccessful'
+                        //         })
+                        //     }
+                        // }
                     }
                 
                 }

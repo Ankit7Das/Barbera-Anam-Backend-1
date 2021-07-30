@@ -167,7 +167,7 @@ exports.handler = async (event) => {
                     break;
                 }
 
-                if( cnt >= total_time) ) {
+                if( cnt >= total_time) {
                     break;
                 }
     

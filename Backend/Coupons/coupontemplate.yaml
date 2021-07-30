@@ -68,6 +68,21 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  GetUsersCoupons:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getusercoupons.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getusercoupons
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
   GetCoupon:
     Type: AWS::Serverless::Function
     Properties:

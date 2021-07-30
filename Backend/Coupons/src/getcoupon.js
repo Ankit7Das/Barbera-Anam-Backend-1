@@ -93,7 +93,12 @@ exports.handler = async (event) => {
         try {
             var data = await documentClient.get(params).promise();
 
+            console.log(data.Item);
+
             if(serviceId !== 'all') {
+
+                console.log(serviceId, data.Item);
+
                 params = {
                     TableName: 'Services',
                     Key:{
@@ -139,8 +144,14 @@ exports.handler = async (event) => {
                 }
             } else {
 
-                data.Item.service.name = data.Item.serviceId;
+                console.log("data: ",data.Item);
+
+                data.Item.service = {
+                    name: 'all'
+                };
                 delete data.Item.serviceId;
+
+                console.log(data.Item);
 
                 return {
                     statusCode: 200,
