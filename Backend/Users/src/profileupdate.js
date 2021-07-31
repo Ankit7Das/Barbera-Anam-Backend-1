@@ -75,7 +75,11 @@ exports.handler = async (event) => {
             exist1.user.address = null;
         }
 
-        var url;
+        if(!exist1.user.pic){
+            exist1.user.pic = null;
+        }
+
+        var url = null;
         if(obj.image) {
             if(exist1.user.pic) {
                 url = new URL(exist1.user.pic);

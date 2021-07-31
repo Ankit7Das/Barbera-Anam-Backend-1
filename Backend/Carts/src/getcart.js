@@ -74,29 +74,30 @@ exports.handler = async (event) => {
         try {
             var data = await documentClient.query(params).promise();
 
-            // var cart = [];
-            // for(var i=0;i<data.Items.length;i++) {
-            //     params = {
-            //         TableName: 'Services',
-            //         Key: {
-            //             id: id,
-            //         }
-            //     }
+            var data1;
+            for(var i=0;i<data.Items.length;i++) {
+                params = {
+                    TableName: 'Services',
+                    Key: {
+                        id: data.Items[i].serviceId,
+                    }
+                }
             
-            //     data = await documentClient.get(params).promise();
+                data1 = await documentClient.get(params).promise();
             
-            //     if(!data.Item) {
-            //         cart.push(data.Item);
-            //     } else {
-            //         return {
-            //             statusCode: 400,
-            //             body: JSON.stringify({
-            //                 success: false,
-            //                 message: 'Service Ids provided are wrong',
-            //             })
-            //         };
-            //     }
-            // }
+                if(data1.Item) {
+                    data.Items[i].category = data1.Item.category;
+                    data.Items[i].type = data1.Item.type;
+                } else {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            success: false,
+                            message: 'Service Ids provided are wrong',
+                        })
+                    };
+                }
+            }
 
             return {
                 statusCode: 200,
