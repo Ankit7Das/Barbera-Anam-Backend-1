@@ -239,7 +239,9 @@ exports.handler = async (event) => {
             }
         }
 
-        total_price -= discount;
+        if(obj.couponName) {
+            total_price -= discount;
+        }
 
         var today = new Date();
         today.setHours(today.getHours() + 5);
@@ -409,6 +411,8 @@ exports.handler = async (event) => {
                     console.log(data1.Item);
         
                     var timestamp = now.getTime(); 
+                    
+                    console.log(total_price);
 
                     for(var i=0;i<service.length;i++){
 
@@ -416,7 +420,7 @@ exports.handler = async (event) => {
                             TableName: 'Bookings',
                             Item: {
                                 userId: exist1.user.id,
-                                serviceId: service[i].serviceId + ',' + timestamp,
+                                serviceId: service[i].serviceId + ',' + String(timestamp),
                                 barberId: barberId,
                                 Timestamp: timestamp,
                                 user_long: exist1.user.longitude,
@@ -431,6 +435,8 @@ exports.handler = async (event) => {
                                 quantity: service[i].quantity
                             }
                         };
+
+                        console.log(params);
 
                         data1 = await documentClient.put(params).promise();
 

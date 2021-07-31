@@ -165,9 +165,9 @@ exports.handler = async (event) => {
 
             params = {
                 TableName: 'Services',
-                FilterExpression: '#category = :this_category',
-                ExpressionAttributeValues: {':this_category': prevCat},
-                ExpressionAttributeNames: {'#category': 'category'},
+                FilterExpression: '#category = :this_category AND #type = :this_type',
+                ExpressionAttributeValues: {':this_category': prevCat, ':this_type': prevType},
+                ExpressionAttributeNames: {'#category': 'category','#type':'type'},
             }
 
             try {
@@ -179,7 +179,7 @@ exports.handler = async (event) => {
                         TableName: 'Stock',
                         Key: {
                             type: 'Tabs',
-                            name: prevCat
+                            name: prevCat + ',' + prevType
                         }
                     }
 
@@ -201,7 +201,7 @@ exports.handler = async (event) => {
                         TableName: 'Stock',
                         Key: {
                             type: 'Tabs',
-                            name: prevCat
+                            name: prevCat + ',' + prevType
                         }
                     }
 
@@ -298,7 +298,7 @@ exports.handler = async (event) => {
                     TableName: 'Stock',
                     Key: {
                         type: 'Tabs',
-                        name: CAT
+                        name: CAT + ',' + TYPE
                     }
                 }
 
@@ -310,12 +310,12 @@ exports.handler = async (event) => {
                             TableName: 'Stock',
                             Item: {
                                 type: 'Tabs',
-                                name: CAT
+                                name: prevCat + ',' + prevType
                             }
                         }
-    
+        
                         data = await documentClient.put(params).promise();
-                    }   
+                    }
 
                     return {
                         statusCode: 200,

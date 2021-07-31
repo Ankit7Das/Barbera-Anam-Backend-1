@@ -104,6 +104,7 @@ exports.handler = async (event) => {
         }
 
         var prevCat = exist2.service.category;
+        var prevType = exist2.service.type;
         var prevName = exist2.service.name;
 
         var params = {
@@ -122,9 +123,9 @@ exports.handler = async (event) => {
 
             params = {
                 TableName: 'Services',
-                FilterExpression: '#category = :this_category',
-                ExpressionAttributeValues: {':this_category': prevCat},
-                ExpressionAttributeNames: {'#category': 'category'},
+                FilterExpression: '#category = :this_category AND #type = :this_type',
+                ExpressionAttributeValues: {':this_category': prevCat, ':this_type': prevType},
+                ExpressionAttributeNames: {'#category': 'category', '#type': 'type'},
             }
 
             try {
@@ -136,7 +137,7 @@ exports.handler = async (event) => {
                         TableName: 'Stock',
                         Key: {
                             type: 'Tabs',
-                            name: prevCat
+                            name: prevCat + ',' + prevType
                         }
                     }
 
@@ -180,7 +181,7 @@ exports.handler = async (event) => {
                         TableName: 'Stock',
                         Key: {
                             type: 'Tabs',
-                            name: prevCat
+                            name: prevCat + ',' + prevType
                         }
                     }
 

@@ -24,6 +24,7 @@ exports.handler = async (event) => {
         console.log(event);
 
         var obj = JSON.parse(event.body);
+        var TAB = obj.tab;
         var CAT = obj.category;
         var TYPE = obj.type;
         var tokenArray = event.headers.Authorization.split(" ");
@@ -97,7 +98,7 @@ exports.handler = async (event) => {
             }
         }
 
-        if (TYPE) {
+        if (!TAB) {
             var params = {
                 TableName: 'Services',
                 FilterExpression: '#category = :this_category AND #type = :this_type',
@@ -166,57 +167,81 @@ exports.handler = async (event) => {
     
             }
         } else {
-                
-            params = {
-                TableName: 'Stock',
-                Key: {
-                    type: 'Tabs',
-                    name: CAT
-                }
+
+            var params = {
+                TableName: 'Services',
+                FilterExpression: '#category = :this_category AND #type = :this_type',
+                ExpressionAttributeValues: {':this_category': CAT, ':this_type': TYPE},
+                ExpressionAttributeNames: {'#category': 'category', '#type': 'type'}
             }
+        
+            var data = await documentClient.scan(params).promise();
 
-            try {
-                data = await documentClient.get(params).promise();
-
-                if(data.Item) {
-                    if(data.Item.image) {
-                        var url = new URL(data.Item.image);
-                        var key = url.pathname.substring(1);
-
-                        await s3
-                            .deleteObject({
-                                Key: `tabs/${key}`,
-                                Bucket: 'barbera-image'
-                            })
-                            .promise();
-                    }
-
-                }
-
+            if(data.Items.length === 0) {
                 params = {
                     TableName: 'Stock',
                     Key: {
                         type: 'Tabs',
-                        name: CAT
+                        name: CAT + ',' + TYPE
                     }
                 }
 
                 try {
-                    data = await documentClient.delete(params).promise();
+                    data = await documentClient.get(params).promise();
 
-                    return {
-                        statusCode: 200,
-                        headers: {
-                            "Access-Control-Allow-Headers" : "Content-Type",
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                        },
-                        body: JSON.stringify({
-                            success: true,
-                            message: 'Image deleted'
-                        })
+                    if(data.Item) {
+                        if(data.Item.image) {
+                            var url = new URL(data.Item.image);
+                            var key = url.pathname.substring(1);
+
+                            await s3
+                                .deleteObject({
+                                    Key: `tabs/${key}`,
+                                    Bucket: 'barbera-image'
+                                })
+                                .promise();
+                        }
+
                     }
-                } catch(err) {
+
+                    params = {
+                        TableName: 'Stock',
+                        Key: {
+                            type: 'Tabs',
+                            name: CAT + ',' + TYPE
+                        }
+                    }
+
+                    try {
+                        data = await documentClient.delete(params).promise();
+
+                        return {
+                            statusCode: 200,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'Tab deleted'
+                            })
+                        }
+                    } catch(err) {
+                        return {
+                            statusCode: 500,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: false,
+                                message: err
+                            })
+                        };
+                    }
+                }catch(err) {
                     return {
                         statusCode: 500,
                         headers: {
@@ -230,19 +255,86 @@ exports.handler = async (event) => {
                         })
                     };
                 }
-            }catch(err) {
-                return {
-                    statusCode: 500,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: err
-                    })
-                };
+            } else {
+                
+                params = {
+                    TableName: 'Stock',
+                    Key: {
+                        type: 'Tabs',
+                        name: CAT + ',' + TYPE
+                    }
+                }
+
+                try {
+                    data = await documentClient.get(params).promise();
+
+                    if(data.Item) {
+                        if(data.Item.image) {
+                            var url = new URL(data.Item.image);
+                            var key = url.pathname.substring(1);
+
+                            await s3
+                                .deleteObject({
+                                    Key: `tabs/${key}`,
+                                    Bucket: 'barbera-image'
+                                })
+                                .promise();
+                        }
+
+                    }
+
+                    params = {
+                        TableName: 'Stock',
+                        Key: {
+                            type: 'Tabs',
+                            name: CAT + ',' + TYPE,
+                            image: null
+                        }
+                    }
+
+                    try {
+                        data = await documentClient.put(params).promise();
+
+                        return {
+                            statusCode: 200,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'Image deleted'
+                            })
+                        }
+                    } catch(err) {
+                        return {
+                            statusCode: 500,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: false,
+                                message: err
+                            })
+                        };
+                    }
+                }catch(err) {
+                    return {
+                        statusCode: 500,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: false,
+                            message: err
+                        })
+                    };
+                }
             }
 
         }

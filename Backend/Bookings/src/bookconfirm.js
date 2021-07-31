@@ -261,6 +261,10 @@ exports.handler = async (event) => {
             }
         }
 
+        if(obj.couponName) {
+            total_price -= discount;
+        }
+
         var today = new Date();
         today.setHours(today.getHours() + 5);
         today.setMinutes(today.getMinutes() + 30);

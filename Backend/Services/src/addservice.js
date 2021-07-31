@@ -152,7 +152,7 @@ exports.handler = async (event) => {
                 TableName: 'Stock',
                 Key: {
                     type: 'Tabs',
-                    name: CAT
+                    name: CAT + ',' + TYPE
                 }
             }
 
@@ -164,7 +164,7 @@ exports.handler = async (event) => {
                         TableName: 'Stock',
                         Item: {
                             type: 'Tabs',
-                            name: CAT
+                            name: CAT + ',' + TYPE
                         }
                     }
 
