@@ -150,7 +150,7 @@ exports.handler = async (event) => {
 
                     await s3
                         .deleteObject({
-                            Key: `sliders/${key}`,
+                            Key: `${key}`,
                             Bucket: 'barbera-image'
                         })
                         .promise();

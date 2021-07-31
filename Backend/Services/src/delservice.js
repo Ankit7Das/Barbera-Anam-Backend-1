@@ -149,7 +149,7 @@ exports.handler = async (event) => {
 
                         await s3
                             .deleteObject({
-                                Key: `tabs/${key}`,
+                                Key: `${key}`,
                                 Bucket: 'barbera-image'
                             })
                             .promise();
@@ -171,7 +171,7 @@ exports.handler = async (event) => {
 
                         await s3
                             .deleteObject({
-                                Key: `sliders/${key}`,
+                                Key: `${key}`,
                                 Bucket: 'barbera-image'
                             })
                             .promise();

@@ -83,6 +83,21 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  CancelBooking:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: cancelbooking.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /bookcancel
+            Method: post
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
   GetBookings:
     Type: AWS::Serverless::Function
     Properties:

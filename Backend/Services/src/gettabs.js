@@ -85,12 +85,20 @@ exports.handler = async (event) => {
             }
         } else {
 
+            var tabs = [];
+
+            for(var i=0; i<data.Items.length; i++) {
+                if(data.Items[i].image) {
+                    tabs.push(data.Items[i]);
+                }
+            }
+
             return {
                 statusCode: 200,
                 body: JSON.stringify({
                     success: true,
                     message: 'Tabs found',
-                    data: data.Items
+                    data: tabs
                 })
             }
         }

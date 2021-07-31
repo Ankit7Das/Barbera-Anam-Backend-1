@@ -239,7 +239,7 @@ exports.handler = async (event) => {
     
                         console.log("image");
     
-                        if(data.Item && data.Item.image !== null) {
+                        if(data.Item.image) {
     
                             console.log("delete image");
                             var url = new URL(data.Item.image);
@@ -247,7 +247,7 @@ exports.handler = async (event) => {
     
                             await s3
                                 .deleteObject({
-                                    Key: `tabs/${key}`,
+                                    Key: `${key}`,
                                     Bucket: 'barbera-image'
                                 })
                                 .promise();
@@ -297,6 +297,8 @@ exports.handler = async (event) => {
                             .promise();
     
                         var url = `https://barbera-image.s3-ap-south-1.amazonaws.com/tabs/${key}`;
+
+                        console.log(CAT + ',' + TYPE);
     
                         params = {
                             TableName: 'Stock',
