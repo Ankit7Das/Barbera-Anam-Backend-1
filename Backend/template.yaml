@@ -131,6 +131,25 @@ Resources:
         WriteCapacityUnits: 5
   #---------------------------------------------------------------
 
+  Offers:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Offers
+      AttributeDefinitions:
+        - AttributeName: serviceId
+          AttributeType: S
+        - AttributeName: name
+          AttributeType: S
+      KeySchema:
+        - AttributeName: serviceId
+          KeyType: HASH
+        - AttributeName: name
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+  #---------------------------------------------------------------
+
 
 
             
