@@ -12,6 +12,7 @@ exports.handler = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
+        var DIST = obj.distance;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -19,7 +20,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 401,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
@@ -38,7 +39,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 403,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
@@ -55,7 +56,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 404,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
@@ -70,7 +71,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 400,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
@@ -82,32 +83,61 @@ exports.handler = async (event) => {
         }
 
         var params = {
-            TableName: 'Users',
-            FilterExpression: '#role = :this_role',
-            ExpressionAttributeValues: {':this_role': 'barber'},
-            ExpressionAttributeNames: {'#role': 'role'},
+            TableName: 'Stock',
+            Key: {
+                type: 'Distance',
+                name: 'distance'
+            }
+        }
+
+        var data = await documentClient.get(params).promise();
+
+        if(data.Item) {
+            if(data.Item.distance === distance) {
+                return {
+                    statusCode: 200,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
+                    body: JSON.stringify({
+                        success: true,
+                        message: 'Booking Radius updated',
+                    })
+                }
+            }
+        }
+
+        params = {
+            TableName: 'Stock',
+            Key: {
+                type: 'Distance',
+                name: 'distance'
+            },
+            UpdateExpression: "set #distance=:d",
+            ExpressionAttributeNames: {
+                '#distance': 'distance', 
+            },
+            ExpressionAttributeValues:{
+                ":d": DIST,
+            },
+            ReturnValues:"UPDATED_NEW"
         }
 
         try {
-            var data = await documentClient.scan(params).promise();
-
-            for(var i=0; i<data.Items.length; i++) {
-                if(!data.Items[i].name) {
-                    data.Items[i].name = '';
-                }
-            }
+            data = await documentClient.update(params).promise();
 
             return {
                 statusCode: 200,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
                 body: JSON.stringify({
                     success: true,
-                    message: 'Barbers found',
-                    data: data.Items
+                    message: 'Booking Radius updated',
                 })
             }
 
@@ -115,7 +145,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 500,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },

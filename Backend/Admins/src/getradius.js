@@ -10,8 +10,7 @@ const { userVerifier } = require("./authentication");
 
 exports.handler = async (event) => {
     try {
-
-        var obj = JSON.parse(event.body);
+        
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -19,7 +18,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 401,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
@@ -38,7 +37,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 403,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
@@ -55,7 +54,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 404,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
@@ -70,7 +69,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 400,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
@@ -82,32 +81,27 @@ exports.handler = async (event) => {
         }
 
         var params = {
-            TableName: 'Users',
-            FilterExpression: '#role = :this_role',
-            ExpressionAttributeValues: {':this_role': 'barber'},
-            ExpressionAttributeNames: {'#role': 'role'},
+            TableName: 'Stock',
+            Key: {
+                type: 'Distance',
+                name: 'distance'
+            }
         }
 
         try {
-            var data = await documentClient.scan(params).promise();
-
-            for(var i=0; i<data.Items.length; i++) {
-                if(!data.Items[i].name) {
-                    data.Items[i].name = '';
-                }
-            }
+            var data = await documentClient.get(params).promise();
 
             return {
                 statusCode: 200,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
                 body: JSON.stringify({
                     success: true,
-                    message: 'Barbers found',
-                    data: data.Items
+                    message: 'Booking Radius found',
+                    data: data.Item
                 })
             }
 
@@ -115,7 +109,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 500,
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },

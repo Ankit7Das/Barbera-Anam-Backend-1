@@ -265,6 +265,16 @@ exports.handler = async (event) => {
             total_price -= discount;
         }
 
+        if(total_price !== obj.totalprice) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Wrong total price sent'
+                })
+            }
+        } 
+
         var today = new Date();
         today.setHours(today.getHours() + 5);
         today.setMinutes(today.getMinutes() + 30);

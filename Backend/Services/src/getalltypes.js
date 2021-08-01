@@ -12,9 +12,6 @@ const { userVerifier, addedBefore, serviceVerifier } = require("./authentication
 exports.handler = async (event) => {
     try {
 
-        var obj = JSON.parse(event.body);
-        var CAT = event.pathParameters.category;
-        var TYPE = obj.type;
         // var tokenArray = event.headers.Authorization.split(" ");
         // var token = tokenArray[1];
 
@@ -64,48 +61,51 @@ exports.handler = async (event) => {
         //     }
         // }
 
-        var CATS = CAT.split('_');
-        CAT = CATS.join(' ');
+
+        // var params = {
+        //     TableName: 'Services',
+        //     ProjectionExpression: '#type',
+        //     FilterExpression: '#category = :this_category',
+        //     ExpressionAttributeValues: {':this_category': CAT},
+        //     ExpressionAttributeNames: {'#category': 'category', '#type': 'type'},
+        // }
+
+        // var data = await documentClient.scan(params).promise();
+
+        // var type = [];
+        // for(var i=0;i<data.Items.length;i++) {
+        //     type.push(data.Items[i].type);
+        // }
+
+        // var unique_type = type.filter((v, i, a) => a.indexOf(v) === i);
 
         var params = {
-            TableName: 'Services',
-            ProjectionExpression: '#subtype',
-            FilterExpression: '#category = :this_category AND #type = :this_type',
-            ExpressionAttributeValues: {':this_category': CAT, ':this_type': TYPE},
-            ExpressionAttributeNames: {'#category': 'category', '#type': 'type', '#subtype': 'subtype'},
-        }
-
-        var data = await documentClient.scan(params).promise();
-
-        if(data.Items.length == 0) {
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'No Subtypes found'
-                })
-            }
-        } else {
-
-            var subtype = [];
-            for(var i=0;i<data.Items.length;i++) {
-                subtype.push(data.Items[i].subtype);
-            }
-
-            var unique_subtype = subtype.filter((v, i, a) => a.indexOf(v) === i);
-
-            return {
-                statusCode: 200,
-                body: JSON.stringify({
-                    success: true,
-                    message: 'Subtypes found',
-                    data: unique_subtype
-                })
+            TableName: 'Stock',
+            KeyConditionExpression: '#type = :t',
+            ExpressionAttributeValues: {
+                ':t': 'Tabs',
+            },
+            ExpressionAttributeNames: {
+                '#type': 'type',
             }
         }
+
+        var data = await documentClient.query(params).promise();
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                success: true,
+                message: 'Types found',
+                data: data.Items
+            })
+        }
+        
 
     } catch(err) {
         console.log(err);
         return err;
     }
 }
+
+

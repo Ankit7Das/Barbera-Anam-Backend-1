@@ -1,10 +1,20 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Resources:
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: '''POST, GET, OPTIONS'''
+        AllowHeaders: '''X-Forwarded-For,Authorization,Content-Type'''
+        AllowOrigin: '''*'''
+        MaxAge: '''600'''
+        AllowCredentials: false
   SendMail:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/3954bb9b4d563f55e30b1552d01303a4
+      CodeUri: s3://barbera-buckets/f764741439f9bfce15abbf40b1d03cae
       Handler: sendmail.handler
       Runtime: nodejs12.x
       Events:
@@ -13,11 +23,13 @@ Resources:
           Properties:
             Path: /sendmail
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   GetAllBarberLogs:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/3954bb9b4d563f55e30b1552d01303a4
+      CodeUri: s3://barbera-buckets/f764741439f9bfce15abbf40b1d03cae
       Handler: getbarberlogs.handler
       Runtime: nodejs12.x
       Events:
@@ -26,11 +38,13 @@ Resources:
           Properties:
             Path: /getlogs/{barberId}
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   GetAllBarbers:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/3954bb9b4d563f55e30b1552d01303a4
+      CodeUri: s3://barbera-buckets/f764741439f9bfce15abbf40b1d03cae
       Handler: getbarbers.handler
       Runtime: nodejs12.x
       Events:
@@ -39,4 +53,36 @@ Resources:
           Properties:
             Path: /getbarbs
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  BookingRadius:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/f764741439f9bfce15abbf40b1d03cae
+      Handler: bookingradius.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /bookradius
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetRadius:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/f764741439f9bfce15abbf40b1d03cae
+      Handler: getradius.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getradius
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser

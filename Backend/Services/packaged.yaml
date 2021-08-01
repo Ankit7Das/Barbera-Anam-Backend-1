@@ -4,7 +4,7 @@ Resources:
   AddService:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: addservice.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   DelService:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: delservice.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   GetServiceByID:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: getservicebyid.handler
       Runtime: nodejs12.x
       Events:
@@ -43,7 +43,7 @@ Resources:
   GetAllServiceName:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: getallservicenames.handler
       Runtime: nodejs12.x
       Events:
@@ -56,7 +56,7 @@ Resources:
   UpdateService:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: updateservice.handler
       Runtime: nodejs12.x
       Events:
@@ -69,7 +69,7 @@ Resources:
   GetTrending:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: gettrending.handler
       Runtime: nodejs12.x
       Events:
@@ -79,10 +79,23 @@ Resources:
             Path: /gettrend
             Method: get
       Role: arn:aws:iam::140544830924:role/BackendUser
+  GetAllTypes:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
+      Handler: getalltypes.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getalltypes
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
   GetServiceByCategory:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: getservicebycategory.handler
       Runtime: nodejs12.x
       Events:
@@ -95,7 +108,7 @@ Resources:
   GetAllServices:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: getallservice.handler
       Runtime: nodejs12.x
       Events:
@@ -108,7 +121,7 @@ Resources:
   GetSliders:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: getslider.handler
       Runtime: nodejs12.x
       Events:
@@ -121,7 +134,7 @@ Resources:
   GetTabs:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: gettabs.handler
       Runtime: nodejs12.x
       Events:
@@ -134,7 +147,7 @@ Resources:
   SliderUploader:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: sliderimguploader.handler
       Runtime: nodejs12.x
       Events:
@@ -147,7 +160,7 @@ Resources:
   SliderDeleter:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: sliderimgdeleter.handler
       Runtime: nodejs12.x
       Events:
@@ -160,7 +173,7 @@ Resources:
   TypeImgUploader:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: typeimguploader.handler
       Runtime: nodejs12.x
       Events:
@@ -173,7 +186,7 @@ Resources:
   TypeImgDeleter:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b982df05d196115b87236d683116a1fc
+      CodeUri: s3://barbera-buckets/c6f6eb0c92f1515d5c0d751be47cbfbb
       Handler: typeimgdeleter.handler
       Runtime: nodejs12.x
       Events:

@@ -98,19 +98,19 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
-  # GetServiceByType:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     CodeUri: src/
-  #     Handler: getservicebytype.handler
-  #     Runtime: nodejs12.x
-  #     Events:
-  #       apiForLambda:
-  #         Type: Api 
-  #         Properties:
-  #           Path: /getsubtypes/{category}
-  #           Method: post
-  #     Role: arn:aws:iam::140544830924:role/BackendUser
+  GetAllTypes:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getalltypes.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getalltypes
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
   # #---------------------------------------------------------------
 
   GetServiceByCategory:

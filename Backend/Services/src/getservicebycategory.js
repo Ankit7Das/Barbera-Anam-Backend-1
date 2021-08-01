@@ -65,29 +65,51 @@ exports.handler = async (event) => {
         var CATS = CAT.split('_');
         CAT = CATS.join(' ');
 
+        // var params = {
+        //     TableName: 'Services',
+        //     ProjectionExpression: '#type',
+        //     FilterExpression: '#category = :this_category',
+        //     ExpressionAttributeValues: {':this_category': CAT},
+        //     ExpressionAttributeNames: {'#category': 'category', '#type': 'type'},
+        // }
+
+        // var data = await documentClient.scan(params).promise();
+
+        // var type = [];
+        // for(var i=0;i<data.Items.length;i++) {
+        //     type.push(data.Items[i].type);
+        // }
+
+        // var unique_type = type.filter((v, i, a) => a.indexOf(v) === i);
+
         var params = {
-            TableName: 'Services',
-            ProjectionExpression: '#type',
-            FilterExpression: '#category = :this_category',
-            ExpressionAttributeValues: {':this_category': CAT},
-            ExpressionAttributeNames: {'#category': 'category', '#type': 'type'},
+            TableName: 'Stock',
+            KeyConditionExpression: '#type = :t AND begins_with( #name, :n)',
+            ExpressionAttributeValues: {
+                ':t': 'Tabs',
+                ':n': CAT + ','
+            },
+            ExpressionAttributeNames: {
+                '#type': 'type',
+                '#name': 'name'
+            }
         }
 
-        var data = await documentClient.scan(params).promise();
+        var data = await documentClient.query(params).promise();
 
-        var type = [];
+        var types = [];
+        var type;
         for(var i=0;i<data.Items.length;i++) {
-            type.push(data.Items[i].type);
+            type = data.Items[i].name.split(",");
+            types.push(type[1]);
         }
-
-        var unique_type = type.filter((v, i, a) => a.indexOf(v) === i);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
                 success: true,
                 message: 'Types found',
-                data: unique_type
+                data: types
             })
         }
         

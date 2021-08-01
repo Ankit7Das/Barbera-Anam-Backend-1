@@ -243,6 +243,16 @@ exports.handler = async (event) => {
             total_price -= discount;
         }
 
+        if(total_price !== obj.totalprice) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Wrong total price sent'
+                })
+            }
+        } 
+
         var today = new Date();
         today.setHours(today.getHours() + 5);
         today.setMinutes(today.getMinutes() + 30);
@@ -298,6 +308,20 @@ exports.handler = async (event) => {
                 };
             } 
         }
+
+        var distance;
+
+        params = {
+            TableName: 'Stock',
+            Key: {
+                type: 'Distance',
+                name: 'distance'
+            }
+        }
+
+        data = await documentClient.get(params).promise();
+
+        distance = data.Item.distance;
 
         params = {
             TableName: 'BarbersLog',
@@ -363,7 +387,7 @@ exports.handler = async (event) => {
                 data2 = await documentClient.get(params).promise();
                 data2.Item.distance = await getDistance(lat1,long1,data2.Item.latitude,data2.Item.longitude);
 
-                if(data2.Item.coins >= 300 && data2.Item.distance<=10) {
+                if(data2.Item.coins >= 300 && data2.Item.distance<=distance) {
                     console.log(data2.Item);
                     barbers.push(data2.Item);
                 } else {

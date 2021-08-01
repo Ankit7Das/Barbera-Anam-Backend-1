@@ -182,9 +182,23 @@ exports.handler = async (event) => {
             }
         }
 
-        console.log(day);
+        var distance;
 
         var params = {
+            TableName: 'Stock',
+            Key: {
+                type: 'Distance',
+                name: 'distance'
+            }
+        }
+
+        var data = await documentClient.get(params).promise();
+
+        distance = data.Item.distance;
+
+        console.log(day);
+
+        params = {
             TableName: 'BarbersLog',
             KeyConditionExpression: '#date = :d',
             ExpressionAttributeValues: {
@@ -196,7 +210,7 @@ exports.handler = async (event) => {
         }
 
         try {
-            var data = await documentClient.query(params).promise();
+            data = await documentClient.query(params).promise();
 
             console.log(data.Items);
 
@@ -254,7 +268,7 @@ exports.handler = async (event) => {
     
                         console.log(data1.Item);
         
-                        if(data1.Item.coins >= 300 && data1.Item.distance<=10) {
+                        if(data1.Item.coins >= 300 && data1.Item.distance<=distance) {
                             barbers.push(data1.Item);
                         } 
                     }     

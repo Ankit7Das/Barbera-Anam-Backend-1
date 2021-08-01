@@ -5,6 +5,17 @@ Resources:
   # Stack-Name: Barbera-Admins
   # Hostname: https://xwtij1tqrc.execute-api.ap-south-1.amazonaws.com/Prod
 
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'POST, GET, OPTIONS'"
+        AllowHeaders: "'X-Forwarded-For,Authorization,Content-Type'"
+        AllowOrigin: "'*'"
+        MaxAge: "'600'"
+        AllowCredentials: false
+
   #---------------------------------------------------------------
   # Barber Functions
   #---------------------------------------------------------------
@@ -21,6 +32,8 @@ Resources:
           Properties:
             Path: /sendmail
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
   
@@ -36,6 +49,8 @@ Resources:
           Properties:
             Path: /getlogs/{barberId}
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -51,5 +66,41 @@ Resources:
           Properties:
             Path: /getbarbs
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  BookingRadius:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: bookingradius.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /bookradius
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  GetRadius:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getradius.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getradius
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
