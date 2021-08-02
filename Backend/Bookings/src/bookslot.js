@@ -382,7 +382,7 @@ exports.handler = async (event) => {
                     Key: {
                         id: data1.Items[i].barberId,
                     },
-                    ProjectionExpression: 'id, longitude, latitude, coins'
+                    ProjectionExpression: 'id, longitude, latitude, coins, phone'
                 }
 
                 data2 = await documentClient.get(params).promise();
@@ -421,6 +421,7 @@ exports.handler = async (event) => {
             } else {
                 var barberId = barbers[0].id;
                 var coins = barbers[0].coins;
+                var phone = barbers[0].phone;
 
                 params = {
                     TableName: 'BarbersLog',
@@ -432,8 +433,6 @@ exports.handler = async (event) => {
         
                 try {
                     data1 = await documentClient.get(params).promise();
-
-                    var phone = data1.Item.phone;
 
                     console.log(data1.Item);
         
