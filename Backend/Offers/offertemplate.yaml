@@ -3,14 +3,14 @@ Transform: AWS::Serverless-2016-10-31
 
 Resources:
   # Stack-Name: Barbera-Offers
-  # Hostname: https://xwtij1tqrc.execute-api.ap-south-1.amazonaws.com/Prod
+  # Hostname: https://ngqdvnidwf.execute-api.ap-south-1.amazonaws.com/Prod
 
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Prod
       Cors:
-        AllowMethods: "'POST, GET, OPTIONS'"
+        AllowMethods: "'POST, GET, OPTIONS, DELETE'"
         AllowHeaders: "'X-Forwarded-For,Authorization,Content-Type'"
         AllowOrigin: "'*'"
         MaxAge: "'600'"
@@ -82,7 +82,7 @@ Resources:
           Type: Api 
           Properties:
             Path: /getalloffer
-            Method: post
+            Method: get
             RestApiId:
               Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser

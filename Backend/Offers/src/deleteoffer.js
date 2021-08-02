@@ -5,7 +5,15 @@ var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
+var { Buffer } = require('buffer');
 const { userVerifier, addedBefore, serviceVerifier } = require("./authentication");
+const s3 = new AWS.S3({
+    accessKeyId: process.env.ACCESS_KEY,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY
+});
+var fileType = require('file-type');
+
+const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 
 exports.handler = async (event) => {
     try {
@@ -95,6 +103,8 @@ exports.handler = async (event) => {
         try {
             var data = await documentClient.get(params).promise();
 
+            console.log(data);
+
             if(data.Item) {
 
                 if(data.Item.image) {
@@ -119,6 +129,8 @@ exports.handler = async (event) => {
 
                 try {
                     data = await documentClient.delete(params).promise();
+
+                    console.log(data);
 
                     return {
                         statusCode: 200,

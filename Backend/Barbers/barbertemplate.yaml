@@ -4,6 +4,18 @@ Transform: AWS::Serverless-2016-10-31
 Resources:
   # Stack-Name: Barbera-Barbers
   # Hostname: https://0dy1hsrsu8.execute-api.ap-south-1.amazonaws.com/Prod
+  # Hostname: https://we4imgw2ie.execute-api.ap-south-1.amazonaws.com/Prod  -----  Admin
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'POST, GET, OPTIONS'"
+        AllowHeaders: "'X-Forwarded-For,Authorization,Content-Type'"
+        AllowOrigin: "'*'"
+        MaxAge: "'600'"
+        AllowCredentials: false
 
   #---------------------------------------------------------------
   # Barber Functions
@@ -35,22 +47,24 @@ Resources:
           Properties:
             Path: /coininc
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
-  DistanceModeToggler:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/
-      Handler: distancemode.handler
-      Runtime: nodejs12.x
-      Events:
-        apiForLambda:
-          Type: Api 
-          Properties:
-            Path: /dismode
-            Method: post
-      Role: arn:aws:iam::140544830924:role/BackendUser
+  # DistanceModeToggler:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: src/
+  #     Handler: distancemode.handler
+  #     Runtime: nodejs12.x
+  #     Events:
+  #       apiForLambda:
+  #         Type: Api 
+  #         Properties:
+  #           Path: /dismode
+  #           Method: post
+  #     Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
   UpdateLog:

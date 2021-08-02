@@ -15,6 +15,8 @@ exports.handler = async (event) => {
         var token = tokenArray[1];
         var obj = JSON.parse(event.body);
         var OTP = obj.otp;
+        var serviceId = obj.serviceId;
+        var userId = obj.userId;
 
         if(token == null) {
             return {
@@ -62,24 +64,37 @@ exports.handler = async (event) => {
             }
         }
 
-        if( OTP === exist1.user.service_start_otp ) {
-            var params = {
-                TableName: 'Users',
-                Key: {
-                    id: userID.id,
-                },
-                UpdateExpression: "set #service_start_otp=:s",
-                ExpressionAttributeNames: {
-                    '#service_start_otp': 'service_start_otp', 
-                },
-                ExpressionAttributeValues:{
-                    ":s": null,
-                },
-                ReturnValues:"UPDATED_NEW"
+        var params = {
+            TableName: 'Bookings',
+            Key: {
+                userId: userId,
+                serviceId: serviceId[0]
             }
+        }
 
-            try {
-                var data = await documentClient.update(params).promise();
+        var data = await documentClient.get(params).promise();
+
+        if(data.Item) {
+            if( OTP === data.Item.start_serv_otp ) {
+                for(var i=0; i<serviceId.length; i++) {
+                    params = {
+                        TableName: 'Bookings',
+                        Key: {
+                            userId: userId,
+                            serviceId: serviceId[i]
+                        },
+                        UpdateExpression: "set #start_serv_otp=:s",
+                        ExpressionAttributeNames: {
+                            '#start_serv_otp': 'start_serv_otp', 
+                        },
+                        ExpressionAttributeValues:{
+                            ":s": null,
+                        },
+                        ReturnValues:"UPDATED_NEW"
+                    }
+    
+                    data = await documentClient.update(params).promise();
+                }
 
                 return {
                     statusCode: 200,
@@ -88,21 +103,21 @@ exports.handler = async (event) => {
                         message: 'OTP matched'
                     })
                 };
-            } catch(err) {
+            } else {
                 return {
-                    statusCode: 500,
+                    statusCode: 400,
                     body: JSON.stringify({
                         success: false,
-                        message: err
+                        message: 'OTP mismatch'
                     })
                 };
             }
-        } else {
+        }else {
             return {
                 statusCode: 400,
                 body: JSON.stringify({
                     success: false,
-                    message: 'OTP mismatch'
+                    message: 'No such booking exists'
                 })
             };
         }

@@ -6,7 +6,7 @@ Resources:
     Properties:
       StageName: Prod
       Cors:
-        AllowMethods: '''POST, GET, OPTIONS'''
+        AllowMethods: '''POST, GET, OPTIONS, DELETE'''
         AllowHeaders: '''X-Forwarded-For,Authorization,Content-Type'''
         AllowOrigin: '''*'''
         MaxAge: '''600'''
@@ -14,7 +14,7 @@ Resources:
   CreateOffer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b71625ed4ccbae83e28ccc92d581f330
+      CodeUri: s3://barbera-buckets/49c9e0e7f210e0c6eeed84a5349b7e60
       Handler: createoffer.handler
       Runtime: nodejs12.x
       Events:
@@ -29,7 +29,7 @@ Resources:
   UpdateOffer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b71625ed4ccbae83e28ccc92d581f330
+      CodeUri: s3://barbera-buckets/49c9e0e7f210e0c6eeed84a5349b7e60
       Handler: updateoffer.handler
       Runtime: nodejs12.x
       Events:
@@ -44,7 +44,7 @@ Resources:
   DeleteOffer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b71625ed4ccbae83e28ccc92d581f330
+      CodeUri: s3://barbera-buckets/49c9e0e7f210e0c6eeed84a5349b7e60
       Handler: deleteoffer.handler
       Runtime: nodejs12.x
       Events:
@@ -59,7 +59,7 @@ Resources:
   GetAllOffer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b71625ed4ccbae83e28ccc92d581f330
+      CodeUri: s3://barbera-buckets/49c9e0e7f210e0c6eeed84a5349b7e60
       Handler: getalloffers.handler
       Runtime: nodejs12.x
       Events:
@@ -67,14 +67,14 @@ Resources:
           Type: Api
           Properties:
             Path: /getalloffer
-            Method: post
+            Method: get
             RestApiId:
               Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   GetOffer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/b71625ed4ccbae83e28ccc92d581f330
+      CodeUri: s3://barbera-buckets/49c9e0e7f210e0c6eeed84a5349b7e60
       Handler: getoffer.handler
       Runtime: nodejs12.x
       Events:

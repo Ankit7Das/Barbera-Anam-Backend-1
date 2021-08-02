@@ -6,16 +6,8 @@ var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
-var { Buffer } = require('buffer');
 const { JWT_SECRET } = process.env;
 const { userVerifier, addedBefore, serviceVerifier } = require("./authentication");
-const s3 = new AWS.S3({
-    accessKeyId: process.env.ACCESS_KEY,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY
-});
-var fileType = require('file-type');
-
-const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 
 exports.handler = async (event) => {
     try {
@@ -92,6 +84,23 @@ exports.handler = async (event) => {
             }
         }
 
+        var exist2 = await serviceVerifier(serviceId);
+
+        if(exist2.success == false) {
+            return {
+                statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Service not found',
+                })
+            }
+        }
+
         var params = {
             TableName: 'Offers',
             Key: {
@@ -103,6 +112,9 @@ exports.handler = async (event) => {
         var data = await documentClient.get(params).promise();
 
         if(data.Item) {
+
+            data.Item.serviceName = exist2.service.name;
+
             return {
                 statusCode: 200,
                 headers: {
@@ -111,7 +123,7 @@ exports.handler = async (event) => {
                     "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
                 body: JSON.stringify({
-                    success: false,
+                    success: true,
                     message: 'Offers found',
                     data: data.Item
                 })

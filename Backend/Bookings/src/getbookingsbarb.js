@@ -65,22 +65,10 @@ exports.handler = async (event) => {
 
         var params = {
             TableName: 'Bookings',
-            ProjectionExpression: '#serviceId, #userId, #Timestamp, #payment_status, #user_long, #user_lat, #user_add, #date, #slot, #quantity, #total_price',
             FilterExpression: '#barberId = :this_barber',
             ExpressionAttributeValues: {':this_barber': exist1.user.id},
             ExpressionAttributeNames: {
                 '#barberId': 'barberId',
-                '#serviceId': 'serviceId', 
-                '#userId': 'userId', 
-                '#date': 'date', 
-                '#payment_status':'payment_status', 
-                '#user_long':'user_long', 
-                '#user_lat':'user_lat', 
-                '#user_add':'user_add',
-                '#slot':'slot',
-                '#quantity':'quantity',
-                '#Timestamp':'Timestamp',
-                '#total_price': 'total_price'
             },
         }
 
@@ -108,7 +96,6 @@ exports.handler = async (event) => {
 
                 data1 = await documentClient.get(params).promise();
 
-                delete data.Items[i].serviceId;
                 data.Items[i].service = data1.Item;
 
                 data.Items[i].distance = await getDistance(data.Items[i].user_lat,data.Items[i].user_long,exist1.user.latitude,exist1.user.longitude);

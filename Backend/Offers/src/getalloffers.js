@@ -6,16 +6,8 @@ var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
-var { Buffer } = require('buffer');
 const { JWT_SECRET } = process.env;
 const { userVerifier, addedBefore, serviceVerifier } = require("./authentication");
-const s3 = new AWS.S3({
-    accessKeyId: process.env.ACCESS_KEY,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY
-});
-var fileType = require('file-type');
-
-const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 
 exports.handler = async (event) => {
     try {

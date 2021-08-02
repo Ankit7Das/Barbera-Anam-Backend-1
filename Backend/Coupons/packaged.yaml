@@ -1,6 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Resources:
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: '''POST, GET, OPTIONS'''
+        AllowHeaders: '''X-Forwarded-For,Authorization,Content-Type'''
+        AllowOrigin: '''*'''
+        MaxAge: '''600'''
+        AllowCredentials: false
   GetReferralCode:
     Type: AWS::Serverless::Function
     Properties:
@@ -26,6 +36,8 @@ Resources:
           Properties:
             Path: /couponcreate
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   UseCoupon:
     Type: AWS::Serverless::Function
@@ -52,6 +64,8 @@ Resources:
           Properties:
             Path: /getallcoupons
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   GetUsersCoupons:
     Type: AWS::Serverless::Function
@@ -78,6 +92,8 @@ Resources:
           Properties:
             Path: /getcoupon/{serviceid}
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   DeleteCoupon:
     Type: AWS::Serverless::Function
@@ -91,6 +107,8 @@ Resources:
           Properties:
             Path: /delcoupon
             Method: delete
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   UpdateCoupon:
     Type: AWS::Serverless::Function
@@ -104,4 +122,6 @@ Resources:
           Properties:
             Path: /updcoupon/{serviceid}
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser

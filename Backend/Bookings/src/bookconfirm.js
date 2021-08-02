@@ -494,7 +494,7 @@ exports.handler = async (event) => {
         
                 }
 
-                var msg = `You have been booked on ${DATE} at ${(Number(SLOT) > 12 ? SLOT : String(Number(SLOT) - 12))}`
+                var msg = `You have been booked on ${DATE} at ${(Number(SLOT) > 12 ? String(Number(SLOT) - 12) : SLOT )}${(Number(SLOT) >= 12 ? 'pm' : 'am' )}`
 
                 var fcmnotif = await new Promise((resolve, reject) => {
                     const options = {

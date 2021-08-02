@@ -76,28 +76,26 @@ exports.handler = async (event) => {
         var yyyy = today.getFullYear();
         var day = dd + '-' + mm + '-' + yyyy;
 
-        if (exist1.user.mode === 'start') {
 
-            var DIST = await getDistance(exist1.user.latitude, exist1.user.longitude, LAT, LONG);
+        var DIST = await getDistance(exist1.user.latitude, exist1.user.longitude, LAT, LONG);
 
-            params = {
-                TableName: 'BarbersLog',
-                Key: {
-                    date: day,
-                    barberId: exist1.user.id
-                },
-                UpdateExpression: "set #distance=#distance + :d",
-                ExpressionAttributeNames: {
-                    '#distance': 'distance'
-                },
-                ExpressionAttributeValues:{
-                    ":d": DIST,
-                },
-                ReturnValues:"UPDATED_NEW"
-            }
-
-            data = await documentClient.update(params).promise();
+        params = {
+            TableName: 'BarbersLog',
+            Key: {
+                date: day,
+                barberId: exist1.user.id
+            },
+            UpdateExpression: "set #distance=#distance + :d",
+            ExpressionAttributeNames: {
+                '#distance': 'distance'
+            },
+            ExpressionAttributeValues:{
+                ":d": DIST,
+            },
+            ReturnValues:"UPDATED_NEW"
         }
+
+        data = await documentClient.update(params).promise();
 
         params = {
             TableName: 'Users',

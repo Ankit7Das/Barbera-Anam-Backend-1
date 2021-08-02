@@ -26,9 +26,43 @@ exports.handler = async (event) => {
         var Terms = obj.terms;
         var NAME = obj.name;
         var UserLimit = obj.userlimit;
+        var START = obj.start;
+        var END = obj.end;
 
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
+
+        if(START === 'Monday') {
+            START = 1;
+        } else if(START === 'Tuesday') {
+            START = 2;
+        } else if(START === 'Wednesday') {
+            START = 3;
+        } else if(START === 'Thursday') {
+            START = 4;
+        } else if(START === 'Friday') {
+            START = 5;
+        } else if(START === 'Saturday') {
+            START = 6;
+        } else if(START === 'Sunday') {
+            START = 7;
+        }
+
+        if(END === 'Monday') {
+            END = 1;
+        } else if(END === 'Tuesday') {
+            END = 2;
+        } else if(END === 'Wednesday') {
+            END = 3;
+        } else if(END === 'Thursday') {
+            END = 4;
+        } else if(END === 'Friday') {
+            END = 5;
+        } else if(END === 'Saturday') {
+            END = 6;
+        } else if(END === 'Sunday') {
+            END = 7;
+        }
 
         if(token == null) {
             return {
@@ -214,16 +248,20 @@ exports.handler = async (event) => {
                             serviceId: serviceId,
                             name: NAME, 
                         },
-                        UpdateExpression: "set #discount=:d, #terms=:t, #userlimit=:u",
+                        UpdateExpression: "set #discount=:d, #terms=:t, #userlimit=:u, #start=:s, #end=:e",
                         ExpressionAttributeNames: {
                             '#terms': 'terms', 
                             '#discount': 'discount',
-                            '#userlimit': 'user_limit'
+                            '#userlimit': 'user_limit',
+                            '#start': 'start',
+                            '#end': 'end'
                         },
                         ExpressionAttributeValues:{
                             ":d": DIS,
                             ":t": Terms,
-                            ":u": UserLimit
+                            ":u": UserLimit,
+                            ":s": START,
+                            ":e": END
                         },
                         ReturnValues:"UPDATED_NEW"
                     }

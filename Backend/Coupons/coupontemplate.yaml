@@ -4,6 +4,18 @@ Transform: AWS::Serverless-2016-10-31
 Resources:
   # Stack-Name: Barbera-Coupons 
   # Hostname: https://zlhjfiu498.execute-api.ap-south-1.amazonaws.com/Prod
+  # Hostname: https://z9t3sasx3e.execute-api.ap-south-1.amazonaws.com/Prod  -----  Admin
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'POST, GET, OPTIONS'"
+        AllowHeaders: "'X-Forwarded-For,Authorization,Content-Type'"
+        AllowOrigin: "'*'"
+        MaxAge: "'600'"
+        AllowCredentials: false
 
   #---------------------------------------------------------------
   # Coupon Functions
@@ -35,6 +47,8 @@ Resources:
           Properties:
             Path: /couponcreate
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -65,6 +79,8 @@ Resources:
           Properties:
             Path: /getallcoupons
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -95,6 +111,8 @@ Resources:
           Properties:
             Path: /getcoupon/{serviceid}
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -110,6 +128,8 @@ Resources:
           Properties:
             Path: /delcoupon
             Method: delete
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -125,6 +145,8 @@ Resources:
           Properties:
             Path: /updcoupon/{serviceid}
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 

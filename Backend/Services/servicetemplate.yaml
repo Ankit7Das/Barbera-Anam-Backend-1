@@ -4,6 +4,18 @@ Transform: AWS::Serverless-2016-10-31
 Resources:
   # Stack-Name: Barbera-Services
   # Hostname: https://r54kj5iekh.execute-api.ap-south-1.amazonaws.com/Prod
+  # Hostname: https://897izsv5m6.execute-api.ap-south-1.amazonaws.com/Prod  -----  Admin
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'POST, GET, OPTIONS'"
+        AllowHeaders: "'X-Forwarded-For,Authorization,Content-Type'"
+        AllowOrigin: "'*'"
+        MaxAge: "'600'"
+        AllowCredentials: false
 
   #---------------------------------------------------------------
   # Service Functions
@@ -20,6 +32,8 @@ Resources:
           Properties:
             Path: /addservice
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -35,6 +49,8 @@ Resources:
           Properties:
             Path: /delservice/{serviceid}
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -50,6 +66,8 @@ Resources:
           Properties:
             Path: /getservbyid/{serviceid}
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -65,6 +83,8 @@ Resources:
           Properties:
             Path: /getallservname
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -80,6 +100,8 @@ Resources:
           Properties:
             Path: /updateservice
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -185,6 +207,8 @@ Resources:
           Properties:
             Path: /sliderupload
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -200,6 +224,8 @@ Resources:
           Properties:
             Path: /sliderdelete
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -215,6 +241,8 @@ Resources:
           Properties:
             Path: /typeupload
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -230,6 +258,8 @@ Resources:
           Properties:
             Path: /typedelete
             Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 

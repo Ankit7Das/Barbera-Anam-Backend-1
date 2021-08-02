@@ -66,109 +66,86 @@ exports.handler = async (event) => {
 
         var random = Math.floor(100000 + Math.random() * 900000);
 
-        var params = {
-            TableName: 'Users',
-            Key: {
-                id: barberId,
-            },
-            UpdateExpression: "set #service_start_otp=:s",
-            ExpressionAttributeNames: {
-                '#service_start_otp': 'service_start_otp', 
-            },
-            ExpressionAttributeValues:{
-                ":s": random,
-            },
-            ReturnValues:"UPDATED_NEW"
+        var msg = `${random}`;
+
+        var fcmnotif = await new Promise((resolve, reject) => {
+            const options = {
+                host: 'fcm.googleapis.com',
+                path: '/fcm/send',
+                method: 'POST',
+                headers: {
+                    'Authorization': 'key=' + process.env.FCM_AUTH,
+                    'Content-Type': 'application/json',
+                },
+            };
+        
+            console.log(options);
+            const req = https.request(options, (res) => {
+                console.log('success');
+                console.log(res.statusCode);
+                resolve('success');
+            });
+        
+            req.on('error', (e) => {
+                console.log('failure' + e.message);
+                reject(e.message);
+            });
+        
+            // const reqBody = '{"to":"' + deviceToken + '", "priority" : "high"}';
+            const reqBody = '{"to":"/topics/' + exist1.user.phone + '", "priority": "high", "notification": {"title": "Barbera Home Salon", "body":"' + msg + '"}}';
+            console.log(reqBody);
+        
+            req.write(reqBody);
+            req.end();
+            
+        });
+
+        var params;
+        var data;
+
+        for(var i=0; i<serviceId.length; i++) {
+            params = {
+                TableName: 'Bookings',
+                Key: {
+                    userId: userID.id,
+                    serviceId: serviceId[i]
+                },
+                UpdateExpression: "set #service_status=:s, #start_serv_otp=:st",
+                ExpressionAttributeNames: {
+                    '#service_status': 'service_status', 
+                    '#start_serv_otp': 'start_serv_otp'
+                },
+                ExpressionAttributeValues:{
+                    ":s": 'ongoing',
+                    ":st": String(random)
+                },
+                ReturnValues:"UPDATED_NEW"
+            }
+
+            data = await documentClient.update(params).promise();
         }
 
-        try {
-            var data = await documentClient.update(params).promise();
+        random = null;
 
-            var msg = `${random}`;
-
-            random = null;
-
-            var fcmnotif = await new Promise((resolve, reject) => {
-                const options = {
-                    host: 'fcm.googleapis.com',
-                    path: '/fcm/send',
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'key=' + process.env.FCM_AUTH,
-                        'Content-Type': 'application/json',
-                    },
-                };
-            
-                console.log(options);
-                const req = https.request(options, (res) => {
-                    console.log('success');
-                    console.log(res.statusCode);
-                    resolve('success');
-                });
-            
-                req.on('error', (e) => {
-                    console.log('failure' + e.message);
-                    reject(e.message);
-                });
-            
-                // const reqBody = '{"to":"' + deviceToken + '", "priority" : "high"}';
-                const reqBody = '{"to":"/topics/' + exist1.user.phone + '", "priority": "high", "notification": {"title": "Barbera Home Salon", "body":"' + msg + '"}}';
-                console.log(reqBody);
-            
-                req.write(reqBody);
-                req.end();
-                
-            });
-
-            for(var i=0; i<serviceId.length; i++) {
-                params = {
-                    TableName: 'Bookings',
-                    Key: {
-                        userId: userID.id,
-                        serviceId: serviceId[i]
-                    },
-                    UpdateExpression: "set #service_status=:s",
-                    ExpressionAttributeNames: {
-                        '#service_status': 'service_status', 
-                    },
-                    ExpressionAttributeValues:{
-                        ":s": 'ongoing',
-                    },
-                    ReturnValues:"UPDATED_NEW"
-                }
-
-                data = await documentClient.update(params).promise();
-            }
-
-            console.log(fcmnotif);
-        
-            if(fcmnotif === "success") {
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify({
-                        success: true,
-                        message: 'Notif otp sent',
-                        notif_status: fcmnotif,
-                    })
-                };
-            } else {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({
-                        success: false,
-                        message: 'Otp not sent'
-                    })
-                };
-            }
-        } catch(err) {
+        console.log(fcmnotif);
+    
+        if(fcmnotif === "success") {
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: true,
+                    message: 'Notif otp sent',
+                    notif_status: fcmnotif,
+                })
+            };
+        } else {
             return {
                 statusCode: 400,
                 body: JSON.stringify({
                     success: false,
-                    message: 'Wrong barber id',
-                    error: err
+                    message: 'Otp not sent'
                 })
-            }
+            };
         }
 
     } catch(err) {

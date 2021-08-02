@@ -64,24 +64,18 @@ exports.handler = async (event) => {
             }
         }
 
-        if( OTP === exist1.user.service_end_otp ) {
-            var params = {
-                TableName: 'Users',
-                Key: {
-                    id: userID.id,
-                },
-                UpdateExpression: "set #service_end_otp=:s",
-                ExpressionAttributeNames: {
-                    '#service_end_otp': 'service_end_otp', 
-                },
-                ExpressionAttributeValues:{
-                    ":s": null,
-                },
-                ReturnValues:"UPDATED_NEW"
+        var params = {
+            TableName: 'Bookings',
+            Key: {
+                userId: userId,
+                serviceId: serviceId[0]
             }
+        }
 
-            try {
-                var data = await documentClient.update(params).promise();
+        var data = await documentClient.get(params).promise();
+
+        if(data.Item) {
+            if( OTP === data.Item.end_serv_otp ) {
 
                 for(var i=0; i<serviceId.length; i++) {
                     params = {
@@ -90,12 +84,14 @@ exports.handler = async (event) => {
                             userId: userId,
                             serviceId: serviceId[i]
                         },
-                        UpdateExpression: "set #payment_status=:p",
+                        UpdateExpression: "set #payment_status=:p, #end_serv_otp=:e",
                         ExpressionAttributeNames: {
                             '#payment_status': 'payment_status', 
+                            '#end_serv_otp': 'end_serv_otp'
                         },
                         ExpressionAttributeValues:{
                             ":p": 'paid',
+                            ":e": null
                         },
                         ReturnValues:"UPDATED_NEW"
                     }
@@ -110,85 +106,21 @@ exports.handler = async (event) => {
                         message: 'OTP matched'
                     })
                 }
-
-                // params = {
-                //     TableName: 'Bookings',
-                //     KeyConditionExpression: '#userId = :u',
-                //     FilterExpression: '#slot = :s, #date = :d',
-                //     ExpressionAttributeValues: {
-                //         ':d': DATE,
-                //         ':s': SLOT,
-                //         ':u': id
-                //     },
-                //     ExpressionAttributeNames: {
-                //         '#date': 'date',
-                //         '#slot': 'slot',
-                //         '#userId': 'userId'
-                //     }
-                // }
-
-                // data = await documentClient.query(params).promise();
-
-                // if(data.Items.length === 0) {
-                //     return {
-                //         statusCode: 500,
-                //         body: JSON.stringify({
-                //             success: false,
-                //             message: 'No such booking exists'
-                //         })
-                //     };
-                // } else {
-                //     params = {
-                //         TableName: 'Bookings',
-                //         Key: {
-                //             userId: id,
-                //             serviceId: data.Items[0].serviceId
-                //         },
-                //         UpdateExpression: "set #payment_status=:p",
-                //         ExpressionAttributeNames: {
-                //             '#payment_status': 'payment_status', 
-                //         },
-                //         ExpressionAttributeValues:{
-                //             ":p": PAY,
-                //         },
-                //         ReturnValues:"UPDATED_NEW"
-                //     }
-
-                //     try {
-                //         data = await documentClient.update(params).promise();
-
-                //         return {
-                //             statusCode: 200,
-                //             body: JSON.stringify({
-                //                 success: true,
-                //                 message: 'OTP matched'
-                //             })
-                //         }
-                //     } catch(err) {
-                //         return {
-                //             statusCode: 400,
-                //             body: JSON.stringify({
-                //                 success: false,
-                //                 message: err
-                //             })
-                //         }
-                //     }
-                // }
-            } catch(err) {
+            } else {
                 return {
-                    statusCode: 500,
+                    statusCode: 400,
                     body: JSON.stringify({
                         success: false,
-                        message: err
+                        message: 'OTP mismatch'
                     })
                 };
             }
-        } else {
+        }else {
             return {
                 statusCode: 400,
                 body: JSON.stringify({
                     success: false,
-                    message: 'OTP mismatch'
+                    message: 'No such booking exists'
                 })
             };
         }
