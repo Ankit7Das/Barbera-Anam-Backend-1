@@ -14,7 +14,7 @@ Resources:
   SendMail:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/f764741439f9bfce15abbf40b1d03cae
+      CodeUri: s3://barbera-buckets/279653fc24c54341311c83f44cd1f2a5
       Handler: sendmail.handler
       Runtime: nodejs12.x
       Events:
@@ -29,7 +29,7 @@ Resources:
   GetAllBarberLogs:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/f764741439f9bfce15abbf40b1d03cae
+      CodeUri: s3://barbera-buckets/279653fc24c54341311c83f44cd1f2a5
       Handler: getbarberlogs.handler
       Runtime: nodejs12.x
       Events:
@@ -44,7 +44,7 @@ Resources:
   GetAllBarbers:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/f764741439f9bfce15abbf40b1d03cae
+      CodeUri: s3://barbera-buckets/279653fc24c54341311c83f44cd1f2a5
       Handler: getbarbers.handler
       Runtime: nodejs12.x
       Events:
@@ -59,7 +59,7 @@ Resources:
   BookingRadius:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/f764741439f9bfce15abbf40b1d03cae
+      CodeUri: s3://barbera-buckets/279653fc24c54341311c83f44cd1f2a5
       Handler: bookingradius.handler
       Runtime: nodejs12.x
       Events:
@@ -74,7 +74,7 @@ Resources:
   GetRadius:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/f764741439f9bfce15abbf40b1d03cae
+      CodeUri: s3://barbera-buckets/279653fc24c54341311c83f44cd1f2a5
       Handler: getradius.handler
       Runtime: nodejs12.x
       Events:
@@ -83,6 +83,96 @@ Resources:
           Properties:
             Path: /getradius
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  ReferralCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/279653fc24c54341311c83f44cd1f2a5
+      Handler: refcoupon.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /updref
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  GetRefCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/279653fc24c54341311c83f44cd1f2a5
+      Handler: getref.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getref
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  AddAdmins:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/279653fc24c54341311c83f44cd1f2a5
+      Handler: addadmin.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /addadmin
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  LoginEmail:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/279653fc24c54341311c83f44cd1f2a5
+      Handler: loginemail.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /loginemail
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  LoginPass:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/279653fc24c54341311c83f44cd1f2a5
+      Handler: loginpass.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /loginpass
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  ResetPass:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/279653fc24c54341311c83f44cd1f2a5
+      Handler: resetpass.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /resetpass
+            Method: post
             RestApiId:
               Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser

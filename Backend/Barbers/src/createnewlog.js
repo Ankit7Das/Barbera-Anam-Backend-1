@@ -12,125 +12,59 @@ const { userVerifier } = require("./authentication");
 exports.handler = async (event) => {
     try {
 
-        var tokenArray = event.headers.Authorization.split(" ");
-        var token = tokenArray[1];
-
-        if(token == null) {
-            return {
-                statusCode: 401,
-                body: JSON.stringify({
-                    success: false,
-                    message: "No token passed"
-                })
-            };
-        }
-
-        var userID;
-
-        try {
-            userID = jwt.verify(token, JWT_SECRET);
-        } catch(err) {
-            return {
-                statusCode: 403,
-                body: JSON.stringify({
-                    success: false,
-                    message: "Invalid Token",
-                })
-            };
-        }
-
-        var exist1 = await userVerifier(userID.id);
-
-        if(exist1.success == false) {
-            return {
-                statusCode: 404,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'User not found',
-                })
-            }
-        }
-
-        if(exist1.user.role != 'barber') {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Not a barber',
-                })
-            }
-        }
-
-        var today = new Date();
-        today.setHours(today.getHours() + 5);
-        today.setMinutes(today.getMinutes() + 30);
-        today.setDate(today.getDate() + 6);
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();
-        var day = dd + '-' + mm + '-' + yyyy;
-
         var params = {
-            TableName: 'BarbersLog',
-            Item: {
-                date: day,
-                barberId: userID.id,
-                distance: 0,
-                '6': 'n',
-                '7': 'n',
-                '8': 'n',
-                '9': 'n',
-                '10': 'n',
-                '11': 'n',
-                '12': 'n',
-                '13': 'n',
-                '14': 'n',
-                '15': 'n',
-                '16': 'n',
-                '17': 'n',
-                '18': 'n',
-            }
+            TableName: 'Users',
+            FilterExpression: '#role = :this_role',
+            ExpressionAttributeValues: {':this_role': 'barber'},
+            ExpressionAttributeNames: {'#role': 'role'},
         }
 
         try {
-            var data = await documentClient.put(params).promise();
+            var data = await documentClient.scan(params).promise();
 
-            today = new Date();
+            var today = new Date();
             today.setHours(today.getHours() + 5);
             today.setMinutes(today.getMinutes() + 30);
-            dd = String(today.getDate()).padStart(2, '0');
-            mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-            yyyy = today.getFullYear();
-            day = dd + '-' + mm + '-' + yyyy;
+            today.setDate(today.getDate() + 6);
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
+            var day = dd + '-' + mm + '-' + yyyy;
 
-            params = {
-                TableName: 'BarbersLog',
-                Key: {
-                    date: day,
-                    barberId: userID.id,
+            for(var i=0; i<data.Items.length; i++) {
+                params = {
+                    TableName: 'BarbersLog',
+                    Item: {
+                        date: day,
+                        barberId: data.Items[i].id,
+                        distance: 0,
+                        '6': 'n',
+                        '7': 'n',
+                        '8': 'n',
+                        '9': 'n',
+                        '10': 'n',
+                        '11': 'n',
+                        '12': 'n',
+                        '13': 'n',
+                        '14': 'n',
+                        '15': 'n',
+                        '16': 'n',
+                        '17': 'n',
+                        '18': 'n',
+                    }
                 }
+    
+                data = await documentClient.put(params).promise();
             }
-
-            data = await documentClient.get(params).promise();
-
-            if(!data.Item) {
-                return {
-                    statusCode: 404,
-                    body: JSON.stringify({
-                        success: false,
-                        message: 'Log for today not found'
-                    })
-                }
-            } else {
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify({
-                        success: true,
-                        message: 'New Date log created',
-                        data:data.Item
-                    })
-                }
+            
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    success: true,
+                    message: 'New Date log created'
+                })
             }
+            
         } catch(err) {
             return {
                 statusCode: 400,

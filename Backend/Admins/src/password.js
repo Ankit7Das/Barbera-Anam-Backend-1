@@ -24,3 +24,17 @@ module.exports.matchPassword = async (password, hash) => {
     throw new Error(err);
   }
 };
+
+module.exports.passwordGenerator = async () => {
+  try {
+      var length = 8,
+          charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+          retVal = "";
+      for (var i = 0, n = charset.length; i < length; ++i) {
+          retVal += charset.charAt(Math.floor(Math.random() * n));
+      }
+      return retVal;
+  } catch(err) {
+      throw new Error(err);
+  }
+};

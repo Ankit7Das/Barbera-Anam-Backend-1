@@ -57,7 +57,8 @@ exports.handler = async(event) => {
                     phone: PHONE,
                     otp: random,
                     referral: code,
-                    invites: 0
+                    invites: 0,
+                    email: ''
                 }
             }
 
@@ -115,7 +116,7 @@ exports.handler = async(event) => {
             phone: PHONE,
         }
 
-        var token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+        var token = jwt.sign(user, JWT_SECRET, {});
 
         var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
 

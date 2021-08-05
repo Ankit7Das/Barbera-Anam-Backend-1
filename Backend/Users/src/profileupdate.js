@@ -68,7 +68,7 @@ exports.handler = async (event) => {
         }
 
         if(!exist1.user.email){
-            exist1.user.email = null;
+            exist1.user.email = '';
         }
 
         if(!exist1.user.address){

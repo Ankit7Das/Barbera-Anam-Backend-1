@@ -94,19 +94,28 @@ exports.handler = async (event) => {
         var prices = [];
         var total_price = 0;
         var total_time = 0;
-        var data;
-        var params;
+        var params = {
+            TableName: 'Stock',
+            Key: {
+                type: 'Ref',
+                name: 'ref'
+            }
+        };
+
+        var data = await documentClient.get(params).promise();
+
         var serviceId;
         var discount;
         var type;
+        var refcoupon = data.Item.couponName;
 
         if(obj.couponName){
-            if(obj.couponName === 'BARBERAREF') {
+            if(obj.couponName === refcoupon) {
 
                 if(exist1.user.invites > 0) {
                     type = 'ref';
                     serviceId = 'all';
-                    discount = 100;
+                    discount = data.Item.discount;
                 } else {
                     return {
                         statusCode: 400,
@@ -365,7 +374,7 @@ exports.handler = async (event) => {
                 }
 
                 if(obj.couponName) {
-                    if(obj.couponName === 'BARBERAREF') {
+                    if(obj.couponName === refcoupon) {
                         params = {
                             TableName: 'Users',
                             Key: {
@@ -458,7 +467,7 @@ exports.handler = async (event) => {
                         '#coins': 'coins', 
                     },
                     ExpressionAttributeValues:{
-                        ":c": percentage*exist3.user.coins,
+                        ":c": percentage*total_price,
                     },
                     ReturnValues:"UPDATED_NEW"
                 }

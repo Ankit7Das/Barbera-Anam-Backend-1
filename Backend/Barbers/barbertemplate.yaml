@@ -52,6 +52,21 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  GetCoins:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getcoins.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getcoins
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
   # DistanceModeToggler:
   #   Type: AWS::Serverless::Function
   #   Properties:

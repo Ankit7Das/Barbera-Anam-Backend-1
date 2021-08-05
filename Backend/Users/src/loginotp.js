@@ -59,6 +59,21 @@ exports.handler = async (event) => {
             };
         }
 
+        if(ROLE === 'admin') {
+            return {
+                statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                body: JSON.stringify({
+                    success: false,
+                    message: "Invalid Request",
+                })
+            };
+        }
+
         var params = {
             TableName: 'Users',
             FilterExpression: '#phone = :this_phone',
@@ -333,7 +348,7 @@ exports.handler = async (event) => {
                                 id: id,
                             }
                 
-                            token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+                            token = jwt.sign(user, JWT_SECRET, {});
                 
                             return {
                                 statusCode: 200,
@@ -377,48 +392,29 @@ exports.handler = async (event) => {
                         };
                     }
                 } else if(!data.Items[0].role) {
-
-                    if(ROLE == 'admin') {
-                        params = {
-                            TableName: 'Users',
-                            Key: {
-                                id: id,
-                            },
-                            UpdateExpression: "set #otp=:o, #role=:r",
-                            ExpressionAttributeNames: {
-                                '#otp': 'otp',
-                                '#role': 'role'
-                            },
-                            ExpressionAttributeValues:{
-                                ":o": null,
-                                ":r": ROLE
-                            },
-                            ReturnValues:"UPDATED_NEW"
-                        };
-                    } else {
-                        params = {
-                            TableName: 'Users',
-                            Key: {
-                                id: id,
-                            },
-                            UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la",
-                            ExpressionAttributeNames: {
-                                '#otp': 'otp',
-                                '#role': 'role',
-                                '#address': 'address',
-                                '#long': 'longitude',
-                                '#lat': 'latitude'
-                            },
-                            ExpressionAttributeValues:{
-                                ":o": null,
-                                ":r": ROLE,
-                                ":a": ADD,
-                                ":lo": LONG,
-                                ":la": LAT
-                            },
-                            ReturnValues:"UPDATED_NEW"
-                        };
-                    }
+                    params = {
+                        TableName: 'Users',
+                        Key: {
+                            id: id,
+                        },
+                        UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la",
+                        ExpressionAttributeNames: {
+                            '#otp': 'otp',
+                            '#role': 'role',
+                            '#address': 'address',
+                            '#long': 'longitude',
+                            '#lat': 'latitude'
+                        },
+                        ExpressionAttributeValues:{
+                            ":o": null,
+                            ":r": ROLE,
+                            ":a": ADD,
+                            ":lo": LONG,
+                            ":la": LAT
+                        },
+                        ReturnValues:"UPDATED_NEW"
+                    };
+                    
 
                     try {
                         data = await documentClient.update(params).promise();
@@ -427,7 +423,7 @@ exports.handler = async (event) => {
                             id: id,
                         }
             
-                        token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+                        token = jwt.sign(user, JWT_SECRET, {});
 
                         if(obj.ref && ROLE == 'user') {
                             params = {
@@ -459,6 +455,23 @@ exports.handler = async (event) => {
                                     TableName: 'Users',
                                     Key: {
                                         id: data.Items[0].id,
+                                    },
+                                    UpdateExpression: "set #invites=#invites + :i",
+                                    ExpressionAttributeNames: {
+                                        '#invites': 'invites',
+                                    },
+                                    ExpressionAttributeValues:{
+                                        ":i": 1,
+                                    },
+                                    ReturnValues:"UPDATED_NEW"
+                                };
+        
+                                data = await documentClient.update(params).promise();
+
+                                params = {
+                                    TableName: 'Users',
+                                    Key: {
+                                        id: userID.id,
                                     },
                                     UpdateExpression: "set #invites=#invites + :i",
                                     ExpressionAttributeNames: {
@@ -550,7 +563,7 @@ exports.handler = async (event) => {
                                 id: id,
                             }
                 
-                            token = jwt.sign(user, JWT_SECRET, { expiresIn: new Date().setDate(new Date().getDate() + 30) });
+                            token = jwt.sign(user, JWT_SECRET, {});
                 
                             return {
                                 statusCode: 200,

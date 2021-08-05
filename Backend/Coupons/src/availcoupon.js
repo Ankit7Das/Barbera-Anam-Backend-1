@@ -62,7 +62,17 @@ exports.handler = async (event) => {
             }
         }
 
-        if(NAME === 'BARBERAREF') {
+        var params = {
+            TableName: 'Stock',
+            Key: {
+                type: "Ref",
+                name: 'ref'
+            }
+        }
+
+        var data = await documentClient.get(params).promise();
+
+        if(NAME === data.Item.couponName) {
 
             if(exist1.user.invites > 0) {
                 return {
@@ -70,7 +80,7 @@ exports.handler = async (event) => {
                     body: JSON.stringify({
                         success: true,
                         message: 'Coupon successful',
-                        discount: 100,
+                        discount: data.Item.discount,
                         serviceId: 'all'
                     })
                 }
@@ -115,7 +125,7 @@ exports.handler = async (event) => {
             
         } else {
 
-            var params = {
+            params = {
                 TableName: 'Coupons',
                 KeyConditionExpression: '#name = :n',
                 ExpressionAttributeValues: {
@@ -127,7 +137,7 @@ exports.handler = async (event) => {
             }
     
             try {
-                var data = await documentClient.query(params).promise();
+                data = await documentClient.query(params).promise();
 
                 if(data.Items.length === 0) {
                     return {

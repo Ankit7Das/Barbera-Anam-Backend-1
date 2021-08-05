@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 
 Resources:
   # Stack-Name: Barbera-Admins
-  # Hostname: https://xwtij1tqrc.execute-api.ap-south-1.amazonaws.com/Prod
+  # Hostname: https://le2fpw7qj8.execute-api.ap-south-1.amazonaws.com/Prod
 
   ApiGatewayApi:
     Type: AWS::Serverless::Api
@@ -100,6 +100,108 @@ Resources:
           Properties:
             Path: /getradius
             Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  ReferralCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: refcoupon.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /updref
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  GetRefCoupon:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getref.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getref
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  AddAdmins:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: addadmin.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /addadmin
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  LoginEmail:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: loginemail.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /loginemail
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  LoginPass:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: loginpass.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /loginpass
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  ResetPass:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: resetpass.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /resetpass
+            Method: post
             RestApiId:
               Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser

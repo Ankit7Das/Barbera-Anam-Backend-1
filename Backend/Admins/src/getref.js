@@ -12,7 +12,6 @@ exports.handler = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
-        var DIST = obj.distance;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -85,48 +84,13 @@ exports.handler = async (event) => {
         var params = {
             TableName: 'Stock',
             Key: {
-                type: 'Distance',
-                name: 'distance'
+                type: 'Ref',
+                name: 'ref'
             }
-        }
-
-        var data = await documentClient.get(params).promise();
-
-        if(data.Item) {
-            if(data.Item.distance === DIST) {
-                return {
-                    statusCode: 200,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: true,
-                        message: 'Booking Radius updated',
-                    })
-                }
-            }
-        }
-
-        params = {
-            TableName: 'Stock',
-            Key: {
-                type: 'Distance',
-                name: 'distance'
-            },
-            UpdateExpression: "set #distance=:d",
-            ExpressionAttributeNames: {
-                '#distance': 'distance', 
-            },
-            ExpressionAttributeValues:{
-                ":d": DIST,
-            },
-            ReturnValues:"UPDATED_NEW"
         }
 
         try {
-            data = await documentClient.update(params).promise();
+            var data = await documentClient.get(params).promise();
 
             return {
                 statusCode: 200,
@@ -137,7 +101,8 @@ exports.handler = async (event) => {
                 },
                 body: JSON.stringify({
                     success: true,
-                    message: 'Booking Radius updated',
+                    message: 'Referral Coupon updated',
+                    data: data.Item
                 })
             }
 

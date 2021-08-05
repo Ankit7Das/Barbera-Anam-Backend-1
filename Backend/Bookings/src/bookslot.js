@@ -72,19 +72,28 @@ exports.handler = async (event) => {
         var prices = [];
         var total_price = 0;
         var total_time = 0;
-        var data;
-        var params;
+        var params = {
+            TableName: 'Stock',
+            Key: {
+                type:'Ref',
+                name: 'ref'
+            }
+        };
+
+        var data = await documentClient.get(params).promise();
+
         var serviceId;
         var discount;
         var type;
+        var refcoupon = data.Item.couponName
 
         if(obj.couponName){
-            if(obj.couponName === 'BARBERAREF') {
+            if(obj.couponName === refcoupon) {
 
                 if(exist1.user.invites > 0) {
                     type = 'ref';
                     serviceId = 'all';
-                    discount = 100;
+                    discount = data.Item.discount;
                 } else {
                     return {
                         statusCode: 400,
@@ -376,17 +385,20 @@ exports.handler = async (event) => {
             var long1 = exist1.user.longitude;
             var lat1 = exist1.user.latitude;
 
+            console.log(distance);
+
             for(var i=0;i<data1.Items.length;i++){
                 params = {
                     TableName: 'Users',
                     Key: {
                         id: data1.Items[i].barberId,
-                    },
-                    ProjectionExpression: 'id, longitude, latitude, coins, phone'
+                    }
                 }
 
                 data2 = await documentClient.get(params).promise();
                 data2.Item.distance = await getDistance(lat1,long1,data2.Item.latitude,data2.Item.longitude);
+
+                console.log("inside",data2.Item);
 
                 if(data2.Item.coins >= 300 && data2.Item.distance<=distance) {
                     console.log(data2.Item);
@@ -469,7 +481,7 @@ exports.handler = async (event) => {
                     }
 
                     if(obj.couponName) {
-                        if(obj.couponName === 'BARBERAREF') {
+                        if(obj.couponName === refcoupon) {
                             params = {
                                 TableName: 'Users',
                                 Key: {
@@ -562,7 +574,7 @@ exports.handler = async (event) => {
                             '#coins': 'coins', 
                         },
                         ExpressionAttributeValues:{
-                            ":c": percentage*coins,
+                            ":c": percentage*total_price,
                         },
                         ReturnValues:"UPDATED_NEW"
                     }

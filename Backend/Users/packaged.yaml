@@ -4,7 +4,7 @@ Resources:
   ProfileUpdate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7fd266cef504a801d57092766287b6e1
+      CodeUri: s3://barbera-buckets/579dab5788c45c7c77868cbf18154732
       Handler: profileupdate.handler
       Runtime: nodejs12.x
       Events:
@@ -17,7 +17,7 @@ Resources:
   AddressUpdate:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7fd266cef504a801d57092766287b6e1
+      CodeUri: s3://barbera-buckets/579dab5788c45c7c77868cbf18154732
       Handler: addressupdate.handler
       Runtime: nodejs12.x
       Events:
@@ -30,7 +30,7 @@ Resources:
   GetUser:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7fd266cef504a801d57092766287b6e1
+      CodeUri: s3://barbera-buckets/579dab5788c45c7c77868cbf18154732
       Handler: getuser.handler
       Runtime: nodejs12.x
       Events:
@@ -43,7 +43,7 @@ Resources:
   LoginPhone:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7fd266cef504a801d57092766287b6e1
+      CodeUri: s3://barbera-buckets/579dab5788c45c7c77868cbf18154732
       Handler: loginphone.handler
       Runtime: nodejs12.x
       Events:
@@ -56,7 +56,7 @@ Resources:
   LoginOtp:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7fd266cef504a801d57092766287b6e1
+      CodeUri: s3://barbera-buckets/579dab5788c45c7c77868cbf18154732
       Handler: loginotp.handler
       Runtime: nodejs12.x
       Events:
@@ -69,7 +69,7 @@ Resources:
   ServiceEndOtp:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7fd266cef504a801d57092766287b6e1
+      CodeUri: s3://barbera-buckets/579dab5788c45c7c77868cbf18154732
       Handler: endservice.handler
       Runtime: nodejs12.x
       Events:
@@ -82,7 +82,7 @@ Resources:
   ServiceStartOtp:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/7fd266cef504a801d57092766287b6e1
+      CodeUri: s3://barbera-buckets/579dab5788c45c7c77868cbf18154732
       Handler: startservice.handler
       Runtime: nodejs12.x
       Events:

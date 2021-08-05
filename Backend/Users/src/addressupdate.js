@@ -79,23 +79,25 @@ exports.handler = async (event) => {
 
         var DIST = await getDistance(exist1.user.latitude, exist1.user.longitude, LAT, LONG);
 
-        params = {
-            TableName: 'BarbersLog',
-            Key: {
-                date: day,
-                barberId: exist1.user.id
-            },
-            UpdateExpression: "set #distance=#distance + :d",
-            ExpressionAttributeNames: {
-                '#distance': 'distance'
-            },
-            ExpressionAttributeValues:{
-                ":d": DIST,
-            },
-            ReturnValues:"UPDATED_NEW"
+        if(exist1.user.role === 'barber') {
+            params = {
+                TableName: 'BarbersLog',
+                Key: {
+                    date: day,
+                    barberId: exist1.user.id
+                },
+                UpdateExpression: "set #distance=#distance + :d",
+                ExpressionAttributeNames: {
+                    '#distance': 'distance'
+                },
+                ExpressionAttributeValues:{
+                    ":d": DIST,
+                },
+                ReturnValues:"UPDATED_NEW"
+            }
+    
+            data = await documentClient.update(params).promise();
         }
-
-        data = await documentClient.update(params).promise();
 
         params = {
             TableName: 'Users',

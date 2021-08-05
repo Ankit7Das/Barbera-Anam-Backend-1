@@ -12,7 +12,8 @@ exports.handler = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
-        var DIST = obj.distance;
+        var DIS = obj.discount;
+        var NAME = obj.name;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -85,42 +86,27 @@ exports.handler = async (event) => {
         var params = {
             TableName: 'Stock',
             Key: {
-                type: 'Distance',
-                name: 'distance'
+                type: 'Ref',
+                name: 'ref'
             }
         }
 
         var data = await documentClient.get(params).promise();
 
-        if(data.Item) {
-            if(data.Item.distance === DIST) {
-                return {
-                    statusCode: 200,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: true,
-                        message: 'Booking Radius updated',
-                    })
-                }
-            }
-        }
-
         params = {
             TableName: 'Stock',
             Key: {
-                type: 'Distance',
-                name: 'distance'
+                type: 'Ref',
+                name: 'ref'
             },
-            UpdateExpression: "set #distance=:d",
+            UpdateExpression: "set #discount=:d, #couponname=:n",
             ExpressionAttributeNames: {
-                '#distance': 'distance', 
+                '#discount': 'discount',
+                '#couponname': 'couponName' 
             },
             ExpressionAttributeValues:{
-                ":d": DIST,
+                ":d": DIS,
+                ":n": NAME
             },
             ReturnValues:"UPDATED_NEW"
         }
@@ -137,7 +123,7 @@ exports.handler = async (event) => {
                 },
                 body: JSON.stringify({
                     success: true,
-                    message: 'Booking Radius updated',
+                    message: 'Referral Coupon updated',
                 })
             }
 

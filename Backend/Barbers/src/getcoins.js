@@ -12,7 +12,6 @@ exports.handler = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
-        var DIST = obj.distance;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -67,7 +66,7 @@ exports.handler = async (event) => {
             }
         }
 
-        if(exist1.user.role != 'admin') {
+        if(exist1.user.role != 'barber') {
             return {
                 statusCode: 400,
                 headers: {
@@ -77,85 +76,24 @@ exports.handler = async (event) => {
                 },
                 body: JSON.stringify({
                     success: false,
-                    message: 'Not an admin',
+                    message: 'Not an barber',
                 })
             }
         }
 
-        var params = {
-            TableName: 'Stock',
-            Key: {
-                type: 'Distance',
-                name: 'distance'
-            }
-        }
-
-        var data = await documentClient.get(params).promise();
-
-        if(data.Item) {
-            if(data.Item.distance === DIST) {
-                return {
-                    statusCode: 200,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: true,
-                        message: 'Booking Radius updated',
-                    })
-                }
-            }
-        }
-
-        params = {
-            TableName: 'Stock',
-            Key: {
-                type: 'Distance',
-                name: 'distance'
+        return {
+            statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Headers" : "Content-Type",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
             },
-            UpdateExpression: "set #distance=:d",
-            ExpressionAttributeNames: {
-                '#distance': 'distance', 
-            },
-            ExpressionAttributeValues:{
-                ":d": DIST,
-            },
-            ReturnValues:"UPDATED_NEW"
+            body: JSON.stringify({
+                success: true,
+                message: 'Referral Coupon updated',
+                coins: exist1.user.coins
+            })
         }
-
-        try {
-            data = await documentClient.update(params).promise();
-
-            return {
-                statusCode: 200,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: true,
-                    message: 'Booking Radius updated',
-                })
-            }
-
-        } catch(err) {
-            return {
-                statusCode: 500,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: err,
-                })
-            }
-        }
-        
     } catch(err) {
         console.log(err);
         return err;

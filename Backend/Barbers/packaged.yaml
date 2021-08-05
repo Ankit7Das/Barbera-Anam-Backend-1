@@ -14,7 +14,7 @@ Resources:
   CreateNewLog:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/856cdc40b4c3ff9a17aaab6a2e0fe2b6
+      CodeUri: s3://barbera-buckets/6ca4ae0ccb3d86a159e8d34c5a3fa5e1
       Handler: createnewlog.handler
       Runtime: nodejs12.x
       Events:
@@ -27,7 +27,7 @@ Resources:
   CoinsIncrease:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/856cdc40b4c3ff9a17aaab6a2e0fe2b6
+      CodeUri: s3://barbera-buckets/6ca4ae0ccb3d86a159e8d34c5a3fa5e1
       Handler: coinincrease.handler
       Runtime: nodejs12.x
       Events:
@@ -39,10 +39,23 @@ Resources:
             RestApiId:
               Ref: ApiGatewayApi
       Role: arn:aws:iam::140544830924:role/BackendUser
+  GetCoins:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://barbera-buckets/6ca4ae0ccb3d86a159e8d34c5a3fa5e1
+      Handler: getcoins.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api
+          Properties:
+            Path: /getcoins
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
   UpdateLog:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/856cdc40b4c3ff9a17aaab6a2e0fe2b6
+      CodeUri: s3://barbera-buckets/6ca4ae0ccb3d86a159e8d34c5a3fa5e1
       Handler: updatelog.handler
       Runtime: nodejs12.x
       Events:
@@ -55,7 +68,7 @@ Resources:
   ServiceEndOtpAccept:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/856cdc40b4c3ff9a17aaab6a2e0fe2b6
+      CodeUri: s3://barbera-buckets/6ca4ae0ccb3d86a159e8d34c5a3fa5e1
       Handler: endservice.handler
       Runtime: nodejs12.x
       Events:
@@ -68,7 +81,7 @@ Resources:
   ServiceStartOtpAccept:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/856cdc40b4c3ff9a17aaab6a2e0fe2b6
+      CodeUri: s3://barbera-buckets/6ca4ae0ccb3d86a159e8d34c5a3fa5e1
       Handler: startservice.handler
       Runtime: nodejs12.x
       Events:

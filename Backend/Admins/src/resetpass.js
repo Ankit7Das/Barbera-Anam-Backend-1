@@ -7,12 +7,14 @@ var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
 const { userVerifier } = require("./authentication");
+const { hashPassword, matchPassword } = require('./password');
 
 exports.handler = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
-        var DIST = obj.distance;
+        var NPASS = obj.newpassword;
+        var OPASS = obj.oldpassword;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -82,30 +84,54 @@ exports.handler = async (event) => {
             }
         }
 
-        var params = {
-            TableName: 'Stock',
-            Key: {
-                type: 'Distance',
-                name: 'distance'
+        var match = await matchPassword(OPASS, exist1.user.password);
+
+        if(match) {
+
+            var HASH = await hashPassword(NPASS);
+
+            var params = {
+                TableName: 'Users',
+                Key: {
+                    id: userID.id
+                },
+                UpdateExpression: "set #password=:p",
+                ExpressionAttributeNames: {
+                    '#password': 'password', 
+                },
+                ExpressionAttributeValues:{
+                    ":p": HASH,
+                },
+                ReturnValues:"UPDATED_NEW"
             }
-        }
 
-        var data = await documentClient.get(params).promise();
-
-        if(data.Item) {
-            if(data.Item.distance === DIST) {
-                return {
-                    statusCode: 200,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: true,
-                        message: 'Booking Radius updated',
-                    })
-                }
+            var data = await documentClient.update(params).promise();
+            
+            return {
+                statusCode: 200,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                body: JSON.stringify({
+                    success: true,
+                    message: 'Password changed',
+                })
+            }
+            
+        } else {
+            return {
+                statusCode: 400,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Password mismatch',
+                })
             }
         }
 

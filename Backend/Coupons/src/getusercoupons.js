@@ -74,13 +74,24 @@ exports.handler = async (event) => {
                 }
             }
 
+            params = {
+                TableName: 'Stock',
+                Key: {
+                    type: 'Ref',
+                    name: 'ref'
+                }
+            }
+
+            data = await documentClient.get(params).promise();
+
             return {
                 statusCode: 200,
                 body: JSON.stringify({
                     success: true,
                     message: 'Coupons found',
                     data: coupons,
-                    refquantity: exist1.user.invites
+                    refquantity: exist1.user.invites,
+                    refcoupon: data.Item.couponName
                 })
             }
         } catch(err) {
