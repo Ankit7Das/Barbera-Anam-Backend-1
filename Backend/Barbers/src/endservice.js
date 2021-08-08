@@ -78,19 +78,22 @@ exports.handler = async (event) => {
             if( OTP === data.Item.end_serv_otp ) {
 
                 for(var i=0; i<serviceId.length; i++) {
+
                     params = {
                         TableName: 'Bookings',
                         Key: {
                             userId: userId,
                             serviceId: serviceId[i]
                         },
-                        UpdateExpression: "set #payment_status=:p, #end_serv_otp=:e",
+                        UpdateExpression: "set #payment_status=:p, #service_status=:s, #end_serv_otp=:e",
                         ExpressionAttributeNames: {
-                            '#payment_status': 'payment_status', 
+                            '#payment_status': 'payment_status',
+                            '#service_status': 'service_status', 
                             '#end_serv_otp': 'end_serv_otp'
                         },
                         ExpressionAttributeValues:{
                             ":p": 'paid',
+                            ":s": 'done',
                             ":e": null
                         },
                         ReturnValues:"UPDATED_NEW"

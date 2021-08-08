@@ -9,14 +9,14 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
 var nodemailer = require('nodemailer');
 const { userVerifier } = require("./authentication");
-const { passwordGenerator, hashPassword } = require('./password');
 
 exports.handler = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
-        var PHONE = obj.phone;
-        var EMAIL = obj.email;
+        var barberId = obj.barberId;
+        var ITEM = obj.item;
+        var QUAN = obj.quantity;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -88,69 +88,46 @@ exports.handler = async (event) => {
 
         var params = {
             TableName: 'Users',
-            FilterExpression: '#email = :this_email',
-            ExpressionAttributeValues: {':this_email': EMAIL},
-            ExpressionAttributeNames: {'#email': 'email'},
+            Key: {
+                id: barberId 
+            }
         }
 
-        var data = await documentClient.scan(params).promise();
+        try {
+            var data = await documentClient.get(params).promise();
 
-        if(data.Items.length === 0) {
-            params = {
-                TableName: 'Users',
-                FilterExpression: '#phone = :this_phone',
-                ExpressionAttributeValues: {':this_phone': PHONE},
-                ExpressionAttributeNames: {'#phone': 'phone'},
-            }
-    
-            data = await documentClient.scan(params).promise();
-
-            if(data.Items.length === 0) {
-
-                var PASS = await passwordGenerator();
-                var HASH = await hashPassword(PASS);
-
+            if(!data.Item) {
+                return {
+                    statusCode: 400,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
+                    body: JSON.stringify({
+                        success: false,
+                        message: 'No such barber exists',
+                    })
+                }
+            } else {
                 params = {
                     TableName: 'Users',
-                    Item: {
-                        id: uuid.v1(),
-                        email: EMAIL,
-                        phone: PHONE,
-                        role: 'admin',
-                        password: HASH
-                    }
+                    Key: {
+                        id: barberId,
+                    },
+                    UpdateExpression: "set #items=:i",
+                    ExpressionAttributeNames: {
+                        '#items': 'items', 
+                    },
+                    ExpressionAttributeValues:{
+                        ":i": data.Item.items + ITEM + '=' + QUAN + ',',
+                    },
+                    ReturnValues:"UPDATED_NEW"
                 }
         
                 try {
-                    data = await documentClient.put(params).promise();
-
-                    console.log(data);
-
-                    var transporter = nodemailer.createTransport({
-                        host: 'smtp.gmail.com',
-                        port: 465,
-                        secure: true,
-                        auth: {
-                          user: process.env.EMAIL_USER,
-                          pass: process.env.EMAIL_PASS
-                        }
-                    });
-            
-                    var emails = EMAIL;
-            
-                    console.log(emails);
-                      
-                    var mailOptions = {
-                        from: '"Barbera Admin" <' + process.env.EMAIL_USER + '>',
-                        to: emails,
-                        subject: 'Mail to add members to the Admin Website for Barbera',
-                        text: `Hello,\n\tYou have been added as an admin for Barbera and have been granted access to the admin services and features through the admin website or app.\n\tYour credentials are: \n\t\tEmail: ${EMAIL}\n\t\tPassword: ${PASS}\n\tOnce you have Signed Up, you can change your password as you like.`
-                    };
-            
-                    console.log(mailOptions);
-            
-                    data = await transporter.sendMail(mailOptions);
-
+                    data = await documentClient.update(params).promise();
+        
                     return {
                         statusCode: 200,
                         headers: {
@@ -160,10 +137,11 @@ exports.handler = async (event) => {
                         },
                         body: JSON.stringify({
                             success: true,
-                            message: 'Admin added',
+                            message: 'Item added',
                         })
                     }
                 } catch(err) {
+                    console.log("Error: ", err);
                     return {
                         statusCode: 500,
                         headers: {
@@ -175,27 +153,13 @@ exports.handler = async (event) => {
                             success: false,
                             message: err,
                         })
-                    }
-                }
-            } else {
-                console.log("inside");
-                return {
-                    statusCode: 400,
-                    headers: {
-                        "Access-Control-Allow-Headers" : "Content-Type",
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                    },
-                    body: JSON.stringify({
-                        success: false,
-                        message: 'User with this email already exists',
-                    })
+                    };
                 }
             }
-        } else {
-            console.log("outside");
+        } catch(err) {
+            console.log("Error: ", err);
             return {
-                statusCode: 400,
+                statusCode: 500,
                 headers: {
                     "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
@@ -203,11 +167,10 @@ exports.handler = async (event) => {
                 },
                 body: JSON.stringify({
                     success: false,
-                    message: 'User with this phone number already exists',
+                    message: err,
                 })
-            }
+            };
         }
-        
     } catch(err) {
         console.log(err);
         return err;

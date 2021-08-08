@@ -16,7 +16,6 @@ exports.handler = async (event) => {
 
         var obj = JSON.parse(event.body);
         var PHONE = obj.phone;
-        var EMAIL = obj.email;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -88,9 +87,9 @@ exports.handler = async (event) => {
 
         var params = {
             TableName: 'Users',
-            FilterExpression: '#email = :this_email',
-            ExpressionAttributeValues: {':this_email': EMAIL},
-            ExpressionAttributeNames: {'#email': 'email'},
+            FilterExpression: '#phone = :this_phone',
+            ExpressionAttributeValues: {':this_phone': PHONE},
+            ExpressionAttributeNames: {'#phone': 'phone'},
         }
 
         var data = await documentClient.scan(params).promise();
@@ -98,89 +97,34 @@ exports.handler = async (event) => {
         if(data.Items.length === 0) {
             params = {
                 TableName: 'Users',
-                FilterExpression: '#phone = :this_phone',
-                ExpressionAttributeValues: {':this_phone': PHONE},
-                ExpressionAttributeNames: {'#phone': 'phone'},
+                Item: {
+                    id: uuid.v1(),
+                    phone: PHONE,
+                    role: 'barber',
+                    email: ''
+                }
             }
-    
-            data = await documentClient.scan(params).promise();
-
-            if(data.Items.length === 0) {
-
-                var PASS = await passwordGenerator();
-                var HASH = await hashPassword(PASS);
-
-                params = {
-                    TableName: 'Users',
-                    Item: {
-                        id: uuid.v1(),
-                        email: EMAIL,
-                        phone: PHONE,
-                        role: 'admin',
-                        password: HASH
-                    }
-                }
         
-                try {
-                    data = await documentClient.put(params).promise();
+            try {
+                data = await documentClient.put(params).promise();
 
-                    console.log(data);
+                console.log(data);
 
-                    var transporter = nodemailer.createTransport({
-                        host: 'smtp.gmail.com',
-                        port: 465,
-                        secure: true,
-                        auth: {
-                          user: process.env.EMAIL_USER,
-                          pass: process.env.EMAIL_PASS
-                        }
-                    });
-            
-                    var emails = EMAIL;
-            
-                    console.log(emails);
-                      
-                    var mailOptions = {
-                        from: '"Barbera Admin" <' + process.env.EMAIL_USER + '>',
-                        to: emails,
-                        subject: 'Mail to add members to the Admin Website for Barbera',
-                        text: `Hello,\n\tYou have been added as an admin for Barbera and have been granted access to the admin services and features through the admin website or app.\n\tYour credentials are: \n\t\tEmail: ${EMAIL}\n\t\tPassword: ${PASS}\n\tOnce you have Signed Up, you can change your password as you like.`
-                    };
-            
-                    console.log(mailOptions);
-            
-                    data = await transporter.sendMail(mailOptions);
-
-                    return {
-                        statusCode: 200,
-                        headers: {
-                            "Access-Control-Allow-Headers" : "Content-Type",
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                        },
-                        body: JSON.stringify({
-                            success: true,
-                            message: 'Admin added',
-                        })
-                    }
-                } catch(err) {
-                    return {
-                        statusCode: 500,
-                        headers: {
-                            "Access-Control-Allow-Headers" : "Content-Type",
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                        },
-                        body: JSON.stringify({
-                            success: false,
-                            message: err,
-                        })
-                    }
-                }
-            } else {
-                console.log("inside");
                 return {
-                    statusCode: 400,
+                    statusCode: 200,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
+                    body: JSON.stringify({
+                        success: true,
+                        message: 'Barber added',
+                    })
+                }
+            } catch(err) {
+                return {
+                    statusCode: 500,
                     headers: {
                         "Access-Control-Allow-Headers" : "Content-Type",
                         "Access-Control-Allow-Origin": "*",
@@ -188,7 +132,7 @@ exports.handler = async (event) => {
                     },
                     body: JSON.stringify({
                         success: false,
-                        message: 'User with this email already exists',
+                        message: err,
                     })
                 }
             }

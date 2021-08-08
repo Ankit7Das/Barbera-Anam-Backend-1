@@ -112,13 +112,11 @@ exports.handler = async (event) => {
                     userId: userID.id,
                     serviceId: serviceId[i]
                 },
-                UpdateExpression: "set #service_status=:s, #end_serv_otp=:e",
-                ExpressionAttributeNames: {
-                    '#service_status': 'service_status', 
+                UpdateExpression: "set #end_serv_otp=:e",
+                ExpressionAttributeNames: { 
                     '#end_serv_otp': 'end_serv_otp'
                 },
                 ExpressionAttributeValues:{
-                    ":s": 'done',
                     ":e": String(random)
                 },
                 ReturnValues:"UPDATED_NEW"

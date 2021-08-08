@@ -82,12 +82,15 @@ exports.handler = async (event) => {
             var info;
 
             console.log(data);
+            var day1;
+            var today1;
 
             for(var i=0;i<data.Items.length;i++) {
 
                 info = data.Items[i].serviceId.split(',');
 
-                console.log(info)
+                console.log(info);
+                console.log(data.Items[i].date);
 
                 params = {
                     TableName: 'Services',
@@ -114,27 +117,55 @@ exports.handler = async (event) => {
                 if(!data1.Item.name) {
                     data1.Item.name = '';
                 }
+                
                 data1.Item.distance = await getDistance(exist1.user.latitude, exist1.user.longitude, data1.Item.latitude, data1.Item.longitude);
                 data.Items[i].barber = data1.Item;
 
+                day1 = data.Items[i].date.split('-');
+                today1 = new Date(Number(day1[2]),Number(day1[1]),Number(day1[0]),Number(data.Items[i].slot));
+                data.Items[i].booktime = today1.getTime();
+
             }
 
-            data.Items.sort((a,b) => {
-                if(a.Timestamp > b.Timestamp) {
-                    return -1;
-                }else if(a.Timestamp < b.Timestamp) {
+            var today = new Date();
+            today.setHours(today.getHours() + 5);
+            today.setMinutes(today.getMinutes() + 30);
+
+            var done = data.Items.filter((item) => {
+                return item.service_status === 'done';
+            });
+
+            var not_done = data.Items.filter((item) => {
+                return item.service_status !== 'done';
+            })
+
+            done.sort((a,b) => {
+                if(a.booktime < b.booktime) {
                     return 1;
-                }else {
+                } else if(a.booktime > b.booktime) {
+                    return -1;
+                } else {
                     return 0;
                 }
-            });
+            })
+
+            not_done.sort((a,b) => {
+                if(a.booktime < b.booktime) {
+                    return -1;
+                } else if(a.booktime > b.booktime) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            })
 
             return {
                 statusCode: 200,
                 body: JSON.stringify({
                     success: true,
                     message: 'Booking found',
-                    data: data.Items,
+                    done: done,
+                    not_done: not_done
                 })
             }
 

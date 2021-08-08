@@ -156,6 +156,57 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  AddBarbers:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: addbarber.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /addbarber
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  AddBarberItems:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: addbarberitems.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /additem
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  GetBarberItems:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: getbarberitems.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /getitems
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
   LoginEmail:
     Type: AWS::Serverless::Function
     Properties:

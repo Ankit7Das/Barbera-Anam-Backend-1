@@ -104,6 +104,148 @@ exports.handler = async (event) => {
 
                 if(ROLE == 'barber' && !data.Items[0].role) {
 
+                    params = {
+                        TableName: 'Users',
+                        Key: {
+                            id: id,
+                        }
+                    };
+
+                    data = await documentClient.delete(params).promise();
+                    
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            success: false,
+                            message: 'Unauthorized barber access'
+                        })
+                    }
+                } else if(!data.Items[0].role) {
+                    params = {
+                        TableName: 'Users',
+                        Key: {
+                            id: id,
+                        },
+                        UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la",
+                        ExpressionAttributeNames: {
+                            '#otp': 'otp',
+                            '#role': 'role',
+                            '#address': 'address',
+                            '#long': 'longitude',
+                            '#lat': 'latitude'
+                        },
+                        ExpressionAttributeValues:{
+                            ":o": null,
+                            ":r": ROLE,
+                            ":a": ADD,
+                            ":lo": LONG,
+                            ":la": LAT
+                        },
+                        ReturnValues:"UPDATED_NEW"
+                    };
+                    
+
+                    try {
+                        data = await documentClient.update(params).promise();
+    
+                        var user = {
+                            id: id,
+                        }
+            
+                        token = jwt.sign(user, JWT_SECRET, {});
+
+                        if(obj.ref && ROLE == 'user') {
+                            params = {
+                                TableName: 'Users',
+                                FilterExpression: '#referral = :this_referral',
+                                ExpressionAttributeValues: {':this_referral': obj.ref},
+                                ExpressionAttributeNames: {'#referral': 'referral'}
+                            };
+            
+                            data = await documentClient.scan(params).promise();
+        
+                            console.log(data);
+        
+                            if(data.Items.length === 0) {
+                                return {
+                                    statusCode: 400,
+                                    headers: {
+                                        "Access-Control-Allow-Headers" : "Content-Type",
+                                        "Access-Control-Allow-Origin": "*",
+                                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                                    },
+                                    body: JSON.stringify({
+                                        success: false,
+                                        message: 'Referral code is invalid'
+                                    })
+                                }
+                            } else {
+                                params = {
+                                    TableName: 'Users',
+                                    Key: {
+                                        id: data.Items[0].id,
+                                    },
+                                    UpdateExpression: "set #invites=#invites + :i",
+                                    ExpressionAttributeNames: {
+                                        '#invites': 'invites',
+                                    },
+                                    ExpressionAttributeValues:{
+                                        ":i": 1,
+                                    },
+                                    ReturnValues:"UPDATED_NEW"
+                                };
+        
+                                data = await documentClient.update(params).promise();
+
+                                params = {
+                                    TableName: 'Users',
+                                    Key: {
+                                        id: userID.id,
+                                    },
+                                    UpdateExpression: "set #invites=#invites + :i",
+                                    ExpressionAttributeNames: {
+                                        '#invites': 'invites',
+                                    },
+                                    ExpressionAttributeValues:{
+                                        ":i": 1,
+                                    },
+                                    ReturnValues:"UPDATED_NEW"
+                                };
+        
+                                data = await documentClient.update(params).promise();
+                            }
+                        }
+            
+                        return {
+                            statusCode: 200,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'Login/Signup Success',
+                                token: token,
+                            })
+                        };
+                    } catch(err) {
+                        return {
+                            statusCode: 500,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: false,
+                                message: err,
+                            })
+                        };
+                    }
+                    
+                }  else if (ROLE == 'barber' && !data.Items[0].coins) {
+
                     var today = new Date();
                     today.setHours(today.getHours() + 5);
                     today.setMinutes(today.getMinutes() + 30);
@@ -391,130 +533,6 @@ exports.handler = async (event) => {
                             })
                         };
                     }
-                } else if(!data.Items[0].role) {
-                    params = {
-                        TableName: 'Users',
-                        Key: {
-                            id: id,
-                        },
-                        UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la",
-                        ExpressionAttributeNames: {
-                            '#otp': 'otp',
-                            '#role': 'role',
-                            '#address': 'address',
-                            '#long': 'longitude',
-                            '#lat': 'latitude'
-                        },
-                        ExpressionAttributeValues:{
-                            ":o": null,
-                            ":r": ROLE,
-                            ":a": ADD,
-                            ":lo": LONG,
-                            ":la": LAT
-                        },
-                        ReturnValues:"UPDATED_NEW"
-                    };
-                    
-
-                    try {
-                        data = await documentClient.update(params).promise();
-    
-                        var user = {
-                            id: id,
-                        }
-            
-                        token = jwt.sign(user, JWT_SECRET, {});
-
-                        if(obj.ref && ROLE == 'user') {
-                            params = {
-                                TableName: 'Users',
-                                FilterExpression: '#referral = :this_referral',
-                                ExpressionAttributeValues: {':this_referral': obj.ref},
-                                ExpressionAttributeNames: {'#referral': 'referral'}
-                            };
-            
-                            data = await documentClient.scan(params).promise();
-        
-                            console.log(data);
-        
-                            if(data.Items.length === 0) {
-                                return {
-                                    statusCode: 400,
-                                    headers: {
-                                        "Access-Control-Allow-Headers" : "Content-Type",
-                                        "Access-Control-Allow-Origin": "*",
-                                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                                    },
-                                    body: JSON.stringify({
-                                        success: false,
-                                        message: 'Referral code is invalid'
-                                    })
-                                }
-                            } else {
-                                params = {
-                                    TableName: 'Users',
-                                    Key: {
-                                        id: data.Items[0].id,
-                                    },
-                                    UpdateExpression: "set #invites=#invites + :i",
-                                    ExpressionAttributeNames: {
-                                        '#invites': 'invites',
-                                    },
-                                    ExpressionAttributeValues:{
-                                        ":i": 1,
-                                    },
-                                    ReturnValues:"UPDATED_NEW"
-                                };
-        
-                                data = await documentClient.update(params).promise();
-
-                                params = {
-                                    TableName: 'Users',
-                                    Key: {
-                                        id: userID.id,
-                                    },
-                                    UpdateExpression: "set #invites=#invites + :i",
-                                    ExpressionAttributeNames: {
-                                        '#invites': 'invites',
-                                    },
-                                    ExpressionAttributeValues:{
-                                        ":i": 1,
-                                    },
-                                    ReturnValues:"UPDATED_NEW"
-                                };
-        
-                                data = await documentClient.update(params).promise();
-                            }
-                        }
-            
-                        return {
-                            statusCode: 200,
-                            headers: {
-                                "Access-Control-Allow-Headers" : "Content-Type",
-                                "Access-Control-Allow-Origin": "*",
-                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                            },
-                            body: JSON.stringify({
-                                success: true,
-                                message: 'Login/Signup Success',
-                                token: token,
-                            })
-                        };
-                    } catch(err) {
-                        return {
-                            statusCode: 500,
-                            headers: {
-                                "Access-Control-Allow-Headers" : "Content-Type",
-                                "Access-Control-Allow-Origin": "*",
-                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                            },
-                            body: JSON.stringify({
-                                success: false,
-                                message: err,
-                            })
-                        };
-                    }
-                    
                 } else {
 
                     if(ROLE === data.Items[0].role) {

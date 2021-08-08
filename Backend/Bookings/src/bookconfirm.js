@@ -503,7 +503,7 @@ exports.handler = async (event) => {
         
                 }
 
-                var msg = `You have been booked on ${DATE} at ${(Number(SLOT) > 12 ? String(Number(SLOT) - 12) : SLOT )}${(Number(SLOT) >= 12 ? 'pm' : 'am' )}`
+                var msg = `You have been booked on ${day} at ${(Number(SLOT) > 12 ? String(Number(SLOT) - 12) : SLOT )}${(Number(SLOT) >= 12 ? 'pm' : 'am' )}`
 
                 var fcmnotif = await new Promise((resolve, reject) => {
                     const options = {
@@ -529,7 +529,7 @@ exports.handler = async (event) => {
                     });
                 
                     // const reqBody = '{"to":"' + deviceToken + '", "priority" : "high"}';
-                    const reqBody = '{"to":"/topics/' + exist3.user.phone + '", "priority": "high", "notification": {"title": "Barbera Home Salon", "body":"' + msg + '"}}';
+                    const reqBody = '{"to":"/topics/' + exist3.user.phone + '", "priority": "high", "notification": {"title": "Barbera Home Salon", "body":"' + msg + '", "click_action":"OPEN_BOOKING_ACTIVITY"}}';
                     console.log(reqBody);
                 
                     req.write(reqBody);

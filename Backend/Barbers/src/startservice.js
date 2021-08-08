@@ -15,6 +15,7 @@ exports.handler = async (event) => {
         var token = tokenArray[1];
         var obj = JSON.parse(event.body);
         var OTP = obj.otp;
+        var DATE = obj.date;
         var serviceId = obj.serviceId;
         var userId = obj.userId;
 
@@ -64,6 +65,24 @@ exports.handler = async (event) => {
             }
         }
 
+        var today = new Date();
+        today.setHours(today.getHours() + 5);
+        today.setMinutes(today.getMinutes() + 30);
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+        var day = dd + '-' + mm + '-' + yyyy;
+
+        // if(day !== DATE) {
+        //     return {
+        //         statusCode: 400,
+        //         body: JSON.stringify({
+        //             success: false,
+        //             message: 'Your booking is on a different day'
+        //         })
+        //     };
+        // }
+
         var params = {
             TableName: 'Bookings',
             Key: {
@@ -77,24 +96,44 @@ exports.handler = async (event) => {
         if(data.Item) {
             if( OTP === data.Item.start_serv_otp ) {
                 for(var i=0; i<serviceId.length; i++) {
+
                     params = {
                         TableName: 'Bookings',
                         Key: {
                             userId: userId,
                             serviceId: serviceId[i]
                         },
-                        UpdateExpression: "set #start_serv_otp=:s",
+                        UpdateExpression: "set #service_status=:s, #start_serv_otp=:st",
                         ExpressionAttributeNames: {
-                            '#start_serv_otp': 'start_serv_otp', 
+                            '#service_status': 'service_status', 
+                            '#start_serv_otp': 'start_serv_otp'
                         },
                         ExpressionAttributeValues:{
-                            ":s": null,
+                            ":s": 'ongoing',
+                            ":st": null
                         },
                         ReturnValues:"UPDATED_NEW"
                     }
     
                     data = await documentClient.update(params).promise();
                 }
+
+                params = {
+                    TableName: 'Users',
+                    Key: {
+                        id: exist1.user.id,
+                    },
+                    UpdateExpression: "set #mode=:m",
+                    ExpressionAttributeNames: {
+                        '#mode': 'mode', 
+                    },
+                    ExpressionAttributeValues:{
+                        ":m": 'end',
+                    },
+                    ReturnValues:"UPDATED_NEW"
+                }
+
+                data = await documentClient.update(params).promise();
 
                 return {
                     statusCode: 200,

@@ -76,6 +76,8 @@ exports.handler = async (event) => {
             var data = await documentClient.scan(params).promise();
             var data1;
             var info;
+            var day1;
+            var today1;
 
             for(var i=0;i<data.Items.length;i++) {
 
@@ -99,24 +101,57 @@ exports.handler = async (event) => {
                 data.Items[i].service = data1.Item;
 
                 data.Items[i].distance = await getDistance(data.Items[i].user_lat,data.Items[i].user_long,exist1.user.latitude,exist1.user.longitude);
+
+                console.log(data.Items[i].date);
+                day1 = data.Items[i].date.split('-');
+                today1 = new Date(Number(day1[2]),Number(day1[1]),Number(day1[0]),Number(data.Items[i].slot));
+                data.Items[i].booktime = today1.getTime();
             }
 
-            data.Items.sort((a,b) => {
-                if(a.Timestamp > b.Timestamp) {
-                    return -1;
-                }else if(a.Timestamp < b.Timestamp) {
+            var today = new Date();
+            today.setHours(today.getHours() + 5);
+            today.setMinutes(today.getMinutes() + 30);
+
+            var done = data.Items.filter((item) => {
+                return item.service_status === 'done';
+            });
+
+            var not_done = data.Items.filter((item) => {
+                return item.service_status !== 'done';
+            })
+
+            done.sort((a,b) => {
+                if(a.booktime < b.booktime) {
                     return 1;
-                }else {
+                } else if(a.booktime > b.booktime) {
+                    return -1;
+                } else {
                     return 0;
                 }
-            });
+            })
+
+            not_done.sort((a,b) => {
+                if(a.booktime < b.booktime) {
+                    return -1;
+                } else if(a.booktime > b.booktime) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            })
+
+            if(!exist1.user.mode) {
+                exist1.user.mode = '';
+            }
 
             return {
                 statusCode: 200,
                 body: JSON.stringify({
                     success: true,
                     message: 'Bookings found',
-                    data: data.Items,
+                    done: done,
+                    not_done: not_done,
+                    mode: exist1.user.mode
                 })
             }
 
