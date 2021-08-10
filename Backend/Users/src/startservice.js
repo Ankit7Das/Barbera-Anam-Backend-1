@@ -102,6 +102,34 @@ exports.handler = async (event) => {
 
         var params;
         var data;
+        var flag = true;
+
+        for(var i=0; i<serviceId.length; i++) {
+            params = {
+                TableName: 'Bookings',
+                Key: {
+                    userId: userID.id,
+                    serviceId: serviceId[i]
+                }
+            }
+
+            data = await documentClient.get(params).promise();
+
+            if(!data.Item) {
+                flag = false;
+                break;
+            }
+        }
+
+        if(!flag) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Wrong service ids entered'
+                })
+            };
+        }
 
         for(var i=0; i<serviceId.length; i++) {
             params = {

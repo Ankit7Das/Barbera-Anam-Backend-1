@@ -22,16 +22,22 @@ exports.handler = async (event) => {
         try {
             var data = await documentClient.scan(params).promise();
 
+            console.log(data.Items);
+
             var today = new Date();
             today.setHours(today.getHours() + 5);
             today.setMinutes(today.getMinutes() + 30);
-            today.setDate(today.getDate() + 6);
+            today.setDate(today.getDate() + 7);
             var dd = String(today.getDate()).padStart(2, '0');
             var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
             var yyyy = today.getFullYear();
             var day = dd + '-' + mm + '-' + yyyy;
 
+            var data1;
+
             for(var i=0; i<data.Items.length; i++) {
+                console.log(data.Items[i]);
+
                 params = {
                     TableName: 'BarbersLog',
                     Item: {
@@ -54,7 +60,7 @@ exports.handler = async (event) => {
                     }
                 }
     
-                data = await documentClient.put(params).promise();
+                data1 = await documentClient.put(params).promise();
             }
             
             return {

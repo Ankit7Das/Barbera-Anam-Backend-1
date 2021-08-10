@@ -8,7 +8,7 @@ var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 const { userVerifier } = require("./authentication");
 const { JWT_SECRET } = process.env;
-
+const smsClient = require("./smsClient");
 
 exports.handler = async(event) => {
     try {
@@ -118,46 +118,36 @@ exports.handler = async(event) => {
 
         var token = jwt.sign(user, JWT_SECRET, {});
 
-        var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
+        user.random = random;
 
-        random = null; 
+        console.log(user);
 
-        params = {
-            Message: msg,
-            PhoneNumber: '+91' + PHONE,
+        await smsClient.sendVerificationMessage(user);
+
+        // var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
+
+        // random = null; 
+
+        // params = {
+        //     Message: msg,
+        //     PhoneNumber: '+91' + PHONE,
+        // };
+    
+        // var sms = await sns.publish(params).promise();
+        
+        return {
+            statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Headers" : "Content-Type",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+            },
+            body: JSON.stringify({
+                success: true,
+                message: 'OTP sent',
+                token: token,
+            })
         };
-    
-        var sms = await sns.publish(params).promise();
-    
-        if(sms.MessageId) {
-            return {
-                statusCode: 200,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: true,
-                    message: 'OTP sent',
-                    messageId: sms.MessageId,
-                    token: token,
-                })
-            };
-        } else {
-            return {
-                statusCode: 400,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: 'OTP not sent'
-                })
-            };
-        }
 
     } catch(err) {
         console.log(err);

@@ -343,6 +343,35 @@ exports.handler = async (event) => {
     
             }
 
+            for(var i = Number(SLOT) ;  ; i++ ) {
+                console.log(i);
+    
+                cnt+=60;
+               
+                params = {
+                    TableName: 'BarbersLog',
+                    Key: {
+                        date: day,
+                        barberId: barberId
+                    },
+                    UpdateExpression: "set #slot=:s",
+                    ExpressionAttributeNames: {
+                        '#slot': i, 
+                    },
+                    ExpressionAttributeValues:{
+                        ":s": 'b',
+                    },
+                    ReturnValues:"UPDATED_NEW"
+                }
+    
+                data1 = await documentClient.update(params).promise();
+    
+                if( cnt >= total_time) {
+                    break;
+                }
+    
+            }
+
             if(flag) {
                 cnt = 0;
                 var timestamp = today.getTime();
@@ -473,35 +502,6 @@ exports.handler = async (event) => {
                 }
     
                 data1 = await documentClient.update(params).promise();
-
-                for(var i = Number(SLOT) ;  ; i++ ) {
-                    console.log(i);
-        
-                    cnt+=60;
-                   
-                    params = {
-                        TableName: 'BarbersLog',
-                        Key: {
-                            date: day,
-                            barberId: barberId
-                        },
-                        UpdateExpression: "set #slot=:s",
-                        ExpressionAttributeNames: {
-                            '#slot': i, 
-                        },
-                        ExpressionAttributeValues:{
-                            ":s": 'b',
-                        },
-                        ReturnValues:"UPDATED_NEW"
-                    }
-        
-                    data1 = await documentClient.update(params).promise();
-        
-                    if( cnt >= total_time) {
-                        break;
-                    }
-        
-                }
 
                 var msg = `You have been booked on ${day} at ${(Number(SLOT) > 12 ? String(Number(SLOT) - 12) : SLOT )}${(Number(SLOT) >= 12 ? 'pm' : 'am' )}`
 

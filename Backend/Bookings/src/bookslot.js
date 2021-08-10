@@ -452,6 +452,36 @@ exports.handler = async (event) => {
                     
                     console.log(total_price);
 
+                    cnt = 0;
+
+                    for(var i = slot ; ; i++) {
+
+                        cnt+=60;
+
+                        params = {
+                            TableName: 'BarbersLog',
+                            Key: {
+                                date: DATE,
+                                barberId: barberId
+                            },
+                            UpdateExpression: "set #slot=:s",
+                            ExpressionAttributeNames: {
+                                '#slot': String(i), 
+                            },
+                            ExpressionAttributeValues:{
+                                ":s": 'b',
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        }
+            
+                        data1 = await documentClient.update(params).promise();
+
+                        if(cnt > total_time) {
+                            break;
+                        }
+                        
+                    }
+
                     for(var i=0;i<service.length;i++){
 
                         params = {
@@ -587,36 +617,6 @@ exports.handler = async (event) => {
                     // if(slot%100 === 0) {
                     //     slot = (slot/100)*100 + 60;
                     // }
-
-                    cnt = 0;
-
-                    for(var i = slot ; ; i += 10) {
-
-                        cnt+=60;
-
-                        params = {
-                            TableName: 'BarbersLog',
-                            Key: {
-                                date: DATE,
-                                barberId: barberId
-                            },
-                            UpdateExpression: "set #slot=:s",
-                            ExpressionAttributeNames: {
-                                '#slot': String(i), 
-                            },
-                            ExpressionAttributeValues:{
-                                ":s": 'b',
-                            },
-                            ReturnValues:"UPDATED_NEW"
-                        }
-            
-                        data1 = await documentClient.update(params).promise();
-
-                        if(cnt > total_time) {
-                            break;
-                        }
-                        
-                    }
 
                     var msg = `You have been booked on ${DATE} at ${(Number(SLOT) > 12 ? String(Number(SLOT) - 12) : SLOT )}${(Number(SLOT) >= 12 ? 'pm' : 'am' )}`
 

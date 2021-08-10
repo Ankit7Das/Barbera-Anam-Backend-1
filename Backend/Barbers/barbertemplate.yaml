@@ -26,12 +26,12 @@ Resources:
       CodeUri: src/
       Handler: createnewlog.handler
       Runtime: nodejs12.x
-      Events:
-        apiForLambda:
-          Type: Api 
-          Properties:
-            Path: /newlog
-            Method: post
+      # Events:
+      #   apiForLambda:
+      #     Type: Api 
+      #     Properties:
+      #       Path: /newlog
+      #       Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 

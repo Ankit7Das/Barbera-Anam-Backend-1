@@ -95,6 +95,36 @@ exports.handler = async (event) => {
 
         if(data.Item) {
             if( OTP === data.Item.start_serv_otp ) {
+
+                var flag = true;
+
+                for(var i=0; i<serviceId.length; i++) {
+                    params = {
+                        TableName: 'Bookings',
+                        Key: {
+                            userId: userId,
+                            serviceId: serviceId[i]
+                        }
+                    }
+
+                    data = await documentClient.get(params).promise();
+
+                    if(!data.Item) {
+                        flag = false;
+                        break;
+                    }
+                }
+
+                if(!flag) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            success: false,
+                            message: 'Wrong service ids entered'
+                        })
+                    };
+                }
+
                 for(var i=0; i<serviceId.length; i++) {
 
                     params = {
@@ -117,23 +147,6 @@ exports.handler = async (event) => {
     
                     data = await documentClient.update(params).promise();
                 }
-
-                params = {
-                    TableName: 'Users',
-                    Key: {
-                        id: exist1.user.id,
-                    },
-                    UpdateExpression: "set #mode=:m",
-                    ExpressionAttributeNames: {
-                        '#mode': 'mode', 
-                    },
-                    ExpressionAttributeValues:{
-                        ":m": 'end',
-                    },
-                    ReturnValues:"UPDATED_NEW"
-                }
-
-                data = await documentClient.update(params).promise();
 
                 return {
                     statusCode: 200,
