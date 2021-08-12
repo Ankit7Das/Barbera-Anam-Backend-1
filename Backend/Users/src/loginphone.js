@@ -63,7 +63,7 @@ exports.handler = async(event) => {
             }
 
             try {
-                data = await documentClient.put(params).promise();
+                data1 = await documentClient.put(params).promise();
 
             } catch(err) {
                 return {
@@ -99,7 +99,7 @@ exports.handler = async(event) => {
             };
     
             try {
-                data = await documentClient.update(params).promise();
+                data1 = await documentClient.update(params).promise();
             } catch(err) {
                 return {
                     statusCode: 500,
@@ -135,19 +135,37 @@ exports.handler = async(event) => {
     
         // var sms = await sns.publish(params).promise();
         
-        return {
-            statusCode: 200,
-            headers: {
-                "Access-Control-Allow-Headers" : "Content-Type",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-            },
-            body: JSON.stringify({
-                success: true,
-                message: 'OTP sent',
-                token: token,
-            })
-        };
+        if(!data.Items[0].gender) {
+            return {
+                statusCode: 200,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                body: JSON.stringify({
+                    success: true,
+                    message: 'OTP sent',
+                    token: token,
+                    first: true,
+                })
+            };
+        } else {
+            return {
+                statusCode: 200,
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+                body: JSON.stringify({
+                    success: true,
+                    message: 'OTP sent',
+                    token: token,
+                    first: false,
+                })
+            };
+        }
 
     } catch(err) {
         console.log(err);

@@ -452,36 +452,69 @@ exports.handler = async (event) => {
                     };
 
                     try {
-                        data = await documentClient.batchWrite(params).promise();
+                        var data1 = await documentClient.batchWrite(params).promise();
 
-                        params = {
-                            TableName: 'Users',
-                            Key: {
-                                id: id,
-                            },
-                            UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #status=:s, #referral=:ref, #coins=:c",
-                            ExpressionAttributeNames: {
-                                '#otp': 'otp',
-                                '#role': 'role',
-                                '#address': 'address',
-                                '#long': 'longitude',
-                                '#lat': 'latitude',
-                                '#status': 'status',
-                                '#referral': 'referral',
-                                '#coins':'coins'
-                            },
-                            ExpressionAttributeValues:{
-                                ":o": null,
-                                ":r": ROLE,
-                                ":a": ADD,
-                                ":lo": LONG,
-                                ":la": LAT,
-                                ":s": 'free',
-                                ":ref": null,
-                                ":c": 0
-                            },
-                            ReturnValues:"UPDATED_NEW"
-                        };
+                        if(!data.Items[0].gender) {
+                            params = {
+                                TableName: 'Users',
+                                Key: {
+                                    id: id,
+                                },
+                                UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #status=:s, #referral=:ref, #coins=:c, #gender=:g",
+                                ExpressionAttributeNames: {
+                                    '#otp': 'otp',
+                                    '#role': 'role',
+                                    '#address': 'address',
+                                    '#long': 'longitude',
+                                    '#lat': 'latitude',
+                                    '#status': 'status',
+                                    '#referral': 'referral',
+                                    '#coins':'coins',
+                                    '#gender':'gender'
+                                },
+                                ExpressionAttributeValues:{
+                                    ":o": null,
+                                    ":r": ROLE,
+                                    ":a": ADD,
+                                    ":lo": LONG,
+                                    ":la": LAT,
+                                    ":s": 'free',
+                                    ":ref": null,
+                                    ":c": 0,
+                                    ":g": obj.gender
+                                },
+                                ReturnValues:"UPDATED_NEW"
+                            };
+                        } else {
+                            params = {
+                                TableName: 'Users',
+                                Key: {
+                                    id: id,
+                                },
+                                UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #status=:s, #referral=:ref, #coins=:c",
+                                ExpressionAttributeNames: {
+                                    '#otp': 'otp',
+                                    '#role': 'role',
+                                    '#address': 'address',
+                                    '#long': 'longitude',
+                                    '#lat': 'latitude',
+                                    '#status': 'status',
+                                    '#referral': 'referral',
+                                    '#coins':'coins'
+                                },
+                                ExpressionAttributeValues:{
+                                    ":o": null,
+                                    ":r": ROLE,
+                                    ":a": ADD,
+                                    ":lo": LONG,
+                                    ":la": LAT,
+                                    ":s": 'free',
+                                    ":ref": null,
+                                    ":c": 0
+                                },
+                                ReturnValues:"UPDATED_NEW"
+                            };
+                        }
 
                         try {
                             data = await documentClient.update(params).promise();

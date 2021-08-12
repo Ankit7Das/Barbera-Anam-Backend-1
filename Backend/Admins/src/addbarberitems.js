@@ -86,6 +86,14 @@ exports.handler = async (event) => {
             }
         }
 
+        var today = new Date();
+        today.setHours(today.getHours() + 5);
+        today.setMinutes(today.getMinutes() + 30);
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+        var day = dd + '-' + mm + '-' + yyyy;
+
         var params = {
             TableName: 'Users',
             Key: {
@@ -120,7 +128,7 @@ exports.handler = async (event) => {
                         '#items': 'items', 
                     },
                     ExpressionAttributeValues:{
-                        ":i": data.Item.items + ITEM + '=' + QUAN + ',',
+                        ":i": data.Item.items + day + '=' + ITEM + '=' + QUAN + ',',
                     },
                     ReturnValues:"UPDATED_NEW"
                 }

@@ -44,12 +44,12 @@ Resources:
       CodeUri: src/
       Handler: bookinstant.handler
       Runtime: nodejs12.x
-      Events:
-        apiForLambda:
-          Type: Api 
-          Properties:
-            Path: /bookinst
-            Method: post
+      # Events:
+      #   apiForLambda:
+      #     Type: Api 
+      #     Properties:
+      #       Path: /bookinst
+      #       Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -59,12 +59,12 @@ Resources:
       CodeUri: src/
       Handler: bookconfirm.handler
       Runtime: nodejs12.x
-      Events:
-        apiForLambda:
-          Type: Api 
-          Properties:
-            Path: /bookconfirm
-            Method: post
+      # Events:
+      #   apiForLambda:
+      #     Type: Api 
+      #     Properties:
+      #       Path: /bookconfirm
+      #       Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -74,12 +74,12 @@ Resources:
       CodeUri: src/
       Handler: bookrevert.handler
       Runtime: nodejs12.x
-      Events:
-        apiForLambda:
-          Type: Api 
-          Properties:
-            Path: /bookrevert
-            Method: post
+      # Events:
+      #   apiForLambda:
+      #     Type: Api 
+      #     Properties:
+      #       Path: /bookrevert
+      #       Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
@@ -109,6 +109,21 @@ Resources:
           Type: Api 
           Properties:
             Path: /getbookings
+            Method: get
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
+  GetSlotAvailability:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: slotavailability.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /slots
             Method: get
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------

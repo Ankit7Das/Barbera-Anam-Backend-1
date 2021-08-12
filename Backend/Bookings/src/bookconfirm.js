@@ -178,27 +178,30 @@ exports.handler = async (event) => {
             }
 
             if(service[i].serviceId === serviceId) {
-                if(exist2.service.price >= data.Items[0].lower_price_limit) {
+
+                if(Number(exist2.service.price) >= data.Items[0].lower_price_limit) {
                     if(data.Items[0].upper_price_limit !== -1) {
-                        if(exist2.service.price <= data.Items[0].upper_price_limit) {
-                            prices.push(service[i].quantity*exist2.service.price);
-                            total_price += service[i].quantity*exist2.service.price;
+                        if(Number(exist2.service.price) <= data.Items[0].upper_price_limit) {
+                            prices.push(service[i].quantity*Number(exist2.service.price));
+                            total_price += service[i].quantity*Number(exist2.service.price);
                             flag = true;
                         } 
                     } else {
-                        prices.push(service[i].quantity*exist2.service.price);
-                        total_price += service[i].quantity*exist2.service.price;
+                        prices.push(service[i].quantity*Number(exist2.service.price));
+                        total_price += service[i].quantity*Number(exist2.service.price);
                         flag = true;
                     }
                 } 
             } else {
-                prices.push(service[i].quantity*exist2.service.price);
-                total_price += service[i].quantity*exist2.service.price;
-                flag = true;
+                prices.push(service[i].quantity*Number(exist2.service.price));
+                total_price += service[i].quantity*Number(exist2.service.price);
             }
 
             total_time += service[i].quantity*Number(exist2.service.time);
         }
+
+        console.log("cal",total_price);
+        console.log(obj.totalprice);
 
         if(serviceId === 'all') {
             if(type === 'ref') {
@@ -251,13 +254,15 @@ exports.handler = async (event) => {
             }
         }
 
-        if(!flag) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Wrong prices sent',
-                })
+        if(obj.couponName) {
+            if(!flag) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        success: false,
+                        message: 'Wrong prices sent',
+                    })
+                }
             }
         }
 
@@ -343,36 +348,38 @@ exports.handler = async (event) => {
     
             }
 
-            for(var i = Number(SLOT) ;  ; i++ ) {
-                console.log(i);
-    
-                cnt+=60;
-               
-                params = {
-                    TableName: 'BarbersLog',
-                    Key: {
-                        date: day,
-                        barberId: barberId
-                    },
-                    UpdateExpression: "set #slot=:s",
-                    ExpressionAttributeNames: {
-                        '#slot': i, 
-                    },
-                    ExpressionAttributeValues:{
-                        ":s": 'b',
-                    },
-                    ReturnValues:"UPDATED_NEW"
-                }
-    
-                data1 = await documentClient.update(params).promise();
-    
-                if( cnt >= total_time) {
-                    break;
-                }
-    
-            }
-
             if(flag) {
+                cnt=0;
+
+                for(var i = Number(SLOT) ;  ; i++ ) {
+                    console.log(i);
+        
+                    cnt+=60;
+                   
+                    params = {
+                        TableName: 'BarbersLog',
+                        Key: {
+                            date: day,
+                            barberId: barberId
+                        },
+                        UpdateExpression: "set #slot=:s",
+                        ExpressionAttributeNames: {
+                            '#slot': i, 
+                        },
+                        ExpressionAttributeValues:{
+                            ":s": 'b',
+                        },
+                        ReturnValues:"UPDATED_NEW"
+                    }
+        
+                    data1 = await documentClient.update(params).promise();
+        
+                    if( cnt >= total_time) {
+                        break;
+                    }
+        
+                }
+
                 cnt = 0;
                 var timestamp = today.getTime();
 
@@ -482,9 +489,7 @@ exports.handler = async (event) => {
                         }
                         
                     }
-                }
-
-                var percentage = 0.1;            
+                }            
     
                 params = {
                     TableName: 'Users',
@@ -496,7 +501,7 @@ exports.handler = async (event) => {
                         '#coins': 'coins', 
                     },
                     ExpressionAttributeValues:{
-                        ":c": percentage*total_price,
+                        ":c": total_price,
                     },
                     ReturnValues:"UPDATED_NEW"
                 }

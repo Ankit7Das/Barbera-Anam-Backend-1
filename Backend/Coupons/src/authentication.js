@@ -26,6 +26,30 @@ module.exports.userVerifier = async (id) => {
 
 }
 
+module.exports.serviceVerifier = async (id) => {
+
+    var params = {
+        TableName: 'Services',
+        Key: {
+            id: id,
+        }
+    }
+
+    var data = await documentClient.get(params).promise();
+
+    if(!data.Item) {
+        return {
+            success: false
+        };
+    } else {
+        return {
+            success: true,
+            service: data.Item
+        };
+    }
+
+}
+
 module.exports.couponVerifier = async (id) => {
 
     var params = {

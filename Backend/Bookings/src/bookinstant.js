@@ -332,6 +332,8 @@ exports.handler = async (event) => {
                     }
 
                 }
+
+                console.log("distance",barbers[0].distance);
     
                 return {
                     statusCode: 200,

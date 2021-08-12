@@ -11,8 +11,8 @@ exports.handler = async (event) => {
     try {
 
         var obj = JSON.parse(event.body);
-        var NAME = obj.name;
-
+        var CNAME = obj.couponName;
+        var service = obj.service;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
@@ -72,7 +72,11 @@ exports.handler = async (event) => {
 
         var data = await documentClient.get(params).promise();
 
-        if(NAME === data.Item.couponName) {
+        var serviceId;
+        var discount;
+        var type;
+
+        if(CNAME === data.Item.couponName) {
 
             if(exist1.user.invites > 0) {
                 return {
@@ -84,35 +88,6 @@ exports.handler = async (event) => {
                         serviceId: 'all'
                     })
                 }
-                // var params = {
-                //     TableName: 'Users',
-                //     Key: {
-                //         id: userID.id,
-                //     },
-                //     UpdateExpression: "set #invites=#invites - :i",
-                //     ExpressionAttributeNames: {
-                //         '#invites': 'invites', 
-                //     },
-                //     ExpressionAttributeValues:{
-                //         ":i": 1,
-                //     },
-                //     ReturnValues:"UPDATED_NEW"
-                // }
-        
-                // try {
-                //     var data = await documentClient.update(params).promise();
-        
-                    
-                // } catch(err) {
-                //     console.log("Error: ", err);
-                //     return {
-                //         statusCode: 500,
-                //         body: JSON.stringify({
-                //             success: false,
-                //             message: err,
-                //         })
-                //     };
-                // }
             } else {
                 return {
                     statusCode: 400,
@@ -129,7 +104,7 @@ exports.handler = async (event) => {
                 TableName: 'Coupons',
                 KeyConditionExpression: '#name = :n',
                 ExpressionAttributeValues: {
-                    ':n': NAME,
+                    ':n': CNAME,
                 },
                 ExpressionAttributeNames: {
                     '#name': 'name'
@@ -157,45 +132,108 @@ exports.handler = async (event) => {
                                 message: 'Coupon already used'
                             })
                         };
-                    } else {
+                    } 
+
+                    type = 'coupon';
+                    serviceId = data.Items[0].serviceId;
+                    discount = data.Items[0].discount;
+
+                    var flag = false;
+                    var total_price = 0;
+
+                    for(var i=0;i<service.length;i++) {
+                        
+                        exist2 = await serviceVerifier(service[i].serviceId);
+
+                        if(exist2.success == false) {
+                            break;
+                        }
+
+                        if(service[i].serviceId === serviceId) {
+                            if(Number(exist2.service.price)*service[i].quantity >= data.Items[0].lower_price_limit) {
+                                if(data.Items[0].upper_price_limit !== -1) {
+                                    if(Number(exist2.service.price) <= data.Items[0].upper_price_limit) {
+                                        total_price += service[i].quantity*Number(exist2.service.price);
+                                        flag = true;
+                                    } else {
+                                        return {
+                                            statusCode: 400,
+                                            body: JSON.stringify({
+                                                success: false,
+                                                message: 'Coupon upper limit is lower',
+                                            })
+                                        }
+                                    }
+                                } else {
+                                    total_price += service[i].quantity*Number(exist2.service.price);
+                                    flag = true;
+                                }
+                            } else {
+                                return {
+                                    statusCode: 400,
+                                    body: JSON.stringify({
+                                        success: false,
+                                        message: 'Coupon lower limit is higher',
+                                    })
+                                }
+                            }
+                        } else {
+                            total_price += service[i].quantity*Number(exist2.service.price);
+                        }
+                    
+                    }
+
+                    if(serviceId === 'all') {
+            
+                        if(total_price < data.Items[0].lower_price_limit) {
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    success: false,
+                                    message: 'Wrong prices sent',
+                                })
+                            }
+                        }
+        
+                        if(data.Items[0].upper_price_limit !== -1) {
+                            if(total_price > data.Items[0].upper_price_limit) {
+                                return {
+                                    statusCode: 400,
+                                    body: JSON.stringify({
+                                        success: false,
+                                        message: 'Wrong prices sent',
+                                    })
+                                }
+                            }
+                        }
+        
+                        flag = true;
+                        
+                    }
+
+                    if(!flag) {
                         return {
-                            statusCode: 200,
+                            statusCode: 400,
                             body: JSON.stringify({
-                                success: true,
-                                message: 'Coupon successful',
-                                data: data.Items[0].discount,
-                                serviceId: data.Items[0].serviceId 
+                                success: false,
+                                message: 'Coupon cannot be applied',
                             })
                         }
-                        // params = {
-                        //     TableName: 'Coupons',
-                        //     Key: {
-                        //         name: NAME,
-                        //         serviceId: serviceId
-                        //     },
-                        //     UpdateExpression: "set #used_by=:u",
-                        //     ExpressionAttributeNames: {
-                        //         '#used_by': 'used_by', 
-                        //     },
-                        //     ExpressionAttributeValues:{
-                        //         ":u": data.Item.used_by + userID.id + ',',
-                        //     },
-                        //     ReturnValues:"UPDATED_NEW"
-                        // }
-    
-                        // try {
-                        //     var data1 = await documentClient.update(params).promise();
-                            
-                        // } catch(err) {
-                        //     return {
-                        //         statusCode: 500,
-                        //         body: JSON.stringify({
-                        //             success: false,
-                        //             message: 'Coupon unsuccessful'
-                        //         })
-                        //     }
-                        // }
                     }
+
+                    
+                    return {
+                        statusCode: 200,
+                        body: JSON.stringify({
+                            success: true,
+                            message: 'Coupon successful',
+                            upper_price_limit: data.Items[0].upper_price_limit,
+                            lower_price_limit: data.Items[0].lower_price_limit,
+                            data: data.Items[0].discount,
+                            serviceId: data.Items[0].serviceId 
+                        })
+                    }
+                    
                 
                 }
     

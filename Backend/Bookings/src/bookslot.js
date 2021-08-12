@@ -87,6 +87,8 @@ exports.handler = async (event) => {
         var type;
         var refcoupon = data.Item.couponName
 
+        console.log("coupon");
+
         if(obj.couponName){
             if(obj.couponName === refcoupon) {
 
@@ -145,7 +147,10 @@ exports.handler = async (event) => {
             }
         }
 
+        console.log("done");
+
         var flag = false;
+        var gender = 'male';
 
         for(var i=0;i<service.length;i++) {
             
@@ -155,66 +160,56 @@ exports.handler = async (event) => {
                 break;
             }
 
-            if(service[i].serviceId === serviceId) {
-                if(exist2.service.price >= data.Items[0].lower_price_limit) {
-                    if(data.Items[0].upper_price_limit !== -1) {
-                        if(exist2.service.price <= data.Items[0].upper_price_limit) {
-                            prices.push(service[i].quantity*exist2.service.price);
-                            total_price += service[i].quantity*exist2.service.price;
+            if(exist2.service.category.startsWith("Women")) {
+                gender = 'female';
+            }
+
+            if(obj.couponName) {
+                if(service[i].serviceId === serviceId) {
+                    if(Number(exist2.service.price)*service[i].quantity >= data.Items[0].lower_price_limit) {
+                        if(data.Items[0].upper_price_limit !== -1) {
+                            if(Number(exist2.service.price) <= data.Items[0].upper_price_limit) {
+                                prices.push(service[i].quantity*Number(exist2.service.price));
+                                total_price += service[i].quantity*Number(exist2.service.price);
+                                flag = true;
+                            } 
+                        } else {
+                            prices.push(service[i].quantity*Number(exist2.service.price));
+                            total_price += service[i].quantity*Number(exist2.service.price);
                             flag = true;
-                        } 
-                    } else {
-                        prices.push(service[i].quantity*exist2.service.price);
-                        total_price += service[i].quantity*exist2.service.price;
-                        flag = true;
-                    }
-                } 
+                        }
+                    } 
+                } else {
+                    prices.push(service[i].quantity*Number(exist2.service.price));
+                    total_price += service[i].quantity*Number(exist2.service.price);
+                }
             } else {
-                prices.push(service[i].quantity*exist2.service.price);
-                total_price += service[i].quantity*exist2.service.price;
-                flag = true;
+                prices.push(service[i].quantity*Number(exist2.service.price));
+                total_price += service[i].quantity*Number(exist2.service.price);
             }
         
             total_time += service[i].quantity*Number(exist2.service.time);
         }
 
-        if(serviceId === 'all') {
-            if(type === 'ref') {
-                if(total_price - discount !== obj.totalprice) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({
-                            success: false,
-                            message: 'Wrong prices sent',
-                        })
-                    }
-                } 
-                
-                flag = true;
-                
-            } else {
-                if(total_price - discount !== obj.totalprice) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({
-                            success: false,
-                            message: 'Wrong prices sent',
-                        })
-                    }
-                }
-    
-                if(total_price < data.Items[0].lower_price_limit) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({
-                            success: false,
-                            message: 'Wrong prices sent',
-                        })
-                    }
-                }
+        var coupon;
 
-                if(data.Items[0].upper_price_limit !== -1) {
-                    if(total_price > data.Items[0].upper_price_limit) {
+        if(obj.couponName) {
+            if(serviceId === 'all') {
+                if(type === 'ref') {
+                    if(total_price - discount !== obj.totalprice) {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                success: false,
+                                message: 'Wrong prices sent',
+                            })
+                        }
+                    } 
+                    
+                    flag = true;
+                    
+                } else {
+                    if(total_price - discount !== obj.totalprice) {
                         return {
                             statusCode: 400,
                             body: JSON.stringify({
@@ -223,19 +218,45 @@ exports.handler = async (event) => {
                             })
                         }
                     }
+        
+                    if(total_price < data.Items[0].lower_price_limit) {
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                success: false,
+                                message: 'Wrong prices sent',
+                            })
+                        }
+                    }
+    
+                    if(data.Items[0].upper_price_limit !== -1) {
+                        if(total_price > data.Items[0].upper_price_limit) {
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    success: false,
+                                    message: 'Wrong prices sent',
+                                })
+                            }
+                        }
+                    }
+    
+                    flag = true;
                 }
-
-                flag = true;
             }
+    
+            coupon = data.Items[0];
         }
 
-        if(!flag) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Wrong prices sent',
-                })
+        if(obj.couponName) {
+            if(!flag) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        success: false,
+                        message: 'Wrong prices sent',
+                    })
+                }
             }
         }
 
@@ -254,6 +275,8 @@ exports.handler = async (event) => {
         }
 
         if(total_price !== obj.totalprice) {
+            console.log(obj.totalprice);
+            console.log("cal",total_price);
             return {
                 statusCode: 400,
                 body: JSON.stringify({
@@ -400,7 +423,7 @@ exports.handler = async (event) => {
 
                 console.log("inside",data2.Item);
 
-                if(data2.Item.coins >= 300 && data2.Item.distance<=distance) {
+                if(data2.Item.coins >= 300 && data2.Item.distance<=distance && data2.Item.gender === gender) {
                     console.log(data2.Item);
                     barbers.push(data2.Item);
                 } else {
@@ -531,23 +554,23 @@ exports.handler = async (event) => {
                             data1 = await documentClient.update(params).promise();
                         } else {
 
-                            var usedby = data.Items[0].used_by.split(",").length - 1;
+                            var usedby = coupon.used_by.split(",").length - 1;
 
                             console.log(usedby);
 
-                            if(data.Items[0].user_limit === -1) {
+                            if(coupon.user_limit === -1) {
                                 params = {
                                     TableName: 'Coupons',
                                     Key: {
                                         name: obj.couponName,
-                                        serviceId: data.Items[0].serviceId
+                                        serviceId: coupon.serviceId
                                     },
                                     UpdateExpression: "set #used_by=:u",
                                     ExpressionAttributeNames: {
                                         '#used_by': 'used_by', 
                                     },
                                     ExpressionAttributeValues:{
-                                        ":u": data.Items[0].used_by + ',' + userID.id,
+                                        ":u": coupon.used_by + ',' + userID.id,
                                     },
                                     ReturnValues:"UPDATED_NEW"
                                 }
@@ -555,13 +578,13 @@ exports.handler = async (event) => {
                                 
                                 data1 = await documentClient.update(params).promise();
                             } else {
-                                if(usedby + 1 === data.Items[0].user_limit) {
+                                if(usedby + 1 === coupon.user_limit) {
 
                                     params = {
                                         TableName: 'Coupons',
                                         Key: {
                                             name: obj.couponName,
-                                            serviceId: data.Items[0].serviceId
+                                            serviceId: coupon.serviceId
                                         }
                                     }
                                     
@@ -572,14 +595,14 @@ exports.handler = async (event) => {
                                         TableName: 'Coupons',
                                         Key: {
                                             name: obj.couponName,
-                                            serviceId: data.Items[0].serviceId
+                                            serviceId: coupon.serviceId
                                         },
                                         UpdateExpression: "set #used_by=:u",
                                         ExpressionAttributeNames: {
                                             '#used_by': 'used_by', 
                                         },
                                         ExpressionAttributeValues:{
-                                            ":u": data.Items[0].used_by + ',' + userID.id,
+                                            ":u": coupon.used_by + ',' + userID.id,
                                         },
                                         ReturnValues:"UPDATED_NEW"
                                     }
@@ -590,9 +613,7 @@ exports.handler = async (event) => {
                             }
                             
                         }
-                    }
-
-                    var percentage = 0.1;            
+                    }         
 
                     params = {
                         TableName: 'Users',
@@ -604,7 +625,7 @@ exports.handler = async (event) => {
                             '#coins': 'coins', 
                         },
                         ExpressionAttributeValues:{
-                            ":c": percentage*total_price,
+                            ":c": total_price,
                         },
                         ReturnValues:"UPDATED_NEW"
                     }
