@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "barbera-home-salon",
+  "private_key_id": "b1379e216adb0c83f778666fd2bd82339535f6e2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDHtdbJAS0Ho8Qr\nVLkG87lI8uewcl0QKokR7hxNAqE4Zn056jO5p234MVANSH7UihjNv/PSPbGre5wm\nZW85Rke4xHR4Q+aQMkdsdYDp+n4j2oz58NmEH/0KiwPTF5c4GT6enZF2clryvxqP\n/gzV666Vp1RWDu+iTjIHjSuCTtJN1uhI2OnUKKoNXjcty8TnzDky8yBwb7RyfcbN\nOrJHcay6PSrH5L6uKToptyFe9n7nGtSul17hIixmos0JVfRvGzipVtLlDCdkbJDM\nAsVsyPvd8kVKSarM6mG3TtjU8rzbaM0PVWT1JmhELEuuUJr8ij2ZaD8QJp4OIe3O\nTqDTlyItAgMBAAECggEAA8dVAQicqYBXvdokhhUmdFLkP1pqmFu1rDktH+fk1QRb\najUcNW8NjZyhPx8YBz11qq7vFhNEwVHdanyQ1iyWPtC4w23FdwT8hPjUL5kludfw\nwunjs7RHPWPT9rKDkfQoUyf4EJ2pSt6CyiasZ3/GFd7MobQ2pIOGPs5U/GoxYHef\n6hx9tn/qfyjNzlLS5aMi0vwsHSsb85Kmz0jP7TZXQKNeG4aGwEjKEmp0vT/565T9\nZ0A14T4lTbOKaLhkTyy/bG15IY69WC9NqxFjYY0BmM2fsZ2tV0MtjO45oIQWqBna\ncf7EXqFTd2v5Y0TBSlK6PMxf0CtrUQA7XE+DbKx1oQKBgQDx1HQWojRXCMOduxM5\nNFNDkM0vAlJZuifUdnJc9wtuNT46GR3k9Qev2UpbQ+B50ajitjmyUxZgsGjnofT4\n6fe0aZP8Qv2wAVSSG4MYMCsf5+ErkelJ8Hn1WDE8kz7CABSLbFefh9REcD92SRFR\nxjXCjEfsrzu/sm1WvJCXxcXYvwKBgQDTaZMbP6gk9rWm11bZO0+S7K2PtUteS54g\nLzjOSiaPqMpY9n21ohpyh6UaZhYw8VWqE0jLoq+bBVRMk2TmI3mwmZa/tecN5+ox\nZl72892fTcNfPrMspC1dfBCx/M6Tl4H50qNFI3lYhmowY/qg8CH9oGgKa8+5HDYq\nxtOPny70EwKBgQCWD2pV3SMzWqngB4TfO1vrkj/wSrWFHiG3EiTXESlTotBRRuKo\n/29crC4awdzaWsI8pCzbPfml1/HQwkv75Vsi5VzB7WP0Qm8TFuVbLhCkhMPRwIIN\nsp5LIwWyfAA2a8xT08/vm16ZdTm8EY0gvCkB5wB+myItSu/UIcBrnXquiwKBgDDL\nTy6c1JwjbO2jCeJ9c/I/OhfPCiQrY8Wd4IiMSLYjiQBbc8w2K9B/SjX7leeZ6+Gj\nLcwCMnGfG0PJSSJs0atW55o7y6ZD/qOEMyrgQiiAdDVJbWVCR04qUlgiNzONZmxY\nl2Jfu6QY8e1VRgVbJx04poqxM3JP9piM50tgvB+NAoGBAK/mvuxcr74X/WqReGEE\nPDpLUIO44fn335S0Uyg8etIBknHWcjPVoUhpiJQMBwuwC6bFp+wOcPzJMhVprtrk\nPBBVTsQVjs8DW5Ua+o+WXPvEn2olBlteseCsCpBMvO8jAU48vF3j1pT0zqqXrhpP\nEKTu3S0CuPklZKiGEOGnnJTH\n-----END PRIVATE KEY-----\n",
+  "client_email": "barbera@barbera-home-salon.iam.gserviceaccount.com",
+  "client_id": "108516391994555954790",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/barbera%40barbera-home-salon.iam.gserviceaccount.com"
+}

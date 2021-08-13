@@ -124,7 +124,7 @@ Resources:
           Type: Api 
           Properties:
             Path: /slots
-            Method: get
+            Method: post
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 

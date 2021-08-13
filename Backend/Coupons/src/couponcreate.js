@@ -17,6 +17,7 @@ exports.handler = async (event) => {
         var LowerLimit = obj.lowerlimit;
         var UpperLimit = obj.upperlimit;
         var UserLimit = obj.userlimit;
+        var TERMS = obj.terms;
 
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
@@ -96,7 +97,8 @@ exports.handler = async (event) => {
                 used_by: '',
                 lower_price_limit: LowerLimit,
                 upper_price_limit: UpperLimit ? UpperLimit : -1,
-                user_limit: UserLimit ? UserLimit : -1
+                user_limit: UserLimit ? UserLimit : -1,
+                terms: terms
             }
         }
 

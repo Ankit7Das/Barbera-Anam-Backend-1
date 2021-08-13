@@ -10,7 +10,8 @@
     "dependencies": {
       "aws-sdk": "^2.783.0",
       "jsonwebtoken": "^8.5.1",
-      "dotenv": "^8.2.0"
+      "dotenv": "^8.2.0",
+      "googleapis": "^84.0.0"
     }
   }
   

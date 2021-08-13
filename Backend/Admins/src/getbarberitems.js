@@ -78,6 +78,8 @@ exports.handler = async (event) => {
     
             try {
                 var data = await documentClient.get(params).promise();
+
+                console.log(data.Item);
     
                 if(!data.Item) {
                     return {
@@ -93,21 +95,25 @@ exports.handler = async (event) => {
                         })
                     }
                 } else {
+
+                    var items = [];
     
-                    var items = data.Item.items.split(',');
-                    var item;
-    
-                    for(var i=0; i<items.length; i++) {
-                        item = items[i].split('=');
-    
-                        if(item[0] !== '' && item[1] !== null) {
-                            items[i] = {
-                                date: item[0],
-                                item: item[1],
-                                quantity: Number(item[2])
+                    if(data.Item.items) {
+                        items = data.Item.items.split(',');
+                        var item;
+        
+                        for(var i=0; i<items.length; i++) {
+                            item = items[i].split('=');
+        
+                            if(item[0] !== '' && item[1] !== null) {
+                                items[i] = {
+                                    date: item[0],
+                                    item: item[1],
+                                    quantity: Number(item[2])
+                                }
+                            } else {
+                                items.splice(i,1);
                             }
-                        } else {
-                            items.splice(i,1);
                         }
                     }
     
@@ -141,20 +147,25 @@ exports.handler = async (event) => {
                 };
             }
         } else if(exist1.user.role === 'barber') {
-            var items = exist1.user.items.split(',');
-            var item;
 
-            for(var i=0; i<items.length; i++) {
-                item = items[i].split('=');
+            var items = [];
 
-                if(item[0] !== '' && item[1] !== null) {
-                    items[i] = {
-                        date: item[0],
-                        item: item[1],
-                        quantity: Number(item[2])
+            if(exist1.user.items) {
+                var items = exist1.user.items.split(',');
+                var item;
+
+                for(var i=0; i<items.length; i++) {
+                    item = items[i].split('=');
+
+                    if(item[0] !== '' && item[1] !== null) {
+                        items[i] = {
+                            date: item[0],
+                            item: item[1],
+                            quantity: Number(item[2])
+                        }
+                    } else {
+                        items.splice(i,1);
                     }
-                } else {
-                    items.splice(i,1);
                 }
             }
 

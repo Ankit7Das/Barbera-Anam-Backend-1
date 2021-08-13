@@ -109,11 +109,13 @@ exports.handler = async (event) => {
             }
 
             var today = new Date();
+            var now;
             today.setHours(today.getHours() + 5);
             today.setMinutes(today.getMinutes() + 30);
 
             var done = data.Items.filter((item) => {
-                return item.service_status === 'done';
+                now = new Date(item.booktime);
+                return item.service_status === 'done' && today.getDate()-now.getDate() >= 30;
             });
 
             var not_done = data.Items.filter((item) => {

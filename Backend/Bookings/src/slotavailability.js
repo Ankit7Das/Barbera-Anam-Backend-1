@@ -107,9 +107,14 @@ exports.handler = async (event) => {
 
         var data = await documentClient.scan(params).promise();
 
-        data.Items.filter((barber) => {
+        console.log("before",data.Items);
+
+        data.Items = data.Items.filter((barber) => {
+            console.log(barber.gender,gender);
             return barber.gender === gender;
         })
+
+        console.log("after",data.Items);
 
         params = {
             TableName: 'Stock',
@@ -131,7 +136,7 @@ exports.handler = async (event) => {
         for(var i=0; i<data.Items.length; i++) {
             dist = await getDistance(exist1.user.latitude, exist1.user.longitude, data.Items[i].latitude, data.Items[i].longitude);
 
-            if(dist <= distance) {
+            if(dist <= distance && data.Items[i].coins >= 300) {
 
                 console.log(data.Items[i]);
 

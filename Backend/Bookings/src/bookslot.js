@@ -3,6 +3,7 @@ require('dotenv').config();
 var AWS = require('aws-sdk');
 var uuid = require('uuid');
 var https = require('https');
+const { google } = require("googleapis");
 var ddb = new AWS.DynamoDB({ apiVersion: '2012-08-10' });
 var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
@@ -10,6 +11,12 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
 const { userVerifier, serviceVerifier } = require("./authentication");
 const { getDistance } = require('./helper');
+
+const auth = new google.auth.GoogleAuth({
+    keyFile: "keys.json", //the key file
+    //url to spreadsheets API
+    scopes: "https://www.googleapis.com/auth/spreadsheets", 
+});
 
 
 exports.handler = async (event) => {
@@ -151,6 +158,7 @@ exports.handler = async (event) => {
 
         var flag = false;
         var gender = 'male';
+        var serviceName = [];
 
         for(var i=0;i<service.length;i++) {
             
@@ -189,6 +197,7 @@ exports.handler = async (event) => {
             }
         
             total_time += service[i].quantity*Number(exist2.service.time);
+            serviceName.push(exist2.service.name + ' (' + exist2.service.category + ')');
         }
 
         var coupon;
@@ -289,6 +298,11 @@ exports.handler = async (event) => {
         var today = new Date();
         today.setHours(today.getHours() + 5);
         today.setMinutes(today.getMinutes() + 30);
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+        var day = dd + '-' + mm + '-' + yyyy;
+
         var now = new Date();
         now.setHours(now.getHours() + 5);
         now.setMinutes(now.getMinutes() + 30);
@@ -457,6 +471,7 @@ exports.handler = async (event) => {
                 var barberId = barbers[0].id;
                 var coins = barbers[0].coins;
                 var phone = barbers[0].phone;
+                var name = barbers[0].name;
 
                 params = {
                     TableName: 'BarbersLog',
@@ -505,6 +520,15 @@ exports.handler = async (event) => {
                         
                     }
 
+                     //Auth client Object
+                    const authClientObject = await auth.getClient();
+
+                    const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject });
+
+                    const spreadsheetId = "1NOsQ1OS-oRa0BW0-G9cUSUBGRd0hJRy_FnNZFeMZB_8";
+
+                    var arr;
+
                     for(var i=0;i<service.length;i++){
 
                         params = {
@@ -531,6 +555,59 @@ exports.handler = async (event) => {
 
                         data1 = await documentClient.put(params).promise();
 
+                        arr = [];
+
+                        if(i==0) {
+                            if(!exist1.user.name) {
+                                arr.push('');
+                            } else {
+                                arr.push(exist1.user.name);
+                            }
+    
+                            arr.push(exist1.user.phone);
+    
+                            arr.push(exist1.user.address);
+    
+                            arr.push(day);
+    
+                            arr.push(DATE);
+    
+                            if(!name) {
+                                arr.push('');
+                            } else {
+                                arr.push(name);
+                            }
+    
+                            arr.push(phone);
+    
+                            arr.push(serviceName[i]);
+                        } else {
+                            arr.push('');
+    
+                            arr.push('');
+    
+                            arr.push('');
+    
+                            arr.push('');
+    
+                            arr.push('');
+    
+                            arr.push('')
+    
+                            arr.push('');
+    
+                            arr.push(serviceName[i]);
+                        }
+
+                        await googleSheetsInstance.spreadsheets.values.append({
+                            auth, //auth object
+                            spreadsheetId, //spreadsheet id
+                            range: "Sheet1!A:B", //sheet name and range of cells
+                            valueInputOption: "USER_ENTERED", // The information will be passed according to what the user passes in as date, number or text
+                            resource: {
+                                values: [ arr ],
+                            },
+                        });
                     }
 
                     if(obj.couponName) {

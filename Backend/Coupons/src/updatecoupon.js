@@ -16,6 +16,7 @@ exports.handler = async (event) => {
         var LowerLimit = obj.lowerlimit;
         var UpperLimit = obj.upperlimit;
         var UserLimit = obj.userlimit;
+        var TERMS = obj.terms;
         var serviceId = event.pathParameters.serviceid;
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
@@ -92,18 +93,20 @@ exports.handler = async (event) => {
                 name: NAME,
                 serviceId: serviceId
             },
-            UpdateExpression: "set #discount=:d, #upperlimit=:u, #lowerlimit=:l, #userlimit=:us",
+            UpdateExpression: "set #discount=:d, #upperlimit=:u, #lowerlimit=:l, #userlimit=:us, #terms=:t",
             ExpressionAttributeNames: {
                 '#discount': 'discount',
                 '#upperlimit': 'upper_price_limit', 
                 '#lowerlimit': 'lower_price_limit', 
                 '#userlimit': 'user_limit',  
+                '#terms': 'terms'
             },
             ExpressionAttributeValues:{
                 ":d": DISCOUNT,
                 ":u": UpperLimit ? UpperLimit : -1,
                 ":l": LowerLimit,
                 ":us": UserLimit ? UserLimit : -1,
+                ":t": TERMS
             },
             ReturnValues:"UPDATED_NEW"
         }

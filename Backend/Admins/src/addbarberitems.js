@@ -118,19 +118,36 @@ exports.handler = async (event) => {
                     })
                 }
             } else {
-                params = {
-                    TableName: 'Users',
-                    Key: {
-                        id: barberId,
-                    },
-                    UpdateExpression: "set #items=:i",
-                    ExpressionAttributeNames: {
-                        '#items': 'items', 
-                    },
-                    ExpressionAttributeValues:{
-                        ":i": data.Item.items + day + '=' + ITEM + '=' + QUAN + ',',
-                    },
-                    ReturnValues:"UPDATED_NEW"
+                if(!data.Item.items) {
+                    params = {
+                        TableName: 'Users',
+                        Key: {
+                            id: barberId,
+                        },
+                        UpdateExpression: "set #items=:i",
+                        ExpressionAttributeNames: {
+                            '#items': 'items', 
+                        },
+                        ExpressionAttributeValues:{
+                            ":i": day + '=' + ITEM + '=' + QUAN + ',',
+                        },
+                        ReturnValues:"UPDATED_NEW"
+                    }
+                } else {
+                    params = {
+                        TableName: 'Users',
+                        Key: {
+                            id: barberId,
+                        },
+                        UpdateExpression: "set #items=:i",
+                        ExpressionAttributeNames: {
+                            '#items': 'items', 
+                        },
+                        ExpressionAttributeValues:{
+                            ":i": data.Item.items + day + '=' + ITEM + '=' + QUAN + ',',
+                        },
+                        ReturnValues:"UPDATED_NEW"
+                    }
                 }
         
                 try {

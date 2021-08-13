@@ -131,23 +131,23 @@ exports.handler = async (event) => {
             today.setHours(today.getHours() + 5);
             today.setMinutes(today.getMinutes() + 30);
 
-            var done = data.Items.filter((item) => {
-                return item.service_status === 'done';
-            });
+            // var done = data.Items.filter((item) => {
+            //     return item.service_status === 'done';
+            // });
 
             var not_done = data.Items.filter((item) => {
                 return item.service_status !== 'done';
             })
 
-            done.sort((a,b) => {
-                if(a.booktime < b.booktime) {
-                    return 1;
-                } else if(a.booktime > b.booktime) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            })
+            // done.sort((a,b) => {
+            //     if(a.booktime < b.booktime) {
+            //         return 1;
+            //     } else if(a.booktime > b.booktime) {
+            //         return -1;
+            //     } else {
+            //         return 0;
+            //     }
+            // })
 
             not_done.sort((a,b) => {
                 if(a.booktime < b.booktime) {
@@ -164,7 +164,6 @@ exports.handler = async (event) => {
                 body: JSON.stringify({
                     success: true,
                     message: 'Booking found',
-                    done: done,
                     not_done: not_done
                 })
             }
