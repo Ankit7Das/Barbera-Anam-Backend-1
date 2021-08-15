@@ -571,6 +571,8 @@ exports.handler = async (event) => {
                             arr.push(day);
     
                             arr.push(DATE);
+
+                            arr.push(SLOT);
     
                             if(!name) {
                                 arr.push('');
@@ -588,6 +590,8 @@ exports.handler = async (event) => {
     
                             arr.push('');
     
+                            arr.push('');
+
                             arr.push('');
     
                             arr.push('');
