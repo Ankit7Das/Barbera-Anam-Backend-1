@@ -23,7 +23,7 @@ const smsClient = {
       tlClient.post("/send", params);
     }
   },
-  sendVerificationMessage: user => {
+  sendVerificationMessage: async(user) => {
     if (user && user.phone) {
       const params = new URLSearchParams();
       params.append("numbers", [parseInt("91" + user.phone)]);
@@ -32,7 +32,7 @@ const smsClient = {
         `${user.random} is your verification code for Barbera: Salon Service at your Home.`
       );
       console.log(params);
-      var res = tlClient.post("/send", params);
+      var res = await tlClient.post("/send", params);
       console.log(res);
     }
   }
