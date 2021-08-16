@@ -77,6 +77,14 @@ exports.handler = async (event) => {
 
         var data = await documentClient.scan(params).promise();
 
+        data.Items.sort((a,b) => {
+            if(a.subtype < b.subtype) {
+                return -1;
+            }else if(a.subtype > b.subtype) {
+                return 1;
+            }else return 0;
+        })
+
         if(data.Items.length == 0) {
             return {
                 statusCode: 404,
