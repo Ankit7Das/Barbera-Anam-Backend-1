@@ -99,7 +99,15 @@ exports.handler = async (event) => {
                 TableName: 'Users',
                 Key:{
                     id: barberId
-                }
+                },
+                UpdateExpression: "set #status=:s",
+                ExpressionAttributeNames: {
+                    '#status': 'status', 
+                },
+                ExpressionAttributeValues:{
+                    ":s": "inactive",
+                },
+                ReturnValues:"UPDATED_NEW"
             }
         
             try {
@@ -116,7 +124,7 @@ exports.handler = async (event) => {
                     },
                     body: JSON.stringify({
                         success: true,
-                        message: 'Barber deleted',
+                        message: 'Barber inactivated',
                     })
                 }
             } catch(err) {

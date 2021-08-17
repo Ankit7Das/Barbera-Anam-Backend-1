@@ -437,7 +437,7 @@ exports.handler = async (event) => {
 
                 console.log("inside",data2.Item);
 
-                if(data2.Item.coins >= 300 && data2.Item.distance<=distance && data2.Item.gender === gender) {
+                if(data2.Item.coins >= 300 && data2.Item.distance<=distance && data2.Item.gender === gender && data2.Item.status=='active') {
                     console.log(data2.Item);
                     barbers.push(data2.Item);
                 } else {

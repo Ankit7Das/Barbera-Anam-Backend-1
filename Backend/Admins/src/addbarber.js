@@ -101,12 +101,64 @@ exports.handler = async (event) => {
                     id: uuid.v1(),
                     phone: PHONE,
                     role: 'barber',
-                    email: ''
+                    email: '',
+                    status: 'active'
                 }
             }
         
             try {
                 data = await documentClient.put(params).promise();
+
+                console.log(data);
+
+                return {
+                    statusCode: 200,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
+                    body: JSON.stringify({
+                        success: true,
+                        message: 'Barber added',
+                    })
+                }
+            } catch(err) {
+                return {
+                    statusCode: 500,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
+                    body: JSON.stringify({
+                        success: false,
+                        message: err,
+                    })
+                }
+            }
+        } else if (!data.Items[0].role) {
+            params = {
+                TableName: 'Users',
+                Key: {
+                    id: data.Items[0].id,
+                },
+                UpdateExpression: "set #status=:s, role=:r, email=:e",
+                ExpressionAttributeNames: {
+                    '#status': 'status', 
+                    '#role': 'role',
+                    '#email': 'email'
+                },
+                ExpressionAttributeValues:{
+                    ":s": "active",
+                    ":r": "barber",
+                    ":e": ''
+                },
+                ReturnValues:"UPDATED_NEW"
+            }
+        
+            try {
+                data = await documentClient.update(params).promise();
 
                 console.log(data);
 
