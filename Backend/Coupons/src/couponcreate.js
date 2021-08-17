@@ -98,7 +98,7 @@ exports.handler = async (event) => {
                 lower_price_limit: LowerLimit,
                 upper_price_limit: UpperLimit ? UpperLimit : -1,
                 user_limit: UserLimit ? UserLimit : -1,
-                terms: terms
+                terms: TERMS
             }
         }
 
