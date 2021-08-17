@@ -173,6 +173,23 @@ Resources:
       Role: arn:aws:iam::140544830924:role/BackendUser
   #---------------------------------------------------------------
 
+  DeleteBarber:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: delbarb.handler
+      Runtime: nodejs12.x
+      Events:
+        apiForLambda:
+          Type: Api 
+          Properties:
+            Path: /delbarber
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Role: arn:aws:iam::140544830924:role/BackendUser
+  #---------------------------------------------------------------
+
   AddBarberItems:
     Type: AWS::Serverless::Function
     Properties:
