@@ -14,7 +14,7 @@ Resources:
   SendMail:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: sendmail.handler
       Runtime: nodejs12.x
       Events:
@@ -29,7 +29,7 @@ Resources:
   GetAllBarberLogs:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: getbarberlogs.handler
       Runtime: nodejs12.x
       Events:
@@ -44,7 +44,7 @@ Resources:
   GetAllBarbers:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: getbarbers.handler
       Runtime: nodejs12.x
       Events:
@@ -59,7 +59,7 @@ Resources:
   BookingRadius:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: bookingradius.handler
       Runtime: nodejs12.x
       Events:
@@ -74,7 +74,7 @@ Resources:
   GetRadius:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: getradius.handler
       Runtime: nodejs12.x
       Events:
@@ -89,7 +89,7 @@ Resources:
   ReferralCoupon:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: refcoupon.handler
       Runtime: nodejs12.x
       Events:
@@ -104,7 +104,7 @@ Resources:
   GetRefCoupon:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: getref.handler
       Runtime: nodejs12.x
       Events:
@@ -119,7 +119,7 @@ Resources:
   AddAdmins:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: addadmin.handler
       Runtime: nodejs12.x
       Events:
@@ -134,7 +134,7 @@ Resources:
   AddBarbers:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: addbarber.handler
       Runtime: nodejs12.x
       Events:
@@ -149,7 +149,7 @@ Resources:
   DeleteBarber:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: delbarb.handler
       Runtime: nodejs12.x
       Events:
@@ -164,7 +164,7 @@ Resources:
   AddBarberItems:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: addbarberitems.handler
       Runtime: nodejs12.x
       Events:
@@ -179,7 +179,7 @@ Resources:
   GetBarberItems:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: getbarberitems.handler
       Runtime: nodejs12.x
       Events:
@@ -194,7 +194,7 @@ Resources:
   LoginEmail:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: loginemail.handler
       Runtime: nodejs12.x
       Events:
@@ -209,7 +209,7 @@ Resources:
   LoginPass:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: loginpass.handler
       Runtime: nodejs12.x
       Events:
@@ -224,7 +224,7 @@ Resources:
   ResetPass:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/e2cf203c6462ec0de0ad391e9a68d1c9
+      CodeUri: s3://barbera-buckets/ab6d62edad0b27b1f00ab1e22b36d79a
       Handler: resetpass.handler
       Runtime: nodejs12.x
       Events:

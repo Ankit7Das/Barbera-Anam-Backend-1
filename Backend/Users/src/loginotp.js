@@ -460,14 +460,13 @@ exports.handler = async (event) => {
                                 Key: {
                                     id: id,
                                 },
-                                UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #status=:s, #referral=:ref, #coins=:c, #gender=:g",
+                                UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #referral=:ref, #coins=:c, #gender=:g",
                                 ExpressionAttributeNames: {
                                     '#otp': 'otp',
                                     '#role': 'role',
                                     '#address': 'address',
                                     '#long': 'longitude',
                                     '#lat': 'latitude',
-                                    '#status': 'status',
                                     '#referral': 'referral',
                                     '#coins':'coins',
                                     '#gender':'gender'
@@ -478,7 +477,6 @@ exports.handler = async (event) => {
                                     ":a": ADD,
                                     ":lo": LONG,
                                     ":la": LAT,
-                                    ":s": 'free',
                                     ":ref": null,
                                     ":c": 0,
                                     ":g": obj.gender
@@ -491,14 +489,13 @@ exports.handler = async (event) => {
                                 Key: {
                                     id: id,
                                 },
-                                UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #status=:s, #referral=:ref, #coins=:c",
+                                UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #referral=:ref, #coins=:c",
                                 ExpressionAttributeNames: {
                                     '#otp': 'otp',
                                     '#role': 'role',
                                     '#address': 'address',
                                     '#long': 'longitude',
                                     '#lat': 'latitude',
-                                    '#status': 'status',
                                     '#referral': 'referral',
                                     '#coins':'coins'
                                 },
@@ -508,7 +505,6 @@ exports.handler = async (event) => {
                                     ":a": ADD,
                                     ":lo": LONG,
                                     ":la": LAT,
-                                    ":s": 'free',
                                     ":ref": null,
                                     ":c": 0
                                 },

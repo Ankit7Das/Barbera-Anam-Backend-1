@@ -64,6 +64,14 @@ exports.handler = async (event) => {
             }
         }
 
+        var today = new Date();
+        today.setHours(today.getHours() + 5);
+        today.setMinutes(today.getMinutes() + 30);
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+        var day = dd + '-' + mm + '-' + yyyy;
+
         var params = {
             TableName: 'Bookings',
             Key: {
@@ -90,7 +98,7 @@ exports.handler = async (event) => {
 
                     data = await documentClient.get(params).promise();
 
-                    if(!data.Item) {
+                    if(!data.Item || data.Item.date !== day || data.Item.service_status !== 'ongoing') {
                         flag = false;
                         break;
                     }

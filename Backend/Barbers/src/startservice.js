@@ -109,7 +109,7 @@ exports.handler = async (event) => {
 
                     data = await documentClient.get(params).promise();
 
-                    if(!data.Item) {
+                    if(!data.Item || data.Item.date !== day || data.Item.service_status !== 'pending') {
                         flag = false;
                         break;
                     }

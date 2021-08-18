@@ -66,6 +66,45 @@ exports.handler = async (event) => {
 
         var random = Math.floor(100000 + Math.random() * 900000);
 
+        var today = new Date();
+        today.setHours(today.getHours() + 5);
+        today.setMinutes(today.getMinutes() + 30);
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+        var day = dd + '-' + mm + '-' + yyyy;
+
+        var params;
+        var data;
+        var flag = true;
+
+        for(var i=0; i<serviceId.length; i++) {
+            params = {
+                TableName: 'Bookings',
+                Key: {
+                    userId: userID.id,
+                    serviceId: serviceId[i]
+                }
+            }
+
+            data = await documentClient.get(params).promise();
+
+            if(!data.Item || data.Item.date !== day || data.Item.service_status !== 'ongoing') {
+                flag = false;
+                break;
+            }
+        }
+
+        if(!flag) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Wrong service ids entered'
+                })
+            };
+        }
+
         var msg = `${random}`;
 
         var fcmnotif = await new Promise((resolve, reject) => {
@@ -101,37 +140,6 @@ exports.handler = async (event) => {
         });
 
         console.log(fcmnotif);
-
-        var params;
-        var data;
-        var flag = true;
-
-        for(var i=0; i<serviceId.length; i++) {
-            params = {
-                TableName: 'Bookings',
-                Key: {
-                    userId: userID.id,
-                    serviceId: serviceId[i]
-                }
-            }
-
-            data = await documentClient.get(params).promise();
-
-            if(!data.Item) {
-                flag = false;
-                break;
-            }
-        }
-
-        if(!flag) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Wrong service ids entered'
-                })
-            };
-        }
 
         for(var i=0; i<serviceId.length; i++) {
             params = {

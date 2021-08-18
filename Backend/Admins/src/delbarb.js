@@ -105,7 +105,7 @@ exports.handler = async (event) => {
                     '#status': 'status', 
                 },
                 ExpressionAttributeValues:{
-                    ":s": "inactive",
+                    ":s": (data.Item.status === "inactive") ? "active" : "inactive",
                 },
                 ReturnValues:"UPDATED_NEW"
             }

@@ -111,7 +111,7 @@ exports.handler = async (event) => {
 
         data.Items = data.Items.filter((barber) => {
             console.log(barber.gender,gender);
-            return barber.gender === gender;
+            return barber.gender === gender && barber.status === 'active';
         })
 
         console.log("after",data.Items);
