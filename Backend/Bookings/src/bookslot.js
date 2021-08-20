@@ -608,6 +608,7 @@ exports.handler = async (event) => {
                             spreadsheetId, //spreadsheet id
                             range: "Sheet1!A:B", //sheet name and range of cells
                             valueInputOption: "USER_ENTERED", // The information will be passed according to what the user passes in as date, number or text
+                            insertDataOption: 'INSERT_ROWS',
                             resource: {
                                 values: [ arr ],
                             },

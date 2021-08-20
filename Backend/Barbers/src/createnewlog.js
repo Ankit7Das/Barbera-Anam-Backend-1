@@ -38,29 +38,51 @@ exports.handler = async (event) => {
             for(var i=0; i<data.Items.length; i++) {
                 console.log(data.Items[i]);
 
-                params = {
-                    TableName: 'BarbersLog',
-                    Item: {
-                        date: day,
-                        barberId: data.Items[i].id,
-                        distance: 0,
-                        '6': 'n',
-                        '7': 'n',
-                        '8': 'n',
-                        '9': 'n',
-                        '10': 'n',
-                        '11': 'n',
-                        '12': 'n',
-                        '13': 'n',
-                        '14': 'n',
-                        '15': 'n',
-                        '16': 'n',
-                        '17': 'n',
-                        '18': 'n',
+                if(data.Items[i].gender === 'male') {
+                    params = {
+                        TableName: 'BarbersLog',
+                        Item: {
+                            date: day,
+                            barberId: data.Items[i].id,
+                            distance: 0,
+                            '6': 'n',
+                            '7': 'n',
+                            '8': 'n',
+                            '9': 'n',
+                            '10': 'n',
+                            '11': 'n',
+                            '12': 'n',
+                            '13': 'n',
+                            '14': 'n',
+                            '15': 'n',
+                            '16': 'n',
+                            '17': 'n',
+                            '18': 'n',
+                        }
                     }
+        
+                    data1 = await documentClient.put(params).promise();
+                } else {
+                    params = {
+                        TableName: 'BarbersLog',
+                        Item: {
+                            date: day,
+                            barberId: data.Items[i].id,
+                            distance: 0,
+                            '9': 'n',
+                            '10': 'n',
+                            '11': 'n',
+                            '12': 'n',
+                            '13': 'n',
+                            '14': 'n',
+                            '15': 'n',
+                            '16': 'n',
+                            '17': 'n',
+                        }
+                    }
+        
+                    data1 = await documentClient.put(params).promise();
                 }
-    
-                data1 = await documentClient.put(params).promise();
             }
             
             return {

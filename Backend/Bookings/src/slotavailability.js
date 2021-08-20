@@ -185,7 +185,8 @@ exports.handler = async (event) => {
             body: JSON.stringify({
                 success: true,
                 message: 'Slot availability',
-                data: Data
+                data: Data,
+                gender: gender
             })
         }
 

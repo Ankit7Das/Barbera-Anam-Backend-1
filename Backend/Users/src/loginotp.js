@@ -246,210 +246,389 @@ exports.handler = async (event) => {
                     
                 }  else if (ROLE == 'barber' && !data.Items[0].coins) {
 
-                    var today = new Date();
-                    today.setHours(today.getHours() + 5);
-                    today.setMinutes(today.getMinutes() + 30);
-                    var dd = String(today.getDate()).padStart(2, '0');
-                    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    var yyyy = today.getFullYear();
-                    var day1 = dd + '-' + mm + '-' + yyyy;
+                    if(obj.gender === 'male') {
+                        var today = new Date();
+                        today.setHours(today.getHours() + 5);
+                        today.setMinutes(today.getMinutes() + 30);
+                        var dd = String(today.getDate()).padStart(2, '0');
+                        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        var yyyy = today.getFullYear();
+                        var day1 = dd + '-' + mm + '-' + yyyy;
 
-                    today.setDate(today.getDate() + 1);
-                    dd = String(today.getDate()).padStart(2, '0');
-                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    yyyy = today.getFullYear();
-                    var day2 = dd + '-' + mm + '-' + yyyy;
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day2 = dd + '-' + mm + '-' + yyyy;
 
-                    today.setDate(today.getDate() + 1);
-                    dd = String(today.getDate()).padStart(2, '0');
-                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    yyyy = today.getFullYear();
-                    var day3 = dd + '-' + mm + '-' + yyyy;
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day3 = dd + '-' + mm + '-' + yyyy;
 
-                    today.setDate(today.getDate() + 1);
-                    dd = String(today.getDate()).padStart(2, '0');
-                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    yyyy = today.getFullYear();
-                    var day4 = dd + '-' + mm + '-' + yyyy;
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day4 = dd + '-' + mm + '-' + yyyy;
 
-                    today.setDate(today.getDate() + 1);
-                    dd = String(today.getDate()).padStart(2, '0');
-                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    yyyy = today.getFullYear();
-                    var day5 = dd + '-' + mm + '-' + yyyy;
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day5 = dd + '-' + mm + '-' + yyyy;
 
-                    today.setDate(today.getDate() + 1);
-                    dd = String(today.getDate()).padStart(2, '0');
-                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    yyyy = today.getFullYear();
-                    var day6 = dd + '-' + mm + '-' + yyyy;
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day6 = dd + '-' + mm + '-' + yyyy;
 
-                    today.setDate(today.getDate() + 1);
-                    dd = String(today.getDate()).padStart(2, '0');
-                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    yyyy = today.getFullYear();
-                    var day7 = dd + '-' + mm + '-' + yyyy;
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day7 = dd + '-' + mm + '-' + yyyy;
 
-                    params = {
-                        RequestItems: {
-                            'BarbersLog': [
-                                {
-                                    PutRequest: {
-                                        Item: {
-                                            date: day1,
-                                            barberId: id,
-                                            distance: 0,
-                                            '6': 'n',
-                                            '7': 'n',
-                                            '8': 'n',
-                                            '9': 'n',
-                                            '10': 'n',
-                                            '11': 'n',
-                                            '12': 'n',
-                                            '13': 'n',
-                                            '14': 'n',
-                                            '15': 'n',
-                                            '16': 'n',
-                                            '17': 'n',
-                                            '18': 'n',
+                        params = {
+                            RequestItems: {
+                                'BarbersLog': [
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day1,
+                                                barberId: id,
+                                                distance: 0,
+                                                '6': 'n',
+                                                '7': 'n',
+                                                '8': 'n',
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                                '18': 'n',
+                                            }
                                         }
-                                    }
-                                },
-                                {
-                                    PutRequest: {
-                                        Item: {
-                                            date: day2,
-                                            barberId: id,
-                                            distance: 0,
-                                            '6': 'n',
-                                            '7': 'n',
-                                            '8': 'n',
-                                            '9': 'n',
-                                            '10': 'n',
-                                            '11': 'n',
-                                            '12': 'n',
-                                            '13': 'n',
-                                            '14': 'n',
-                                            '15': 'n',
-                                            '16': 'n',
-                                            '17': 'n',
-                                            '18': 'n',
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day2,
+                                                barberId: id,
+                                                distance: 0,
+                                                '6': 'n',
+                                                '7': 'n',
+                                                '8': 'n',
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                                '18': 'n',
+                                            }
                                         }
-                                    }
-                                },
-                                {
-                                    PutRequest: {
-                                        Item: {
-                                            date: day3,
-                                            barberId: id,
-                                            distance: 0,
-                                            '6': 'n',
-                                            '7': 'n',
-                                            '8': 'n',
-                                            '9': 'n',
-                                            '10': 'n',
-                                            '11': 'n',
-                                            '12': 'n',
-                                            '13': 'n',
-                                            '14': 'n',
-                                            '15': 'n',
-                                            '16': 'n',
-                                            '17': 'n',
-                                            '18': 'n',
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day3,
+                                                barberId: id,
+                                                distance: 0,
+                                                '6': 'n',
+                                                '7': 'n',
+                                                '8': 'n',
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                                '18': 'n',
+                                            }
                                         }
-                                    }
-                                },
-                                {
-                                    PutRequest: {
-                                        Item: {
-                                            date: day4,
-                                            barberId: id,
-                                            distance: 0,
-                                            '6': 'n',
-                                            '7': 'n',
-                                            '8': 'n',
-                                            '9': 'n',
-                                            '10': 'n',
-                                            '11': 'n',
-                                            '12': 'n',
-                                            '13': 'n',
-                                            '14': 'n',
-                                            '15': 'n',
-                                            '16': 'n',
-                                            '17': 'n',
-                                            '18': 'n',
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day4,
+                                                barberId: id,
+                                                distance: 0,
+                                                '6': 'n',
+                                                '7': 'n',
+                                                '8': 'n',
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                                '18': 'n',
+                                            }
                                         }
-                                    }
-                                },
-                                {
-                                    PutRequest: {
-                                        Item: {
-                                            date: day5,
-                                            barberId: id,
-                                            distance: 0,
-                                            '6': 'n',
-                                            '7': 'n',
-                                            '8': 'n',
-                                            '9': 'n',
-                                            '10': 'n',
-                                            '11': 'n',
-                                            '12': 'n',
-                                            '13': 'n',
-                                            '14': 'n',
-                                            '15': 'n',
-                                            '16': 'n',
-                                            '17': 'n',
-                                            '18': 'n',
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day5,
+                                                barberId: id,
+                                                distance: 0,
+                                                '6': 'n',
+                                                '7': 'n',
+                                                '8': 'n',
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                                '18': 'n',
+                                            }
                                         }
-                                    }
-                                },
-                                {
-                                    PutRequest: {
-                                        Item: {
-                                            date: day6,
-                                            barberId: id,
-                                            distance: 0,
-                                            '6': 'n',
-                                            '7': 'n',
-                                            '8': 'n',
-                                            '9': 'n',
-                                            '10': 'n',
-                                            '11': 'n',
-                                            '12': 'n',
-                                            '13': 'n',
-                                            '14': 'n',
-                                            '15': 'n',
-                                            '16': 'n',
-                                            '17': 'n',
-                                            '18': 'n',
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day6,
+                                                barberId: id,
+                                                distance: 0,
+                                                '6': 'n',
+                                                '7': 'n',
+                                                '8': 'n',
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                                '18': 'n',
+                                            }
                                         }
-                                    }
-                                },
-                                {
-                                    PutRequest: {
-                                        Item: {
-                                            date: day7,
-                                            barberId: id,
-                                            distance: 0,
-                                            '6': 'n',
-                                            '7': 'n',
-                                            '8': 'n',
-                                            '9': 'n',
-                                            '10': 'n',
-                                            '11': 'n',
-                                            '12': 'n',
-                                            '13': 'n',
-                                            '14': 'n',
-                                            '15': 'n',
-                                            '16': 'n',
-                                            '17': 'n',
-                                            '18': 'n',
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day7,
+                                                barberId: id,
+                                                distance: 0,
+                                                '6': 'n',
+                                                '7': 'n',
+                                                '8': 'n',
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                                '18': 'n',
+                                            }
                                         }
-                                    }
-                                },
-                            ]
-                        }
-                    };
+                                    },
+                                ]
+                            }
+                        };
+                    } else {
+                        var today = new Date();
+                        today.setHours(today.getHours() + 5);
+                        today.setMinutes(today.getMinutes() + 30);
+                        var dd = String(today.getDate()).padStart(2, '0');
+                        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        var yyyy = today.getFullYear();
+                        var day1 = dd + '-' + mm + '-' + yyyy;
+
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day2 = dd + '-' + mm + '-' + yyyy;
+
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day3 = dd + '-' + mm + '-' + yyyy;
+
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day4 = dd + '-' + mm + '-' + yyyy;
+
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day5 = dd + '-' + mm + '-' + yyyy;
+
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day6 = dd + '-' + mm + '-' + yyyy;
+
+                        today.setDate(today.getDate() + 1);
+                        dd = String(today.getDate()).padStart(2, '0');
+                        mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        yyyy = today.getFullYear();
+                        var day7 = dd + '-' + mm + '-' + yyyy;
+
+                        params = {
+                            RequestItems: {
+                                'BarbersLog': [
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day1,
+                                                barberId: id,
+                                                distance: 0,
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                            }
+                                        }
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day2,
+                                                barberId: id,
+                                                distance: 0,
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                            }
+                                        }
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day3,
+                                                barberId: id,
+                                                distance: 0,
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                            }
+                                        }
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day4,
+                                                barberId: id,
+                                                distance: 0,
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                            }
+                                        }
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day5,
+                                                barberId: id,
+                                                distance: 0,
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                            }
+                                        }
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day6,
+                                                barberId: id,
+                                                distance: 0,
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                            }
+                                        }
+                                    },
+                                    {
+                                        PutRequest: {
+                                            Item: {
+                                                date: day7,
+                                                barberId: id,
+                                                distance: 0,
+                                                '9': 'n',
+                                                '10': 'n',
+                                                '11': 'n',
+                                                '12': 'n',
+                                                '13': 'n',
+                                                '14': 'n',
+                                                '15': 'n',
+                                                '16': 'n',
+                                                '17': 'n',
+                                            }
+                                        }
+                                    },
+                                ]
+                            }
+                        };
+                    }
 
                     try {
                         var data1 = await documentClient.batchWrite(params).promise();

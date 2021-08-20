@@ -111,7 +111,7 @@ exports.handler = async (event) => {
             }
         
             try {
-                data = await documentClient.delete(params).promise();
+                data = await documentClient.update(params).promise();
 
                 console.log(data);
 

@@ -65,6 +65,32 @@ exports.handler = async(event) => {
             try {
                 data1 = await documentClient.put(params).promise();
 
+                var user = {
+                    phone: PHONE,
+                }
+        
+                var token = jwt.sign(user, JWT_SECRET, {});
+        
+                user.random = random;
+        
+                console.log(user);
+        
+                await smsClient.sendVerificationMessage(user);
+
+                return {
+                    statusCode: 200,
+                    headers: {
+                        "Access-Control-Allow-Headers" : "Content-Type",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                    },
+                    body: JSON.stringify({
+                        success: true,
+                        message: 'OTP sent',
+                        token: token,
+                    })
+                };
+
             } catch(err) {
                 return {
                     statusCode: 500,
@@ -100,6 +126,50 @@ exports.handler = async(event) => {
     
             try {
                 data1 = await documentClient.update(params).promise();
+
+                var user = {
+                    phone: PHONE,
+                }
+        
+                var token = jwt.sign(user, JWT_SECRET, {});
+        
+                user.random = random;
+        
+                console.log(user);
+        
+                await smsClient.sendVerificationMessage(user);
+
+                if(!data.Items[0].gender) {
+                    return {
+                        statusCode: 200,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: true,
+                            message: 'OTP sent',
+                            token: token,
+                            first: true,
+                        })
+                    };
+                } else {
+                    return {
+                        statusCode: 200,
+                        headers: {
+                            "Access-Control-Allow-Headers" : "Content-Type",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                        },
+                        body: JSON.stringify({
+                            success: true,
+                            message: 'OTP sent',
+                            token: token,
+                            first: false,
+                        })
+                    };
+                }
             } catch(err) {
                 return {
                     statusCode: 500,
@@ -110,61 +180,6 @@ exports.handler = async(event) => {
                 };
             }
             
-        }
-
-        var user = {
-            phone: PHONE,
-        }
-
-        var token = jwt.sign(user, JWT_SECRET, {});
-
-        user.random = random;
-
-        console.log(user);
-
-        await smsClient.sendVerificationMessage(user);
-
-        // var msg = `${random} is your verification code for Barbera: Salon Service at your Home.`;
-
-        // random = null; 
-
-        // params = {
-        //     Message: msg,
-        //     PhoneNumber: '+91' + PHONE,
-        // };
-    
-        // var sms = await sns.publish(params).promise();
-        
-        if(!data.Items[0].gender) {
-            return {
-                statusCode: 200,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: true,
-                    message: 'OTP sent',
-                    token: token,
-                    first: true,
-                })
-            };
-        } else {
-            return {
-                statusCode: 200,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: true,
-                    message: 'OTP sent',
-                    token: token,
-                    first: false,
-                })
-            };
         }
 
     } catch(err) {
