@@ -102,25 +102,28 @@ exports.handler = async (event) => {
 
             if(`${otp}` == OTP){
 
-                if(ROLE == 'barber' && !data.Items[0].role) {
+                if(!data.Items[0].role) {
 
-                    params = {
-                        TableName: 'Users',
-                        Key: {
-                            id: id,
+                    if(ROLE == 'barber') {
+
+                        params = {
+                            TableName: 'Users',
+                            Key: {
+                                id: id,
+                            }
+                        };
+    
+                        data = await documentClient.delete(params).promise();
+                        
+                        return {
+                            statusCode: 400,
+                            body: JSON.stringify({
+                                success: false,
+                                message: 'Unauthorized barber access'
+                            })
                         }
-                    };
+                    } 
 
-                    data = await documentClient.delete(params).promise();
-                    
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({
-                            success: false,
-                            message: 'Unauthorized barber access'
-                        })
-                    }
-                } else if(!data.Items[0].role) {
                     params = {
                         TableName: 'Users',
                         Key: {
@@ -244,7 +247,7 @@ exports.handler = async (event) => {
                         };
                     }
                     
-                }  else if (ROLE == 'barber' && !data.Items[0].coins) {
+                }  else if (ROLE == 'barber' && !data.Items[0].gender && data.Items[0].role === 'barber') {
 
                     if(obj.gender === 'male') {
                         var today = new Date();
@@ -633,63 +636,34 @@ exports.handler = async (event) => {
                     try {
                         var data1 = await documentClient.batchWrite(params).promise();
 
-                        if(!data.Items[0].gender) {
-                            params = {
-                                TableName: 'Users',
-                                Key: {
-                                    id: id,
-                                },
-                                UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #referral=:ref, #coins=:c, #gender=:g",
-                                ExpressionAttributeNames: {
-                                    '#otp': 'otp',
-                                    '#role': 'role',
-                                    '#address': 'address',
-                                    '#long': 'longitude',
-                                    '#lat': 'latitude',
-                                    '#referral': 'referral',
-                                    '#coins':'coins',
-                                    '#gender':'gender'
-                                },
-                                ExpressionAttributeValues:{
-                                    ":o": null,
-                                    ":r": ROLE,
-                                    ":a": ADD,
-                                    ":lo": LONG,
-                                    ":la": LAT,
-                                    ":ref": null,
-                                    ":c": 0,
-                                    ":g": obj.gender
-                                },
-                                ReturnValues:"UPDATED_NEW"
-                            };
-                        } else {
-                            params = {
-                                TableName: 'Users',
-                                Key: {
-                                    id: id,
-                                },
-                                UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #referral=:ref, #coins=:c",
-                                ExpressionAttributeNames: {
-                                    '#otp': 'otp',
-                                    '#role': 'role',
-                                    '#address': 'address',
-                                    '#long': 'longitude',
-                                    '#lat': 'latitude',
-                                    '#referral': 'referral',
-                                    '#coins':'coins'
-                                },
-                                ExpressionAttributeValues:{
-                                    ":o": null,
-                                    ":r": ROLE,
-                                    ":a": ADD,
-                                    ":lo": LONG,
-                                    ":la": LAT,
-                                    ":ref": null,
-                                    ":c": 0
-                                },
-                                ReturnValues:"UPDATED_NEW"
-                            };
-                        }
+                        params = {
+                            TableName: 'Users',
+                            Key: {
+                                id: id,
+                            },
+                            UpdateExpression: "set #otp=:o, #role=:r, #address=:a, #long=:lo, #lat=:la, #referral=:ref, #coins=:c, #gender=:g",
+                            ExpressionAttributeNames: {
+                                '#otp': 'otp',
+                                '#role': 'role',
+                                '#address': 'address',
+                                '#long': 'longitude',
+                                '#lat': 'latitude',
+                                '#referral': 'referral',
+                                '#coins':'coins',
+                                '#gender':'gender'
+                            },
+                            ExpressionAttributeValues:{
+                                ":o": null,
+                                ":r": ROLE,
+                                ":a": ADD,
+                                ":lo": LONG,
+                                ":la": LAT,
+                                ":ref": null,
+                                ":c": 0,
+                                ":g": obj.gender
+                            },
+                            ReturnValues:"UPDATED_NEW"
+                        };
 
                         try {
                             data = await documentClient.update(params).promise();

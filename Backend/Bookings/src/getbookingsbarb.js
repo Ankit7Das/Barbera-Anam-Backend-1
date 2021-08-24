@@ -102,6 +102,21 @@ exports.handler = async (event) => {
 
                 data.Items[i].distance = await getDistance(data.Items[i].user_lat,data.Items[i].user_long,exist1.user.latitude,exist1.user.longitude);
 
+                params = {
+                    TableName: 'Users',
+                    Key:{
+                        id: data.Items[0].userId
+                    },
+                    ProjectionExpression: "#phone",
+                    ExpressionAttributeNames: {
+                        "#phone": "phone",
+                    }
+                }
+
+                data1 = await documentClient.get(params).promise();
+
+                data.Items[i].userphone = data1.Item.phone;
+
                 console.log(data.Items[i].date);
                 day1 = data.Items[i].date.split('-');
                 today1 = new Date(Number(day1[2]),Number(day1[1]),Number(day1[0]),Number(data.Items[i].slot));
