@@ -14,80 +14,25 @@ exports.handler = async (event) => {
 
         var obj = JSON.parse(event.body);
 
-        var tokenArray = event.headers.Authorization.split(" ");
-        var token = tokenArray[1];
-
-        if(token == null) {
-            return {
-                statusCode: 401,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: "No token passed"
-                })
-            };
-        }
-
-        var userID;
-
-        try {
-            userID = jwt.verify(token, JWT_SECRET);
-        } catch(err) {
-            return {
-                statusCode: 403,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: "Invalid Token",
-                })
-            };
-        }
-
-        var exist1 = await userVerifier(userID.id);
-
-        if(exist1.success == false) {
-            return {
-                statusCode: 400,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: 'User not found',
-                })
-            }
-        }
-
-        if(exist1.user.role === 'barber') {
-            return {
-                statusCode: 400,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Not an admin or a user',
-                })
-            }
-        }
-
         var params = {
             TableName: 'Offers',
         }
 
         var data = await documentClient.scan(params).promise();
+        var data1;
+
+        for(var i=0 ; i<data.Items.length ; i++){
+            params = {
+                TableName: 'Services',
+                Key: {
+                    id: data.Items[i].serviceId
+                }
+            }
+
+            data1 = await documentClient.get(params).promise();
+
+            data.Items[i].service = data1.Item
+        }
 
         return {
             statusCode: 200,

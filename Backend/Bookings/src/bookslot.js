@@ -9,7 +9,7 @@ var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
-const { userVerifier, serviceVerifier } = require("./authentication");
+const { userVerifier, serviceVerifier, offerVerifier } = require("./authentication");
 const { getDistance } = require('./helper');
 
 const auth = new google.auth.GoogleAuth({
@@ -76,6 +76,7 @@ exports.handler = async (event) => {
         }
 
         var exist2;
+        var exist3;
         var prices = [];
         var total_price = 0;
         var total_time = 0;
@@ -157,8 +158,13 @@ exports.handler = async (event) => {
         console.log("done");
 
         var flag = false;
+        var flag1 = true;
         var gender = 'male';
         var serviceName = [];
+
+        var today = new Date();
+        today.setHours(today.getHours() + 5);
+        today.setMinutes(today.getMinutes() + 30);
 
         for(var i=0;i<service.length;i++) {
             
@@ -172,32 +178,101 @@ exports.handler = async (event) => {
                 gender = 'female';
             }
 
+            if(service[i].offerName !== ""){
+                exist3 = await offerVerifier(service[i].serviceId, service[i].offerName);
+
+                console.log(exist3);
+
+                if(exist3.success === false){
+                    flag1 = false;
+                    break;
+                }
+
+                if(exist3.offer.user_limit <= 0){
+                    flag1 = false;
+                    break;
+                }
+
+                var Day = today.getDay();
+
+                if(Day === 0) Day = 7;
+
+                console.log(Day);
+
+                if(Day < exist3.offer.start){
+                    flag1 = false;
+                    break;
+                }
+
+                if(Day > exist3.offer.end){
+                    flag1 = false;
+                    break;
+                }
+
+                console.log(Number(exist2.service.price)-exist3.offer.discount, Number(service[i].price));
+
+                if(Number(exist2.service.price)-exist3.offer.discount !== Number(service[i].price)) {
+                    flag1 = false;
+                    break;
+                }
+            }
+
             if(obj.couponName) {
                 if(service[i].serviceId === serviceId) {
                     if(Number(exist2.service.price)*service[i].quantity >= data.Items[0].lower_price_limit) {
                         if(data.Items[0].upper_price_limit !== -1) {
                             if(Number(exist2.service.price) <= data.Items[0].upper_price_limit) {
-                                prices.push(service[i].quantity*Number(exist2.service.price));
-                                total_price += service[i].quantity*Number(exist2.service.price);
+                                if(service[i].offerName === "") {
+                                    prices.push(service[i].quantity*Number(exist2.service.price));
+                                    total_price += service[i].quantity*Number(exist2.service.price);
+                                } else {
+                                    prices.push(service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount));
+                                    total_price += service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount);
+                                }
                                 flag = true;
                             } 
                         } else {
-                            prices.push(service[i].quantity*Number(exist2.service.price));
-                            total_price += service[i].quantity*Number(exist2.service.price);
+                            if(service[i].offerName === "") {
+                                prices.push(service[i].quantity*Number(exist2.service.price));
+                                total_price += service[i].quantity*Number(exist2.service.price);
+                            } else {
+                                prices.push(service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount));
+                                total_price += service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount);
+                            }
                             flag = true;
                         }
                     } 
                 } else {
-                    prices.push(service[i].quantity*Number(exist2.service.price));
-                    total_price += service[i].quantity*Number(exist2.service.price);
+                    if(service[i].offerName === "") {
+                        prices.push(service[i].quantity*Number(exist2.service.price));
+                        total_price += service[i].quantity*Number(exist2.service.price);
+                    } else {
+                        prices.push(service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount));
+                        total_price += service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount);
+                    }
                 }
             } else {
-                prices.push(service[i].quantity*Number(exist2.service.price));
-                total_price += service[i].quantity*Number(exist2.service.price);
+                if(service[i].offerName === "") {
+                    prices.push(service[i].quantity*Number(exist2.service.price));
+                    total_price += service[i].quantity*Number(exist2.service.price);
+                } else {
+                    prices.push(service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount));
+                    total_price += service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount);
+                }
             }
         
             total_time += service[i].quantity*Number(exist2.service.time);
             serviceName.push(exist2.service.name + ' (' + exist2.service.category + ')');
+        }
+
+        if(!flag1) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Offer not available',
+                })
+            }
         }
 
         var coupon;
@@ -295,9 +370,6 @@ exports.handler = async (event) => {
             }
         } 
 
-        var today = new Date();
-        today.setHours(today.getHours() + 5);
-        today.setMinutes(today.getMinutes() + 30);
         var dd = String(today.getDate()).padStart(2, '0');
         var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
         var yyyy = today.getFullYear();
@@ -312,10 +384,10 @@ exports.handler = async (event) => {
 
         var date1 = DATE.split('-');
 
-        var date = new Date(date1[2],date1[1],date1[0]);
+        var date = new Date(Number(date1[2]),Number(date1[1])-1,Number(date1[0]));
 
-        console.log(Number(date.getDate()));
-        console.log(Number(today.getDate()));
+        console.log(Number(date.getTime()));
+        console.log(Number(today.getTime()));
 
         var slot = Number(SLOT);
 
@@ -334,7 +406,7 @@ exports.handler = async (event) => {
         console.log("slot",slot);
         console.log("SLOT",SLOT);
 
-        if(date<=today) {
+        if(date.getTime()<=today.getTime()) {
             return {
                 statusCode: 400,
                 body: JSON.stringify({
@@ -344,7 +416,7 @@ exports.handler = async (event) => {
             };
         }
 
-        if(date.getDate()===today.getDate()) {
+        if(date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) {
             if(slot <= Number(today.getHours())) {
                 return {
                     statusCode: 400,
@@ -547,13 +619,35 @@ exports.handler = async (event) => {
                                 service_status: 'pending',
                                 date: DATE,
                                 slot: SLOT,
-                                quantity: service[i].quantity
+                                quantity: service[i].quantity,
+                                offer: (service[i].offerName !== "" ? true : false)
                             }
                         };
 
                         console.log(params);
 
                         data1 = await documentClient.put(params).promise();
+
+                        if(service[i].offerName !== "") {
+                            params = {
+                                TableName: 'Offers',
+                                Key: {
+                                    serviceId: service[i].serviceId,
+                                    name: service[i].offerName
+                                },
+                                UpdateExpression: "set #user_limit=#user_limit - :u",
+                                ExpressionAttributeNames: {
+                                    '#user_limit': 'user_limit', 
+                                },
+                                ExpressionAttributeValues:{
+                                    ":u": 1,
+                                },
+                                ReturnValues:"UPDATED_NEW"
+                            }
+        
+                            
+                            data1 = await documentClient.update(params).promise();
+                        }
 
                         arr = [];
 

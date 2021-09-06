@@ -234,8 +234,8 @@ exports.handler = async (event) => {
                             Item: {
                                 serviceId: data.Items[0].id,
                                 name: NAME, 
-                                discount: DIS,
-                                user_limit: UserLimit,
+                                discount: Number(DIS),
+                                user_limit: Number(UserLimit),
                                 terms: Terms,
                                 image: url,
                                 start: START,

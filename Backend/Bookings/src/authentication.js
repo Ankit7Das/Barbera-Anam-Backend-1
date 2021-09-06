@@ -50,6 +50,31 @@ module.exports.serviceVerifier = async (id) => {
 
 }
 
+module.exports.offerVerifier = async (serviceId, offerName) => {
+
+    var params = {
+        TableName: 'Offers',
+        Key: {
+            serviceId: serviceId,
+            name: offerName
+        }
+    }
+
+    var data = await documentClient.get(params).promise();
+
+    if(!data.Item) {
+        return {
+            success: false
+        };
+    } else {
+        return {
+            success: true,
+            offer: data.Item
+        };
+    }
+
+}
+
 module.exports.addedBefore = async (userId, serviceId) => {
 
     var params = {

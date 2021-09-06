@@ -15,75 +15,7 @@ exports.handler = async (event) => {
         var obj = JSON.parse(event.body);
         var serviceId = obj.serviceId;
         var NAME = obj.name;
-        var tokenArray = event.headers.Authorization.split(" ");
-        var token = tokenArray[1];
-
-        if(token == null) {
-            return {
-                statusCode: 401,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: "No token passed"
-                })
-            };
-        }
-
-        var userID;
-
-        try {
-            userID = jwt.verify(token, JWT_SECRET);
-        } catch(err) {
-            return {
-                statusCode: 403,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: "Invalid Token",
-                })
-            };
-        }
-
-        var exist1 = await userVerifier(userID.id);
-
-        if(exist1.success == false) {
-            return {
-                statusCode: 400,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: 'User not found',
-                })
-            }
-        }
-
-        if(exist1.user.role === 'barber') {
-            return {
-                statusCode: 400,
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Not an admin or a user',
-                })
-            }
-        }
-
+        
         var exist2 = await serviceVerifier(serviceId);
 
         if(exist2.success == false) {

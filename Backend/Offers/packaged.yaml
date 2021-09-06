@@ -14,7 +14,7 @@ Resources:
   CreateOffer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/49c9e0e7f210e0c6eeed84a5349b7e60
+      CodeUri: s3://barbera-buckets/e3fc1b5d8dc0fc7acd5e4d027119bc88
       Handler: createoffer.handler
       Runtime: nodejs12.x
       Events:
@@ -29,7 +29,7 @@ Resources:
   UpdateOffer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/49c9e0e7f210e0c6eeed84a5349b7e60
+      CodeUri: s3://barbera-buckets/e3fc1b5d8dc0fc7acd5e4d027119bc88
       Handler: updateoffer.handler
       Runtime: nodejs12.x
       Events:
@@ -44,7 +44,7 @@ Resources:
   DeleteOffer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/49c9e0e7f210e0c6eeed84a5349b7e60
+      CodeUri: s3://barbera-buckets/e3fc1b5d8dc0fc7acd5e4d027119bc88
       Handler: deleteoffer.handler
       Runtime: nodejs12.x
       Events:
@@ -59,7 +59,7 @@ Resources:
   GetAllOffer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/49c9e0e7f210e0c6eeed84a5349b7e60
+      CodeUri: s3://barbera-buckets/e3fc1b5d8dc0fc7acd5e4d027119bc88
       Handler: getalloffers.handler
       Runtime: nodejs12.x
       Events:
@@ -74,7 +74,7 @@ Resources:
   GetOffer:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/49c9e0e7f210e0c6eeed84a5349b7e60
+      CodeUri: s3://barbera-buckets/e3fc1b5d8dc0fc7acd5e4d027119bc88
       Handler: getoffer.handler
       Runtime: nodejs12.x
       Events:

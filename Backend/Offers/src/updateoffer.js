@@ -257,9 +257,9 @@ exports.handler = async (event) => {
                             '#end': 'end'
                         },
                         ExpressionAttributeValues:{
-                            ":d": DIS,
+                            ":d": Number(DIS),
                             ":t": Terms,
-                            ":u": UserLimit,
+                            ":u": Number(UserLimit),
                             ":s": START,
                             ":e": END
                         },
