@@ -73,6 +73,12 @@ exports.handler = async (event) => {
             if(exist2.success == false) {
                 continue;
             }
+
+            if(service[i].offerName){
+                if(service[i].offerName !== ""){
+                    service[i].serviceId += "," + service[i].offerName;
+                }
+            }
             
             exist3 = await addedBefore(userID.id, service[i].serviceId);
 

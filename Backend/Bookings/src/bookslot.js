@@ -161,6 +161,7 @@ exports.handler = async (event) => {
         var flag1 = true;
         var gender = 'male';
         var serviceName = [];
+        var off;
 
         var today = new Date();
         today.setHours(today.getHours() + 5);
@@ -178,43 +179,43 @@ exports.handler = async (event) => {
                 gender = 'female';
             }
 
-            if(service[i].offerName !== ""){
-                exist3 = await offerVerifier(service[i].serviceId, service[i].offerName);
+            off = false;
 
-                console.log(exist3);
-
-                if(exist3.success === false){
-                    flag1 = false;
-                    break;
+            if(service[i].offerName) {
+                if(service[i].offerName !== ""){
+                    exist3 = await offerVerifier(service[i].serviceId, service[i].offerName);
+    
+                    console.log(exist3);
+    
+                    if(exist3.success === false){
+                        flag1 = false;
+                        break;
+                    }
+    
+                    if(exist3.offer.user_limit - service[i].quantity <= 0){
+                        flag1 = false;
+                        break;
+                    }
+    
+                    var Day = today.getDay();
+    
+                    if(Day === 0) Day = 7;
+    
+                    console.log(Day);
+    
+                    if(Day < exist3.offer.start){
+                        flag1 = false;
+                        break;
+                    }
+    
+                    if(Day > exist3.offer.end){
+                        flag1 = false;
+                        break;
+                    }
+                    
+                    off = true;
                 }
 
-                if(exist3.offer.user_limit <= 0){
-                    flag1 = false;
-                    break;
-                }
-
-                var Day = today.getDay();
-
-                if(Day === 0) Day = 7;
-
-                console.log(Day);
-
-                if(Day < exist3.offer.start){
-                    flag1 = false;
-                    break;
-                }
-
-                if(Day > exist3.offer.end){
-                    flag1 = false;
-                    break;
-                }
-
-                console.log(Number(exist2.service.price)-exist3.offer.discount, Number(service[i].price));
-
-                if(Number(exist2.service.price)-exist3.offer.discount !== Number(service[i].price)) {
-                    flag1 = false;
-                    break;
-                }
             }
 
             if(obj.couponName) {
@@ -222,7 +223,7 @@ exports.handler = async (event) => {
                     if(Number(exist2.service.price)*service[i].quantity >= data.Items[0].lower_price_limit) {
                         if(data.Items[0].upper_price_limit !== -1) {
                             if(Number(exist2.service.price) <= data.Items[0].upper_price_limit) {
-                                if(service[i].offerName === "") {
+                                if(service[i].offerName === "" || !off) {
                                     prices.push(service[i].quantity*Number(exist2.service.price));
                                     total_price += service[i].quantity*Number(exist2.service.price);
                                 } else {
@@ -232,7 +233,7 @@ exports.handler = async (event) => {
                                 flag = true;
                             } 
                         } else {
-                            if(service[i].offerName === "") {
+                            if(service[i].offerName === "" || !off) {
                                 prices.push(service[i].quantity*Number(exist2.service.price));
                                 total_price += service[i].quantity*Number(exist2.service.price);
                             } else {
@@ -243,7 +244,7 @@ exports.handler = async (event) => {
                         }
                     } 
                 } else {
-                    if(service[i].offerName === "") {
+                    if(service[i].offerName === "" || !off) {
                         prices.push(service[i].quantity*Number(exist2.service.price));
                         total_price += service[i].quantity*Number(exist2.service.price);
                     } else {
@@ -252,7 +253,7 @@ exports.handler = async (event) => {
                     }
                 }
             } else {
-                if(service[i].offerName === "") {
+                if(service[i].offerName === "" || !off) {
                     prices.push(service[i].quantity*Number(exist2.service.price));
                     total_price += service[i].quantity*Number(exist2.service.price);
                 } else {
@@ -406,16 +407,6 @@ exports.handler = async (event) => {
         console.log("slot",slot);
         console.log("SLOT",SLOT);
 
-        if(date.getTime()<=today.getTime()) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Date chosen is not possible'
-                })
-            };
-        }
-
         if(date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) {
             if(slot <= Number(today.getHours())) {
                 return {
@@ -426,6 +417,14 @@ exports.handler = async (event) => {
                     })
                 };
             } 
+        } else if(date.getTime()<=today.getTime()) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Date chosen is not possible'
+                })
+            };
         }
 
         var distance;
@@ -603,11 +602,19 @@ exports.handler = async (event) => {
 
                     for(var i=0;i<service.length;i++){
 
+                        off = false;
+
+                        if(service[i].offerName) {
+                            if(service[i].offerName !== ""){
+                                off = true;
+                            }
+                        }
+
                         params = {
                             TableName: 'Bookings',
                             Item: {
                                 userId: exist1.user.id,
-                                serviceId: service[i].serviceId + ',' + String(timestamp),
+                                serviceId: service[i].serviceId + ',' + String(timestamp) + (off ? "," + service[i].offerName : ""),
                                 barberId: barberId,
                                 Timestamp: timestamp,
                                 user_long: exist1.user.longitude,
@@ -620,7 +627,7 @@ exports.handler = async (event) => {
                                 date: DATE,
                                 slot: SLOT,
                                 quantity: service[i].quantity,
-                                offer: (service[i].offerName !== "" ? true : false)
+                                offer: off
                             }
                         };
 
@@ -628,7 +635,7 @@ exports.handler = async (event) => {
 
                         data1 = await documentClient.put(params).promise();
 
-                        if(service[i].offerName !== "") {
+                        if(off) {
                             params = {
                                 TableName: 'Offers',
                                 Key: {

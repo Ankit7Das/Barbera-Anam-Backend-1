@@ -15,6 +15,9 @@ exports.handler = async (event) => {
         var tokenArray = event.headers.Authorization.split(" ");
         var token = tokenArray[1];
 
+        var temp = serviceId.split("_");
+        serviceId = temp.join(" ");
+
         if(token == null) {
             return {
                 statusCode: 401,
@@ -61,7 +64,9 @@ exports.handler = async (event) => {
             }
         }
 
-        var exist2 = await serviceVerifier(serviceId);
+        var info = serviceId.split(",");
+
+        var exist2 = await serviceVerifier(info[0]);
 
         if(exist2.success == false) {
             return {

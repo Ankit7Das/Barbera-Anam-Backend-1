@@ -4,7 +4,7 @@ Resources:
   BookSlotWise:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/9281215f865cb002539dcade9a55a3c8
+      CodeUri: s3://barbera-buckets/343d7d484ef515c16fe6494e2686564d
       Handler: bookslot.handler
       Runtime: nodejs12.x
       Events:
@@ -17,28 +17,28 @@ Resources:
   InstantBooking:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/9281215f865cb002539dcade9a55a3c8
+      CodeUri: s3://barbera-buckets/343d7d484ef515c16fe6494e2686564d
       Handler: bookinstant.handler
       Runtime: nodejs12.x
       Role: arn:aws:iam::140544830924:role/BackendUser
   ConfirmBooking:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/9281215f865cb002539dcade9a55a3c8
+      CodeUri: s3://barbera-buckets/343d7d484ef515c16fe6494e2686564d
       Handler: bookconfirm.handler
       Runtime: nodejs12.x
       Role: arn:aws:iam::140544830924:role/BackendUser
   RevertBooking:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/9281215f865cb002539dcade9a55a3c8
+      CodeUri: s3://barbera-buckets/343d7d484ef515c16fe6494e2686564d
       Handler: bookrevert.handler
       Runtime: nodejs12.x
       Role: arn:aws:iam::140544830924:role/BackendUser
   CancelBooking:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/9281215f865cb002539dcade9a55a3c8
+      CodeUri: s3://barbera-buckets/343d7d484ef515c16fe6494e2686564d
       Handler: cancelbooking.handler
       Runtime: nodejs12.x
       Events:
@@ -51,7 +51,7 @@ Resources:
   GetBookings:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/9281215f865cb002539dcade9a55a3c8
+      CodeUri: s3://barbera-buckets/343d7d484ef515c16fe6494e2686564d
       Handler: getbookings.handler
       Runtime: nodejs12.x
       Events:
@@ -64,7 +64,7 @@ Resources:
   GetSlotAvailability:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/9281215f865cb002539dcade9a55a3c8
+      CodeUri: s3://barbera-buckets/343d7d484ef515c16fe6494e2686564d
       Handler: slotavailability.handler
       Runtime: nodejs12.x
       Events:
@@ -77,7 +77,7 @@ Resources:
   GetBookingsForBarbers:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/9281215f865cb002539dcade9a55a3c8
+      CodeUri: s3://barbera-buckets/343d7d484ef515c16fe6494e2686564d
       Handler: getbookingsbarb.handler
       Runtime: nodejs12.x
       Events:
@@ -90,7 +90,7 @@ Resources:
   DeleteFullCart:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://barbera-buckets/9281215f865cb002539dcade9a55a3c8
+      CodeUri: s3://barbera-buckets/343d7d484ef515c16fe6494e2686564d
       Handler: deletefullcart.handler
       Runtime: nodejs12.x
       Events:

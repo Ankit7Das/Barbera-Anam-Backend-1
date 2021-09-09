@@ -75,11 +75,15 @@ exports.handler = async (event) => {
             var data = await documentClient.query(params).promise();
 
             var data1;
+            var info;
+
             for(var i=0;i<data.Items.length;i++) {
+                info = data.Items[i].serviceId.split(",");
+
                 params = {
                     TableName: 'Services',
                     Key: {
-                        id: data.Items[i].serviceId,
+                        id: info[0],
                     }
                 }
             
@@ -88,6 +92,7 @@ exports.handler = async (event) => {
                 if(data1.Item) {
                     data.Items[i].category = data1.Item.category;
                     data.Items[i].type = data1.Item.type;
+                    data.Items[i].offerName = (info.length === 2 ? info[1] : "");
                 } else {
                     return {
                         statusCode: 400,

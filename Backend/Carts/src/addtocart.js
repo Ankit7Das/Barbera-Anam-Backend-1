@@ -6,7 +6,7 @@ var sns = new AWS.SNS({apiVersion: '2010-03-31'});
 var documentClient = new AWS.DynamoDB.DocumentClient({ region: 'ap-south-1' });
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
-const { userVerifier, addedBefore, serviceVerifier } = require("./authentication");
+const { userVerifier, addedBefore, serviceVerifier, offerVerifier } = require("./authentication");
 
 
 exports.handler = async (event) => {
@@ -72,24 +72,34 @@ exports.handler = async (event) => {
         var data;
         var cnt = 0;
         var cnt1 = 0;
+        var discount;
+        var info;
 
         for(var i=0;i<serviceId.length;i++) {
-            exist2 = await serviceVerifier(serviceId[i]);
+            info = serviceId[i].split(",");
+
+            exist2 = await serviceVerifier(info[0]);
 
             if(exist2.success == false) {
                 cnt1++;
                 continue;
             }
             
-            exist3 = await addedBefore(userID.id, serviceId[i]);
+            exist3 = await addedBefore(userID.id, info[0]);
 
             if(exist3 == true) {
                 cnt++;
                 continue;
             }
 
+            discount = 0;
+            if(info.length === 2) {
+                exist3 = await offerVerifier(info[0], info[1]);
+                discount = exist3.offer.discount;
+            }
+
             NAME = exist2.data.name;
-            PRICE = exist2.data.price;
+            PRICE = exist2.data.price - discount;
             TIME = exist2.data.time;
             
             params = {
@@ -100,7 +110,7 @@ exports.handler = async (event) => {
                     name: NAME,
                     price: PRICE,
                     quantity: 1,
-                    time: TIME
+                    time: TIME,
                 }
             };
 
