@@ -99,7 +99,7 @@ exports.handler = async (event) => {
             }
 
             NAME = exist2.data.name;
-            PRICE = exist2.data.price - discount;
+            PRICE = exist2.data.price - Math.floor((discount*exist2.data.price)/100);
             TIME = exist2.data.time;
             
             params = {

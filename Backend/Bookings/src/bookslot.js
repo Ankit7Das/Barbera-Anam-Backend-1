@@ -162,6 +162,7 @@ exports.handler = async (event) => {
         var gender = 'male';
         var serviceName = [];
         var off;
+        var p;
 
         var today = new Date();
         today.setHours(today.getHours() + 5);
@@ -227,20 +228,22 @@ exports.handler = async (event) => {
                                     prices.push(service[i].quantity*Number(exist2.service.price));
                                     total_price += service[i].quantity*Number(exist2.service.price);
                                 } else {
-                                    prices.push(service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount));
-                                    total_price += service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount);
+                                    prices.push(service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100)));
+                                    total_price += service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100));
                                 }
                                 flag = true;
+                                p = service[i].quantity*Number(exist2.service.price);
                             } 
                         } else {
                             if(service[i].offerName === "" || !off) {
                                 prices.push(service[i].quantity*Number(exist2.service.price));
                                 total_price += service[i].quantity*Number(exist2.service.price);
                             } else {
-                                prices.push(service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount));
-                                total_price += service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount);
+                                prices.push(service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100)));
+                                total_price += service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100));
                             }
                             flag = true;
+                            p = service[i].quantity*Number(exist2.service.price);
                         }
                     } 
                 } else {
@@ -248,8 +251,8 @@ exports.handler = async (event) => {
                         prices.push(service[i].quantity*Number(exist2.service.price));
                         total_price += service[i].quantity*Number(exist2.service.price);
                     } else {
-                        prices.push(service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount));
-                        total_price += service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount);
+                        prices.push(service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100)));
+                        total_price += service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100));
                     }
                 }
             } else {
@@ -257,8 +260,8 @@ exports.handler = async (event) => {
                     prices.push(service[i].quantity*Number(exist2.service.price));
                     total_price += service[i].quantity*Number(exist2.service.price);
                 } else {
-                    prices.push(service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount));
-                    total_price += service[i].quantity*(Number(exist2.service.price)-exist3.offer.discount);
+                    prices.push(service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100)));
+                    total_price += service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100));
                 }
             }
         
@@ -356,7 +359,7 @@ exports.handler = async (event) => {
         }
 
         if(obj.couponName) {
-            total_price -= discount;
+            total_price -= Math.floor((discount*p)/100);
         }
 
         if(total_price !== obj.totalprice) {

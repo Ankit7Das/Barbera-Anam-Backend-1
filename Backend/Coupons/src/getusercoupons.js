@@ -69,7 +69,7 @@ exports.handler = async (event) => {
             var coupons = [];
 
             for(var i=0; i<data.Items.length; i++) {
-                if(!data.Items[i].used_by.includes(userID.id)) {
+                if(!data.Items[i].used_by.includes(userID.id) && !data.Items[i].invisible) {
                     coupons.push(data.Items[i]);
                 }
             }
