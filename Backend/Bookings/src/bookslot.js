@@ -686,7 +686,9 @@ exports.handler = async (event) => {
     
                             arr.push(phone);
     
-                            arr.push(serviceName[i]);
+                            arr.push(serviceName[i] + (off ? "(" + service[i].offerName + ") (Offer)" : ""));
+
+                            arr.push(total_price);
                         } else {
                             arr.push('');
     
@@ -704,7 +706,9 @@ exports.handler = async (event) => {
     
                             arr.push('');
     
-                            arr.push(serviceName[i]);
+                            arr.push(serviceName[i] + (off ? "(" + service[i].offerName + ") (Offer)" : ""));
+
+                            arr.push(total_price);
                         }
 
                         await googleSheetsInstance.spreadsheets.values.append({
