@@ -284,7 +284,7 @@ exports.handler = async (event) => {
         if(obj.couponName) {
             if(serviceId === 'all') {
                 if(type === 'ref') {
-                    if(total_price - Math.floor((discount*p)/100) !== obj.totalprice) {
+                    if(total_price - Math.floor((discount*total_price)/100) !== obj.totalprice) {
                         return {
                             statusCode: 400,
                             body: JSON.stringify({
@@ -297,7 +297,7 @@ exports.handler = async (event) => {
                     flag = true;
                     
                 } else {
-                    if(total_price - Math.floor((discount*p)/100) !== obj.totalprice) {
+                    if(total_price - Math.floor((discount*total_price)/100) !== obj.totalprice) {
                         return {
                             statusCode: 400,
                             body: JSON.stringify({
