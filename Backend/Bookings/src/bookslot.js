@@ -92,6 +92,7 @@ exports.handler = async (event) => {
 
         var serviceId;
         var discount;
+        var uplim;
         var type;
         var refcoupon = data.Item.couponName
 
@@ -143,6 +144,7 @@ exports.handler = async (event) => {
                     type = 'coupon';
                     serviceId = data.Items[0].serviceId;
                     discount = data.Items[0].discount;
+                    uplim = data.Items[0].upper_price_limit;
                 } catch(err) {
                     return {
                         statusCode: 500,
@@ -298,7 +300,7 @@ exports.handler = async (event) => {
                     flag = true;
                     
                 } else {
-                    if(total_price - Math.floor((discount*p)/100) !== obj.totalprice) {
+                    if(total_price - Math.min(uplim,Math.floor((discount*p)/100)) !== obj.totalprice) {
                         return {
                             statusCode: 400,
                             body: JSON.stringify({
@@ -318,17 +320,17 @@ exports.handler = async (event) => {
                         }
                     }
     
-                    if(data.Items[0].upper_price_limit !== -1) {
-                        if(total_price > data.Items[0].upper_price_limit) {
-                            return {
-                                statusCode: 400,
-                                body: JSON.stringify({
-                                    success: false,
-                                    message: 'Wrong prices sent',
-                                })
-                            }
-                        }
-                    }
+                    // if(data.Items[0].upper_price_limit !== -1) {
+                    //     if(total_price > data.Items[0].upper_price_limit) {
+                    //         return {
+                    //             statusCode: 400,
+                    //             body: JSON.stringify({
+                    //                 success: false,
+                    //                 message: 'Wrong prices sent',
+                    //             })
+                    //         }
+                    //     }
+                    // }
     
                     flag = true;
                 }
@@ -360,7 +362,11 @@ exports.handler = async (event) => {
         }
 
         if(obj.couponName) {
-            total_price -= Math.floor((discount*p)/100);
+            if(type === 'ref'){
+                total_price -= Math.floor((discount*p)/100);
+            }else {
+                total_price -= Math.min(uplim,Math.floor((discount*p)/100));
+            }
         }
 
         if(total_price !== obj.totalprice) {
