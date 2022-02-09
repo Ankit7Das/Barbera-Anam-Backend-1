@@ -269,16 +269,6 @@ exports.handler = async (event) => {
             }
         }
 
-        if(disc_amount < data.Items[0].lower_price_limit){
-            return {
-                statusCode: 400,
-                body: JSON.stringify({
-                    success: false,
-                    message: 'Coupon lower limit is higher',
-                })
-            }
-        }
-
         var coupon;
 
         if(obj.couponName) {
@@ -333,6 +323,14 @@ exports.handler = async (event) => {
                     // }
     
                     flag = true;
+                }
+            }else if(disc_amount < data.Items[0].lower_price_limit){
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({
+                        success: false,
+                        message: 'Coupon lower limit is higher',
+                    })
                 }
             }
     
