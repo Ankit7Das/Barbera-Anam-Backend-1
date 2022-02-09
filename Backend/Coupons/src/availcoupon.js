@@ -140,6 +140,7 @@ exports.handler = async (event) => {
 
                     var flag = false;
                     var total_price = 0;
+                    var disc_amount = 0;
 
                     for(var i=0;i<service.length;i++) {
                         
@@ -149,34 +150,25 @@ exports.handler = async (event) => {
                             break;
                         }
 
-                        if(service[i].serviceId === serviceId) {
-                            if(Number(exist2.service.price)*service[i].quantity >= data.Items[0].lower_price_limit) {
-                                // if(data.Items[0].upper_price_limit !== -1) {
-                                //     if(Number(exist2.service.price) <= data.Items[0].upper_price_limit) {
-                                //         total_price += service[i].quantity*Number(exist2.service.price);
-                                //         flag = true;
-                                //     } else {
-                                //         return {
-                                //             statusCode: 400,
-                                //             body: JSON.stringify({
-                                //                 success: false,
-                                //                 message: 'Coupon upper limit is lower',
-                                //             })
-                                //         }
-                                //     }
-                                // } else {
-                                total_price += service[i].quantity*Number(exist2.service.price);
-                                flag = true;
-                                // }
-                            } else {
-                                return {
-                                    statusCode: 400,
-                                    body: JSON.stringify({
-                                        success: false,
-                                        message: 'Coupon lower limit is higher',
-                                    })
-                                }
-                            }
+                        if(serviceId.includes(service[i].serviceId)) {
+                            // if(data.Items[0].upper_price_limit !== -1) {
+                            //     if(Number(exist2.service.price) <= data.Items[0].upper_price_limit) {
+                            //         total_price += service[i].quantity*Number(exist2.service.price);
+                            //         flag = true;
+                            //     } else {
+                            //         return {
+                            //             statusCode: 400,
+                            //             body: JSON.stringify({
+                            //                 success: false,
+                            //                 message: 'Coupon upper limit is lower',
+                            //             })
+                            //         }
+                            //     }
+                            // } else {
+                            total_price += service[i].quantity*Number(exist2.service.price);
+                            disc_amount += service[i].quantity*Number(exist2.service.price);
+                            flag = true;
+                            // }
                         } else {
                             total_price += service[i].quantity*Number(exist2.service.price);
                         }
@@ -209,6 +201,16 @@ exports.handler = async (event) => {
         
                         flag = true;
                         
+                    }else{
+                        if(disc_amount < data.Items[0].lower_price_limit) {
+                            return {
+                                statusCode: 400,
+                                body: JSON.stringify({
+                                    success: false,
+                                    message: 'Coupon lower limit is higher',
+                                })
+                            }
+                        }
                     }
 
                     if(!flag) {

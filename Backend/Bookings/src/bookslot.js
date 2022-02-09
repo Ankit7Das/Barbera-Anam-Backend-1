@@ -164,7 +164,9 @@ exports.handler = async (event) => {
         var gender = 'male';
         var serviceName = [];
         var off;
-        var p;
+        var p = 0;
+        var d;
+        var disc_amount = 0;
 
         var today = new Date();
         today.setHours(today.getHours() + 5);
@@ -222,32 +224,18 @@ exports.handler = async (event) => {
             }
 
             if(obj.couponName) {
-                if(service[i].serviceId === serviceId) {
-                    if(Number(exist2.service.price)*service[i].quantity >= data.Items[0].lower_price_limit) {
-                        if(data.Items[0].upper_price_limit !== -1) {
-                            if(Number(exist2.service.price) <= data.Items[0].upper_price_limit) {
-                                if(service[i].offerName === "" || !off) {
-                                    prices.push(service[i].quantity*Number(exist2.service.price));
-                                    total_price += service[i].quantity*Number(exist2.service.price);
-                                } else {
-                                    prices.push(service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100)));
-                                    total_price += service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100));
-                                }
-                                flag = true;
-                                p = service[i].quantity*Number(exist2.service.price);
-                            } 
-                        } else {
-                            if(service[i].offerName === "" || !off) {
-                                prices.push(service[i].quantity*Number(exist2.service.price));
-                                total_price += service[i].quantity*Number(exist2.service.price);
-                            } else {
-                                prices.push(service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100)));
-                                total_price += service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100));
-                            }
-                            flag = true;
-                            p = service[i].quantity*Number(exist2.service.price);
-                        }
-                    } 
+                if(serviceId.includes(service[i].serviceId)) {
+                    if(service[i].offerName === "" || !off) {
+                        prices.push(service[i].quantity*Number(exist2.service.price));
+                        total_price += service[i].quantity*Number(exist2.service.price);
+                    } else {
+                        prices.push(service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100)));
+                        total_price += service[i].quantity*(Number(exist2.service.price)-Math.floor((exist3.offer.discount*Number(exist2.service.price))/100));
+                    }
+                    flag = true;
+                    d = service[i].quantity*Number(exist2.service.price);
+                    disc_amount += d;
+                    p += Math.floor((discount*d)/100);
                 } else {
                     if(service[i].offerName === "" || !off) {
                         prices.push(service[i].quantity*Number(exist2.service.price));
@@ -281,13 +269,24 @@ exports.handler = async (event) => {
             }
         }
 
+        if(disc_amount < data.Items[0].lower_price_limit){
+            return {
+                statusCode: 400,
+                body: JSON.stringify({
+                    success: false,
+                    message: 'Coupon lower limit is higher',
+                })
+            }
+        }
+
         var coupon;
 
         if(obj.couponName) {
             if(serviceId === 'all') {
-                p = total_price
+                d = total_price;
                 if(type === 'ref') {
-                    if(total_price - Math.floor((discount*p)/100) !== obj.totalprice) {
+                    p += Math.floor((discount*d)/100);
+                    if(total_price - p !== obj.totalprice) {
                         return {
                             statusCode: 400,
                             body: JSON.stringify({
@@ -300,7 +299,8 @@ exports.handler = async (event) => {
                     flag = true;
                     
                 } else {
-                    if(total_price - Math.min(uplim,Math.floor((discount*p)/100)) !== obj.totalprice) {
+                    p += Math.floor((discount*d)/100);
+                    if(total_price - Math.min(p,uplim) !== obj.totalprice) {
                         return {
                             statusCode: 400,
                             body: JSON.stringify({
@@ -315,7 +315,7 @@ exports.handler = async (event) => {
                             statusCode: 400,
                             body: JSON.stringify({
                                 success: false,
-                                message: 'Wrong prices sent',
+                                message: 'Coupon lower limit is higher',
                             })
                         }
                     }
@@ -363,9 +363,9 @@ exports.handler = async (event) => {
 
         if(obj.couponName) {
             if(type === 'ref'){
-                total_price -= Math.floor((discount*p)/100);
+                total_price -= p;
             }else {
-                total_price -= Math.min(uplim,Math.floor((discount*p)/100));
+                total_price -= Math.min(uplim,p);
             }
         }
 

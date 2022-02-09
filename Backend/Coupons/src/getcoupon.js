@@ -98,50 +98,53 @@ exports.handler = async (event) => {
             if(serviceId !== 'all') {
 
                 console.log(serviceId, data.Item);
+                var serviceIds = serviceId.split(",");
 
-                params = {
-                    TableName: 'Services',
-                    Key:{
-                        id: data.Item.serviceId
+                for(var i=0;i<serviceIds.length;i++) {
+                    params = {
+                        TableName: 'Services',
+                        Key:{
+                            id: serviceIds[i]
+                        }
+                    }
+        
+                    try {
+                        data1 = await documentClient.get(params).promise();
+        
+                        data.Item.service[i] = data1.Item;
+        
+                        console.log(data.Item);
+                        
+                        return {
+                            statusCode: 200,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: true,
+                                message: 'Coupon found',
+                                data: data.Item
+                            })
+                        } 
+                    } catch(err) {
+                        return {
+                            statusCode: 500,
+                            headers: {
+                                "Access-Control-Allow-Headers" : "Content-Type",
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                            },
+                            body: JSON.stringify({
+                                success: false,
+                                message: err,
+                            })
+                        }
                     }
                 }
-    
-                try {
-                    data1 = await documentClient.get(params).promise();
-    
-                    data.Item.service = data1.Item;
-    
-                    delete data.Item.serviceId;
-    
-                    console.log(data.Item);
-                    
-                    return {
-                        statusCode: 200,
-                        headers: {
-                            "Access-Control-Allow-Headers" : "Content-Type",
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                        },
-                        body: JSON.stringify({
-                            success: true,
-                            message: 'Coupon found',
-                            data: data.Item
-                        })
-                    } 
-                } catch(err) {
-                    return {
-                        statusCode: 500,
-                        headers: {
-                            "Access-Control-Allow-Headers" : "Content-Type",
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                        },
-                        body: JSON.stringify({
-                            success: false,
-                            message: err,
-                        })
-                    }
-                }
+
+                delete data.Item.serviceId;
             } else {
 
                 console.log("data: ",data.Item);
